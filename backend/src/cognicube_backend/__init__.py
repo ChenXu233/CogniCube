@@ -19,3 +19,11 @@ async def root():
 APP.include_router(auth)
 APP.include_router(signup)
 APP.include_router(ai)
+
+@APP.on_event("shutdown")
+async def shutdown_event():
+    """应用关闭时，清理全局 aiohttp session"""
+    global SESSION
+    if SESSION is not None:
+        await SESSION.close()
+        SESSION = None  # 释放全局 session

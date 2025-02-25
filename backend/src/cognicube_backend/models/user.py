@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session, mapped_column, Mapped
 from cognicube_backend.databases.database import Base
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
 class User(Base):
     """数据库中的User模型"""
 
