@@ -3,16 +3,14 @@ from sqlalchemy.orm import Session
 import datetime
 
 from cognicube_backend.databases.database import get_db
-from cognicube_backend.models.user import (
-    User,
-    Conversation,
-)
-from cognicube_backend.services.ai_chat import ai_chat_api, create_conversation_record
+from cognicube_backend.models.user import User
+from cognicube_backend.models.conversation import Conversation
+from cognicube_backend.utils.get_ai_session import ai_chat_api
+from cognicube_backend.services.ai_chat import create_conversation_record
 from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 from cognicube_backend.schemas.conversation import (
     ConversationRequest,
     ConversationResponse,
-    ConversationHistoryResponse,
 )
 
 ai = APIRouter(prefix="/apis/v1/ai")
@@ -29,10 +27,10 @@ async def create_conversation(
         raise HTTPException(status_code=404, detail="用户不存在")
 
     ai_response = await ai_chat_api(message.message)
-    create_conversation_record(db, user_id, message.message, ai_response)
+    await create_conversation_record(db, user_id, message.message, ai_response)
     return {"reply": ai_response}
 
-@ai.get("/history", response_model=ConversationHistoryResponse)
+@ai.get("/history")
 async def get_conversation_history(
     token: str = Query(..., description="用户的JWT访问令牌"),
     start_time: int = Query(..., description="起始时间戳（包含）"),
@@ -45,24 +43,24 @@ async def get_conversation_history(
         raise HTTPException(status_code=404, detail="用户不存在")
 
     # 将时间戳转换为 datetime 对象
-    start_datetime = datetime.fromtimestamp(start_time)
-    end_datetime = datetime.fromtimestamp(end_time)
+    start_datetime = datetime.datetime.fromtimestamp(start_time)
+    end_datetime = datetime.datetime.fromtimestamp(end_time)
 
     # 查询符合时间范围的对话记录
     conversations = (
         db.query(Conversation)
         .filter(
             Conversation.user_id == user_id,
-            Conversation.timestamp >= start_datetime,
-            Conversation.timestamp <= end_datetime,
+            Conversation.time >= start_datetime,
+            Conversation.time <= end_datetime,
         )
-        .order_by(Conversation.timestamp)
+        .order_by(Conversation.time)
         .all()
     )
 
     # 构造返回数据
     history = [
-        {"message": convo.message, "timestamp": int(convo.timestamp.timestamp())}
+        {"message": convo.message, "timestamp": int(convo.time.timestamp())}
         for convo in conversations
     ]
     
