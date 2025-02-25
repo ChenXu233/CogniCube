@@ -21,8 +21,12 @@ class ChatScreen extends StatelessWidget {
             child: ListView.builder(
               reverse: true,
               padding: const EdgeInsets.only(top: 16),
-              itemCount: viewModel.messages.length,
+              controller: viewModel.scrollController,
+              itemCount: viewModel.messages.length + 1, // +1 是为了加载更多提示
               itemBuilder: (context, index) {
+                if (index == viewModel.messages.length) {
+                  return _buildLoadMoreHint(viewModel);
+                }
                 final message = viewModel.messages.reversed.toList()[index];
                 return MessageBubble(message: message);
               },
@@ -30,6 +34,21 @@ class ChatScreen extends StatelessWidget {
           ),
           _buildInputArea(context),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLoadMoreHint(ChatViewModel viewModel) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          viewModel.isLoadingMore ? 'Loading more messages...' : 'No more messages',
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 12,
+          ),
+        ),
       ),
     );
   }
@@ -43,25 +62,38 @@ class ChatScreen extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: TextField(
-                controller: viewModel.messageController,
-                decoration: InputDecoration(
-                  hintText: 'Type your message...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
+              child: Focus(
+                onFocusChange: (hasFocus) {
+                  if (hasFocus) {
+                    // 当输入框聚焦时，滚动到最新消息
+                    viewModel.scrollToBottom();
+                  }
+                },
+                child: TextField(
+                  controller: viewModel.messageController,
+                  decoration: InputDecoration(
+                    hintText: 'Type a message...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                  onChanged: (text) {
+                    viewModel.updateSendButtonState(text.trim().isNotEmpty);
+                  },
+                  onSubmitted: (text) {
+                    _sendMessage(context, text);
+                  },
+                  autofocus: true, // 自动聚焦
                 ),
-                onSubmitted: (text) {
-                _sendMessage(context, text);
-                viewModel.messageController.clear(); // 新增清空操作
-              },
               ),
             ),
             IconButton(
               icon: const Icon(Icons.send_rounded),
               color: Colors.blue,
-              onPressed: () => _sendMessage(context, viewModel.messageController.text),
+              onPressed: viewModel.isSendButtonEnabled
+                  ? () => _sendMessage(context, viewModel.messageController.text)
+                  : null, // 禁用发送按钮
             ),
           ],
         ),

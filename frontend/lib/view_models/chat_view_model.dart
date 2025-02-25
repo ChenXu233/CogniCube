@@ -2,59 +2,63 @@ import 'package:flutter/material.dart';
 import '../models/message_model.dart';
 import '../services/chat.dart';
 
-class ChatViewModel with ChangeNotifier {
-  final List<Message> _messages = [];
+class ChatViewModel extends ChangeNotifier {
   final TextEditingController messageController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
+  bool isSendButtonEnabled = false;
+  bool isLoadingMore = false;
+  List<Message> messages = [];
 
-  List<Message> get messages => _messages;
-
-  Future<void> sendMessage(String text) async {
-    if (text.isEmpty) return;
-
-    final userMessage = Message(
-      text: text,
-      type: MessageType.user,
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-    );
-    _messages.add(userMessage);
+  void updateSendButtonState(bool isEnabled) {
+    isSendButtonEnabled = isEnabled;
     notifyListeners();
+  }
 
-    String? loadingId;
+  void scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
+  void sendMessage(String text) async {
+    if (text.trim().isEmpty) return;
+
+    // 添加用户消息
+    messages.add(Message(text: text, type: MessageType.user));
+    notifyListeners();
+    scrollToBottom();
+
+    // 添加加载状态
+    messages.add(Message(text: '', type: MessageType.loading));
+    notifyListeners();
+    scrollToBottom();
+
     try {
-      loadingId = _addLoadingMessage();
+      // 获取 AI 响应
       final aiResponse = await ApiService.getAIResponse(text);
-      
-      _removeMessage(loadingId);
-      _addAIMessage(aiResponse);
+      messages.removeLast(); // 移除加载状态
+      messages.add(Message(text: aiResponse, type: MessageType.ai));
+      notifyListeners();
+      scrollToBottom();
     } catch (e) {
-      _removeMessage(loadingId);
-      _addAIMessage("Error: ${e.toString()}");
+      messages.removeLast(); // 移除加载状态
+      messages.add(Message(text: 'Error: $e', type: MessageType.ai));
+      notifyListeners();
+      scrollToBottom();
     }
+
+    messageController.clear();
+    updateSendButtonState(false); // 清空输入框后禁用发送按钮
   }
 
-  String _addLoadingMessage() {
-    final loadingMessage = Message(
-      text: "Thinking...",
-      type: MessageType.loading,
-      id: "loading_${DateTime.now().millisecondsSinceEpoch}",
-    );
-    _messages.add(loadingMessage);
-    notifyListeners();
-    return loadingMessage.id!;
-  }
-
-  void _addAIMessage(String text) {
-    _messages.add(Message(
-      text: text,
-      type: MessageType.ai,
-      id: "ai_${DateTime.now().millisecondsSinceEpoch}",
-    ));
-    notifyListeners();
-  }
-
-  void _removeMessage(String? id) {
-    if (id == null) return;
-    _messages.removeWhere((m) => m.id == id);
-    notifyListeners();
+   @override
+  void dispose() {
+    messageController.dispose();
+    scrollController.dispose(); // 确保释放 ScrollController
+    super.dispose();
   }
 }

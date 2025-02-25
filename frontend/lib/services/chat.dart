@@ -5,8 +5,8 @@ import '../utils/constants.dart';
 
 class ApiService {
   static Future<String> getAIResponse(String message) async {
-    await Future.delayed(const Duration(seconds: 1)); // Simulated delay
-    
+    await Future.delayed(const Duration(seconds: 1)); // 模拟延迟
+
     if (Constants.useMockResponses) {
       return "Mock AI Response to: $message";
     }
