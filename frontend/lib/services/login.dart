@@ -2,26 +2,26 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static Future<String> getAIResponse(String message) async {
-    await Future.delayed(const Duration(seconds: 1)); // 模拟延迟
-
-    if (Constants.useMockResponses) {
-      return "Mock AI Response to: $message";
-    }
-
+  static Future<String> getLoginResponse(String username, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('${Constants.backendUrl}/conversation'),
+        Uri.parse('${Constants.backendUrl}/login'),
         headers: {
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({'message': message}),
+        body: jsonEncode({
+          'username': username,
+          'password': password,
+        }),
       ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("token", data['token']);
         return data['response'] ?? "No response";
       }
       throw "API Error: ${response.statusCode}";
