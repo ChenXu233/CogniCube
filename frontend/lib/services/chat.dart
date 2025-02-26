@@ -23,8 +23,7 @@ class ChatApiService {
       ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print(data);
+        final data = jsonDecode(utf8.decode(latin1.encode(response.body)));
         return data['reply'] ?? "No response";
       }
       throw "API Error: ${response.statusCode}";
