@@ -193,7 +193,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       if (authVM.isAuthenticated && mounted) {
         Navigator.pushNamedAndRemoveUntil(
           context,
-          '/chat',
+          '/login',
           (route) => false,
         );
       }

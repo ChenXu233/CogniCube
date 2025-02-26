@@ -3,26 +3,30 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
 
-class ChatApiService {
-  static Future<String> getAIResponse(String message) async {
-    await Future.delayed(const Duration(seconds: 1)); // 模拟延迟
-
-    if (Constants.useMockResponses) {
-      return "Mock AI Response to: $message";
-    }
-
+class RegisterApiService {
+  static Future<String> getRegisternResponse(
+    String username,
+    String password,
+    String email,
+  ) async {
     try {
       final response = await http.post(
-        Uri.parse('${Constants.backendUrl}/conversation'),
+        Uri.parse('${Constants.backendUrl}/apis/v1/auth/register'),
         headers: {
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({'message': message}),
+        body: jsonEncode({
+          'email': email,
+          'username': username,
+          'password': password,
+        }),
       ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['response'] ?? "No response";
+        // Extract the String field from the response (e.g., 'message' or 'token')
+        final result = data['message'] as String?;
+        return result ?? "No message in response";
       }
       throw "API Error: ${response.statusCode}";
     } on TimeoutException {

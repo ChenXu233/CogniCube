@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ApiService {
+class LoginApiService {
   static Future<String> getLoginResponse(String username, String password) async {
     try {
       final response = await http.post(

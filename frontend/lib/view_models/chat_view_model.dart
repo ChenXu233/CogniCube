@@ -39,7 +39,7 @@ class ChatViewModel extends ChangeNotifier {
 
     try {
       // 获取 AI 响应
-      final aiResponse = await ApiService.getAIResponse(text);
+      final aiResponse = await ChatApiService.getAIResponse(text);
       messages.removeLast(); // 移除加载状态
       messages.add(Message(text: aiResponse, type: MessageType.ai));
       notifyListeners();

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/register.dart';
 
 class AuthViewModel with ChangeNotifier {
   final SharedPreferences prefs;
@@ -34,9 +35,8 @@ class AuthViewModel with ChangeNotifier {
 
       await Future.delayed(const Duration(seconds: 1));
 
-      await prefs.setString('auth_token', 'fake_jwt_token');
-      await prefs.setString('user_email', email);
-      
+      RegisterApiService.getRegisternResponse(username, password, email);
+    
       _isAuthenticated = true;
       _errorMessage = null;
     } catch (e) {
