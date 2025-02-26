@@ -2,23 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_view_model.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class RegistrationScreen extends StatelessWidget {
+  const RegistrationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
+    final usernameController = TextEditingController();
     final _formKey = GlobalKey<FormState>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('登录')),
+      appBar: AppBar(title: const Text('注册')),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
+              TextFormField(
+                controller: usernameController,
+                decoration: const InputDecoration(labelText: '用户名'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '请输入用户名';
+                  }
+                  return null;
+                },
+              ),
               TextFormField(
                 controller: emailController,
                 decoration: const InputDecoration(labelText: '邮箱'),
@@ -34,8 +45,8 @@ class LoginScreen extends StatelessWidget {
                 obscureText: true,
                 decoration: const InputDecoration(labelText: '密码'),
                 validator: (value) {
-                  if (value == null || value.length < 6) {
-                    return '密码至少6位';
+                  if (value == null || value.length < 8) {
+                    return '密码至少8位';
                   }
                   return null;
                 },
@@ -47,14 +58,14 @@ class LoginScreen extends StatelessWidget {
                     return const CircularProgressIndicator();
                   }
                   return ElevatedButton(
-                    onPressed: () => _login(context, emailController.text, passwordController.text, _formKey),
-                    child: const Text('登录'),
+                    onPressed: () => _register(context, usernameController.text, emailController.text, passwordController.text, _formKey),
+                    child: const Text('注册'),
                   );
                 }
               ),
               TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/register'),
-                child: const Text('没有账号？立即注册'),
+                onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+                child: const Text('已有账号？去登录'),
               ),
               Consumer<AuthViewModel>(
                 builder: (ctx, authVM, _) {
@@ -77,19 +88,19 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void _login(BuildContext context, String email, String password, GlobalKey<FormState> formKey) async {
+  void _register(BuildContext context, String username, String email, String password, GlobalKey<FormState> formKey) async {
     if (!formKey.currentState!.validate()) return;
 
     final authVM = Provider.of<AuthViewModel>(context, listen: false);
     try {
-      await authVM.login(email, password);
+      await authVM.register(username, email, password);
       if (authVM.isAuthenticated) {
         Navigator.pushNamedAndRemoveUntil(context, '/chat', (route) => false);
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('登录失败: ${e.toString()}')),
+          SnackBar(content: Text('注册失败: ${e.toString()}')),
         );
       }
     }

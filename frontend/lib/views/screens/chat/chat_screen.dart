@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/chat_view_model.dart';
+import '../../../view_models/auth_view_model.dart'; // 新增
 import '../../../views/components/message_bubble.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -8,12 +9,18 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<ChatViewModel>();
+    final chatVM = context.watch<ChatViewModel>();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('AI Chat'),
         elevation: 1,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _logout(context),
+          )
+        ],
       ),
       body: Column(
         children: [
@@ -21,13 +28,13 @@ class ChatScreen extends StatelessWidget {
             child: ListView.builder(
               reverse: true,
               padding: const EdgeInsets.only(top: 16),
-              controller: viewModel.scrollController,
-              itemCount: viewModel.messages.length + 1, // +1 是为了加载更多提示
+              controller: chatVM.scrollController,
+              itemCount: chatVM.messages.length + 1,
               itemBuilder: (context, index) {
-                if (index == viewModel.messages.length) {
-                  return _buildLoadMoreHint(viewModel);
+                if (index == chatVM.messages.length) {
+                  return _buildLoadMoreHint(chatVM);
                 }
-                final message = viewModel.messages.reversed.toList()[index];
+                final message = chatVM.messages.reversed.toList()[index];
                 return MessageBubble(message: message);
               },
             ),
@@ -38,6 +45,10 @@ class ChatScreen extends StatelessWidget {
     );
   }
 
+  void _logout(BuildContext context) {
+    Provider.of<AuthViewModel>(context, listen: false).logout();
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  }
   Widget _buildLoadMoreHint(ChatViewModel viewModel) {
     return Center(
       child: Padding(

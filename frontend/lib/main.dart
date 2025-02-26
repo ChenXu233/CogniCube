@@ -9,11 +9,11 @@ import 'view_models/chat_view_model.dart';
 // Screens
 import 'views/screens/chat/chat_screen.dart';
 import 'views/screens/auth/login_screen.dart';
+import 'views/screens/auth/registration_screen.dart'; // 新增注册页导入
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 预加载SharedPreferences
   final prefs = await SharedPreferences.getInstance();
   
   runApp(
@@ -35,16 +35,29 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'AI Chat',
       theme: _buildTheme(),
-      home: Consumer<AuthViewModel>(
-        builder: (ctx, authVM, _) {
-          return authVM.isAuthenticated 
-              ? const ChatScreen() 
-              : const LoginScreen();
-        }
-      ),
+      initialRoute: '/',
       routes: {
+        '/': (ctx) => Consumer<AuthViewModel>(
+          builder: (ctx, authVM, _) => authVM.isAuthenticated 
+              ? const ChatScreen() 
+              : const LoginScreen()
+        ),
         '/login': (ctx) => const LoginScreen(),
+        '/register': (ctx) => const RegistrationScreen(),
         '/chat': (ctx) => const ChatScreen(),
+      },
+      onGenerateRoute: (settings) {
+        // 路由守卫：未认证用户访问/chat时跳转登录
+        if (settings.name == '/chat') {
+          return MaterialPageRoute(
+            builder: (_) => Consumer<AuthViewModel>(
+              builder: (ctx, authVM, _) => authVM.isAuthenticated 
+                  ? const ChatScreen()
+                  : const LoginScreen()
+            )
+          );
+        }
+        return null;
       },
       debugShowCheckedModeBanner: false,
     );
