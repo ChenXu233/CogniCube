@@ -10,7 +10,6 @@ from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 from cognicube_backend.schemas.conversation import (
     ConversationRequest,
     ConversationResponse,
-    ConversationHistoryResponse,
 )
 
 ai = APIRouter(prefix="/apis/v1/ai")
