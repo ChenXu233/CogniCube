@@ -20,62 +20,73 @@ class AuthViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  // 注册方法
-  Future<void> register(String username, String email, String password) async {
-    if (username.isEmpty || email.isEmpty || password.isEmpty) {
-      _errorMessage = '请填写所有字段';
-      notifyListeners();
-      return;
-    }
-
-    _isLoading = true;
+  void clearError() {
+    _errorMessage = null;
     notifyListeners();
+  }
 
+  Future<void> register(String username, String email, String password) async {
     try {
-      await Future.delayed(const Duration(seconds: 1)); // 模拟API调用
+      _validateRegistrationFields(username, email, password);
+      
+      _isLoading = true;
+      notifyListeners();
 
-      // 模拟注册成功逻辑
+      await Future.delayed(const Duration(seconds: 1));
+
       await prefs.setString('auth_token', 'fake_jwt_token');
+      await prefs.setString('user_email', email);
+      
       _isAuthenticated = true;
       _errorMessage = null;
     } catch (e) {
-      _errorMessage = '注册失败: ${e.toString()}';
+      _errorMessage = e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  // 已有登录方法
+  void _validateRegistrationFields(String username, String email, String password) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d).{8,}$');
+
+    if (username.trim().isEmpty) throw '用户名不能为空';
+    if (username.trim().length < 3) throw '用户名至少需要3个字符';
+    if (!emailRegex.hasMatch(email)) throw '请输入有效的邮箱地址';
+    if (!passwordRegex.hasMatch(password)) throw '密码需至少8位且包含字母和数字';
+  }
+
   Future<void> login(String email, String password) async {
-    if (email.isEmpty || password.isEmpty) {
-      _errorMessage = '请填写所有字段';
-      notifyListeners();
-      return;
-    }
-
-    _isLoading = true;
-    notifyListeners();
-
     try {
-      await Future.delayed(const Duration(seconds: 1)); // 模拟API调用
+      _validateLoginFields(email, password);
+      
+      _isLoading = true;
+      notifyListeners();
 
-      if (email == 'test@example.com' && password == 'password') {
-        await prefs.setString('auth_token', 'fake_jwt_token');
-        _isAuthenticated = true;
-        _errorMessage = null;
-      } else {
-        _errorMessage = '邮箱或密码错误';
-      }
+      await Future.delayed(const Duration(seconds: 1));
+
+      if (password.length < 8) throw '密码至少需要8位';
+      
+      await prefs.setString('auth_token', 'fake_jwt_token');
+      
+      _isAuthenticated = true;
+      _errorMessage = null;
     } catch (e) {
-      _errorMessage = '登录失败: ${e.toString()}';
+      _errorMessage = e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  // 登出方法
+  void _validateLoginFields(String email, String password) {
+    if (email.isEmpty || password.isEmpty) throw '请填写所有字段';
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
+      throw '邮箱格式不正确';
+    }
+  }
+
   Future<void> logout() async {
     await prefs.remove('auth_token');
     _isAuthenticated = false;
