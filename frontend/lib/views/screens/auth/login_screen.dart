@@ -58,8 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       validator: (value) {
-        return null;
-      
         // if (value == null || value.isEmpty) return '请输入邮箱';
         // if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
         //   return '邮箱格式不正确';

@@ -26,7 +26,7 @@ async def create_conversation(
         raise HTTPException(status_code=404, detail="用户不存在")
 
     ai_response = await ai_chat_api(message.message)
-    await create_conversation_record(db, user_id, message.message, ai_response)
+    await create_conversation_record(db, user_id, message.message)
     return {"reply": ai_response}
 
 @ai.get("/history")

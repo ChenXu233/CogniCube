@@ -15,7 +15,7 @@ class ChatApiService {
 
     try {
       final response = await http.post(
-        Uri.parse('${Constants.backendUrl}/ai/conversation?token=$token'),
+        Uri.parse('${Constants.backendUrl}/ai/conversation?token=${token}'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -23,7 +23,7 @@ class ChatApiService {
       ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(utf8.decode(latin1.encode(response.body)));
         print(data);
         return data['reply'] ?? "No response";
       }
