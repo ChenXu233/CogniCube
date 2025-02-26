@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/register.dart';
+import '../services/login.dart';
 
 class AuthViewModel with ChangeNotifier {
   final SharedPreferences prefs;
@@ -48,13 +49,13 @@ class AuthViewModel with ChangeNotifier {
   }
 
   void _validateRegistrationFields(String username, String email, String password) {
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d).{8,}$');
+    // final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    // final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d).{8,}$');
 
-    if (username.trim().isEmpty) throw '用户名不能为空';
-    if (username.trim().length < 3) throw '用户名至少需要3个字符';
-    if (!emailRegex.hasMatch(email)) throw '请输入有效的邮箱地址';
-    if (!passwordRegex.hasMatch(password)) throw '密码需至少8位且包含字母和数字';
+    // if (username.trim().isEmpty) throw '用户名不能为空';
+    // if (username.trim().length < 3) throw '用户名至少需要3个字符';
+    // if (!emailRegex.hasMatch(email)) throw '请输入有效的邮箱地址';
+    // if (!passwordRegex.hasMatch(password)) throw '密码需至少8位且包含字母和数字';
   }
 
   Future<void> login(String email, String password) async {
@@ -68,7 +69,7 @@ class AuthViewModel with ChangeNotifier {
 
       if (password.length < 8) throw '密码至少需要8位';
       
-      await prefs.setString('auth_token', 'fake_jwt_token');
+      await LoginApiService.getLoginResponse(email, password);
       
       _isAuthenticated = true;
       _errorMessage = null;
@@ -81,10 +82,10 @@ class AuthViewModel with ChangeNotifier {
   }
 
   void _validateLoginFields(String email, String password) {
-    if (email.isEmpty || password.isEmpty) throw '请填写所有字段';
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
-      throw '邮箱格式不正确';
-    }
+    // if (email.isEmpty || password.isEmpty) throw '请填写所有字段';
+    // if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
+    //   throw '邮箱格式不正确';
+    // }
   }
 
   Future<void> logout() async {

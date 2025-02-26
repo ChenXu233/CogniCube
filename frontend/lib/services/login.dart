@@ -6,9 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginApiService {
   static Future<String> getLoginResponse(String username, String password) async {
+    print('${Constants.backendUrl}/auth/login');
     try {
       final response = await http.post(
-        Uri.parse('${Constants.backendUrl}/login'),
+        Uri.parse('${Constants.backendUrl}/auth/login'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -21,7 +22,7 @@ class LoginApiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("token", data['token']);
+        await prefs.setString("token", data['access_token']);
         return data['response'] ?? "No response";
       }
       throw "API Error: ${response.statusCode}";

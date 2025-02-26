@@ -11,7 +11,7 @@ class RegisterApiService {
   ) async {
     try {
       final response = await http.post(
-        Uri.parse('${Constants.backendUrl}/apis/v1/auth/register'),
+        Uri.parse('${Constants.backendUrl}/auth/register'),
         headers: {
           'Content-Type': 'application/json',
         },
