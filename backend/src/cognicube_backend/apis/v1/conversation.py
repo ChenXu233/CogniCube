@@ -5,8 +5,7 @@ import datetime
 from cognicube_backend.databases.database import get_db
 from cognicube_backend.models.user import User
 from cognicube_backend.models.conversation import Conversation
-from cognicube_backend.utils.get_ai_session import ai_chat_api
-from cognicube_backend.services.ai_chat import create_conversation_record
+from cognicube_backend.services.ai_service import create_conversation_record,ai_chat_api
 from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 from cognicube_backend.schemas.conversation import (
     ConversationRequest,
@@ -27,7 +26,7 @@ async def create_conversation(
         raise HTTPException(status_code=404, detail="用户不存在")
 
     ai_response = await ai_chat_api(message.message)
-    await create_conversation_record(db, user_id, message.message, ai_response)
+    await create_conversation_record(db, user_id, message.message)
     return {"reply": ai_response}
 
 @ai.get("/history")
