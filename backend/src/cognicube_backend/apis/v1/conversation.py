@@ -4,10 +4,9 @@ import datetime
 
 from cognicube_backend.databases.database import get_db
 from cognicube_backend.models.user import User
-from cognicube_backend.models.conversation import Conversation
+from cognicube_backend.models.conversation import Conversation, Who
 from cognicube_backend.services.ai_service import (
-    ai_chat_api,
-    create_conversation_record,
+    AIChatService,
 )
 from cognicube_backend.schemas.message import Message
 from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
@@ -21,16 +20,21 @@ ai = APIRouter(prefix="/apis/v1/ai")
 
 @ai.post("/conversation", response_model=ConversationResponse)
 async def create_conversation(
-    message: Message = Depends(ConversationRequest),
     user_id: int = Depends(get_jwt_token_user_id),
+    text: ConversationRequest = Depends(ConversationRequest),
     db: Session = Depends(get_db),
-):
+): 
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="用户不存在")
+    
+    _message = Message(text=text.text, who='USER')
 
-    ai_response = await ai_chat_api(message.essagem)
-    await create_conversation_record(db, user_id, message.message, ai_response)
+    ai_service = AIChatService(db)
+    await ai_service.save_message_record(user_id, _message)
+    ai_response = await ai_service.chat(user_id, text.text)
+    ai_response_text:str = ai_response.choices[0].message.content # type: ignore
+    await ai_service.save_ai_message_record(user_id=user_id, text=ai_response_text)
     return {"reply": ai_response}
 
 @ai.get("/history")

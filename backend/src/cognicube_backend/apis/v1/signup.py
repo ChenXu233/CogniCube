@@ -81,4 +81,4 @@ async def verify_email(token: str, db: Session = Depends(get_db)):
     db_user.verification_token_expiry = None  # 将token过期时间移除
     db.commit()
 
-    return {"message": "Email verified successfully", "username": db_user.username}
+    return {"message": "Email verified successfully，you can close this page and login now", "username": db_user.username}

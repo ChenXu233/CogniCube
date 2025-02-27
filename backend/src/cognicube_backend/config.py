@@ -15,6 +15,7 @@ class Setting(BaseSettings):
     JWT_SECRET_KEY: str = "secret"
     AI_API_URL: str
     AI_API_KEY: str
+    AI_PROMPT: str
 
     class Config:
         """读取配置文件"""
