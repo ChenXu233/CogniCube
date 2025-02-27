@@ -1,11 +1,12 @@
 from pydantic import BaseModel
 from typing import List
 
-class ConversationHistoryItem(BaseModel):
-    message: str
-    reply: str
+class Message(BaseModel):
+    text: str
+    reply_to: str
     timestamp: int
-
+    who: str
+    message_id: int
 
 class ConversationHistoryResponse(BaseModel):
-    history: List[ConversationHistoryItem]
+    history: List[Message]
