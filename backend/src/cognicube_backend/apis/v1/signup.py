@@ -25,7 +25,7 @@ async def signup_user(
 
     # 生成用户验证token，并在5分钟后过期
     verfication_token = str(uuid.uuid4())
-    token_expiry = datetime.now(UTC) + timedelta(minutes=5)
+    token_expiry = datetime.now(UTC) + timedelta(minutes=60)
 
     if not db_user:
         # 创建用户
