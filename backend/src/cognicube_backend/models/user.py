@@ -58,7 +58,11 @@ def create_user(
         verification_token=verification_token,
         verification_token_expiry=token_expiry,
     )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+    try:
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    except Exception as e:
+        db.rollback()
+        raise e
     return user
