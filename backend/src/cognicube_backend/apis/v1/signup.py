@@ -4,10 +4,14 @@ from datetime import datetime, timedelta, UTC, timezone
 from fastapi import APIRouter, HTTPException, Depends, Request
 from sqlalchemy.orm import Session
 
+from fastapi.responses import HTMLResponse
+
 from cognicube_backend.schemas.user import UserCreate
 from cognicube_backend.services.email_service import send_verification_email
 from cognicube_backend.databases.database import get_db
 from cognicube_backend.models.user import User, create_user
+from cognicube_backend.utils.create_html_page import generate_html_page
+
 
 signup = APIRouter(prefix="/apis/v1/auth")
 
@@ -81,4 +85,5 @@ async def verify_email(token: str, db: Session = Depends(get_db)):
     db_user.verification_token_expiry = None  # 将token过期时间移除
     db.commit()
 
-    return {"message": "Email verified successfully", "username": db_user.username}
+    html_page = generate_html_page(db_user.username)
+    return HTMLResponse(content=html_page, status_code=200)
