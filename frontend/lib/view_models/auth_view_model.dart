@@ -58,9 +58,9 @@ class AuthViewModel with ChangeNotifier {
     // if (!passwordRegex.hasMatch(password)) throw '密码需至少8位且包含字母和数字';
   }
 
-  Future<void> login(String email, String password) async {
+   Future<void> login(String username, String password) async { // 参数改为username
     try {
-      _validateLoginFields(email, password);
+      _validateLoginFields(username, password); // 修改验证方法
       
       _isLoading = true;
       notifyListeners();
@@ -69,7 +69,7 @@ class AuthViewModel with ChangeNotifier {
 
       if (password.length < 8) throw '密码至少需要8位';
       
-      await LoginApiService.getLoginResponse(email, password);
+      await LoginApiService.getLoginResponse(username, password); // 传递username
       
       _isAuthenticated = true;
       _errorMessage = null;
@@ -81,11 +81,8 @@ class AuthViewModel with ChangeNotifier {
     }
   }
 
-  void _validateLoginFields(String email, String password) {
-    // if (email.isEmpty || password.isEmpty) throw '请填写所有字段';
-    // if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
-    //   throw '邮箱格式不正确';
-    // }
+  void _validateLoginFields(String username, String password) { // 改为username验证
+    if (username.isEmpty || password.isEmpty) throw '请填写所有字段';
   }
 
   Future<void> logout() async {

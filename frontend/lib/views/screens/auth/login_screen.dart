@@ -11,13 +11,13 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController(); // 改为username
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose(); // 改为username
     _passwordController.dispose();
     super.dispose();
   }
@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildEmailField(),
+              _buildUsernameField(), // 改为用户名输入框
               const SizedBox(height: 20),
               _buildPasswordField(),
               const SizedBox(height: 25),
@@ -47,22 +47,18 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildEmailField() {
+  Widget _buildUsernameField() {
     return TextFormField(
-      controller: _emailController,
+      controller: _usernameController,
       decoration: const InputDecoration(
-        labelText: '邮箱',
-        prefixIcon: Icon(Icons.email_outlined),
+        labelText: '用户名', // 修改标签
+        prefixIcon: Icon(Icons.person_outlined), // 修改图标
         border: OutlineInputBorder(),
       ),
-      keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       validator: (value) {
-        // if (value == null || value.isEmpty) return '请输入邮箱';
-        // if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-        //   return '邮箱格式不正确';
-        // }
-        // return null;
+        if (value == null || value.isEmpty) return '请输入用户名'; // 修改验证逻辑
+        return null;
       },
     );
   }
@@ -139,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _submitForm() async {
+ void _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
 
     final authVM = context.read<AuthViewModel>();
@@ -147,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       await authVM.login(
-        _emailController.text.trim(),
+        _usernameController.text.trim(), // 传递用户名
         _passwordController.text,
       );
 
