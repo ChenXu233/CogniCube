@@ -39,7 +39,7 @@ async def ai_chat_api(user_message: str) -> str:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"AI服务请求失败: {str(e)}",
-        )
+        ) from e
 
 
 async def save_message_record(db: Session, user_id: int, user_message: str, who: str, reply_to: int|None = None):
@@ -56,7 +56,7 @@ async def save_message_record(db: Session, user_id: int, user_message: str, who:
         return message_record
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"消息保存失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"消息保存失败: {str(e)}") from e
 
 async def create_conversation_record(db: Session, user_id: int, user_message: str):
     """创建对话记录，先保存提问，再保存回答"""
@@ -66,7 +66,7 @@ async def create_conversation_record(db: Session, user_id: int, user_message: st
         await save_message_record(db, user_id, ai_reply, Who.AI, reply_to=user_message_record.message_id)
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"对话记录保存失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"对话记录保存失败: {str(e)}") from e
     
     
 class AIChatService:
@@ -77,7 +77,7 @@ class AIChatService:
         """简化保存对话记录的过程"""
         message_record = Conversation(
             user_id=user_id,
-            message=user_message,  
+            message=user_message,
             who=who,
             reply_to=reply_to,
         )
@@ -88,7 +88,7 @@ class AIChatService:
             return message_record
         except Exception as e:
             self.db.rollback()
-            raise HTTPException(status_code=500, detail=f"消息保存失败: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"消息保存失败: {str(e)}") from e
 
     async def create_conversation_record(self, user_id: int, user_message: str):
         """创建对话记录，先保存提问，再保存回答"""
@@ -97,7 +97,7 @@ class AIChatService:
             ai_reply = await ai_chat_api(user_message)
             await self.save_message_record(user_id, ai_reply, Who.AI, reply_to=user_message_record.message_id)
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"对话记录保存失败: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"对话记录保存失败: {str(e)}") from e
         
 class AIContext:
     """

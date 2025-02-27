@@ -43,10 +43,15 @@ async def signup_user(
             raise HTTPException(
                 status_code=400, detail="User already exists and is verified"
             )
-
-        db_user.verification_token = verfication_token
-        db_user.verification_token_expiry = token_expiry
-        db.commit()
+        try:
+            db_user.verification_token = verfication_token
+            db_user.verification_token_expiry = token_expiry
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(
+                status_code=500, detail=f"Error updating verification token: {str(e)}"
+            ) from e
 
     # 发送验证邮件
     await send_verification_email(request, user.email, str(db_user.verification_token))
@@ -76,9 +81,13 @@ async def verify_email(token: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Verification token has expired")
 
     # 邮箱已验证
-    db_user.is_verified = True
-    db_user.verification_token = None  # 将token移除
-    db_user.verification_token_expiry = None  # 将token过期时间移除
-    db.commit()
+    try:
+        db_user.is_verified = True
+        db_user.verification_token = None  # 将token移除
+        db_user.verification_token_expiry = None  # 将token过期时间移除
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error verifying email: {str(e)}") from e
 
     return {"message": "Email verified successfully", "username": db_user.username}
