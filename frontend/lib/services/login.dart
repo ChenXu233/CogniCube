@@ -14,7 +14,7 @@ class LoginApiService {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'username': username, // 字段改为username
+          'username': username,
           'password': password,
         }),
       ).timeout(const Duration(seconds: 10));

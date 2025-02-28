@@ -25,18 +25,26 @@ class ChatScreen extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              reverse: true,
-              padding: const EdgeInsets.only(top: 16),
-              controller: chatVM.scrollController,
-              itemCount: chatVM.messages.length + 1,
-              itemBuilder: (context, index) {
-                if (index == chatVM.messages.length) {
-                  return _buildLoadMoreHint(chatVM);
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (scrollNotification) {
+                if (scrollNotification.metrics.pixels == 0) {
+                  chatVM.fetchMoreMessages();
                 }
-                final message = chatVM.messages.reversed.toList()[index];
-                return MessageBubble(message: message);
+                return true;
               },
+              child: ListView.builder(
+                reverse: true,
+                padding: const EdgeInsets.only(top: 16),
+                controller: chatVM.scrollController,
+                itemCount: chatVM.messages.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == chatVM.messages.length) {
+                    return _buildLoadMoreHint(chatVM);
+                  }
+                  final message = chatVM.messages.reversed.toList()[index];
+                  return MessageBubble(message: message);
+                },
+              ),
             ),
           ),
           _buildInputArea(context),
@@ -49,6 +57,7 @@ class ChatScreen extends StatelessWidget {
     Provider.of<AuthViewModel>(context, listen: false).logout();
     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
+
   Widget _buildLoadMoreHint(ChatViewModel viewModel) {
     return Center(
       child: Padding(

@@ -9,6 +9,26 @@ class ChatViewModel extends ChangeNotifier {
   bool isLoadingMore = false;
   List<Message> messages = [];
 
+   Future<void> fetchMoreMessages() async {
+    if (isLoadingMore) return;
+
+    isLoadingMore = true;
+    notifyListeners();
+
+    await Future.delayed(const Duration(seconds: 2));
+
+
+    final List<Message>  newMessages = [
+      Message(text: 'Hello, how can I assist you today?', type: MessageType.ai),
+      Message(text: 'I am feeling a bit down today.', type: MessageType.user),
+    ];
+
+    messages.insertAll(0, newMessages);
+
+    isLoadingMore = false;
+    notifyListeners();
+  }
+
   void updateSendButtonState(bool isEnabled) {
     isSendButtonEnabled = isEnabled;
     notifyListeners();

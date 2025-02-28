@@ -50,6 +50,7 @@ class AuthViewModel with ChangeNotifier {
   }
 
   void _validateRegistrationFields(String username, String email, String password) {
+    // TODO：增加正则表达式验证
     // final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     // final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d).{8,}$');
 
