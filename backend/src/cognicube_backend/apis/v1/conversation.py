@@ -51,7 +51,7 @@ async def create_conversation(
 
 @ai.get("/history")
 async def get_conversation_history(
-    token: str = Query(..., description="用户的JWT访问令牌"),
+    # token: str = Query(..., description="用户的JWT访问令牌"),
     start_time: int = Query(..., description="起始时间戳（包含）"),
     end_time: int = Query(..., description="结束时间戳（包含）"),
     user_id: int = Depends(get_jwt_token_user_id),
@@ -79,8 +79,13 @@ async def get_conversation_history(
 
     # 构造返回数据
     history = [
-        {"message": convo.text, "timestamp": int(convo.time.timestamp())}
-        for convo in conversations
+        Message(
+            text=convo.text,
+            who=convo.who,
+            reply_to=convo.reply_to,
+            timestamp=convo.time.timestamp(),
+            message_id=convo.message_id,
+        ) for convo in conversations
     ]
 
     return {"history": history}

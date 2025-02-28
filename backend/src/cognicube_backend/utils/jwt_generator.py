@@ -28,6 +28,6 @@ def decode_jwt_token(token: str) -> dict:
     return info
 
 
-def get_jwt_token_user_id(token: str = Header(...)) -> int:
+def get_jwt_token_user_id(token: str = Header(...,description="JWT Token")) -> int:
     """获取JWT令牌中的用户信息"""
     return decode_jwt_token(token).get("sub", None)
