@@ -6,7 +6,7 @@ from typing import Optional
 from cognicube_backend.databases.database import Base
 
 
-class Who(Enum):
+class Who(str,Enum):
     USER = "User"
     AI = "AI"
 
