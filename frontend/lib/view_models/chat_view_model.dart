@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/message_model.dart';
 import '../services/chat.dart';
+import '../utils/constants.dart';
 
 class ChatViewModel extends ChangeNotifier {
   final TextEditingController messageController = TextEditingController();
@@ -14,14 +15,23 @@ class ChatViewModel extends ChangeNotifier {
 
     isLoadingMore = true;
     notifyListeners();
+
+    List<Message> newMessages = [];
+
+    if (Constants.useMockResponses){
+      await Future.delayed(const Duration(seconds: 2));
+
+      newMessages = [
+        Message(text: 'Hello, how can I assist you today?', type: MessageType.ai),
+        Message(text: 'I am feeling a bit down today.', type: MessageType.user),
+      ];
+    }else{
+      final double timeStart = messages.isNotEmpty ? messages.last.timestamp as double : DateTime.now().millisecondsSinceEpoch / 1000.0;
+      final double timeEnd = messages.isNotEmpty ? messages.first.timestamp as double : DateTime.now().millisecondsSinceEpoch / 1000.0;
+
+      newMessages = await ChatApiService.getChatHistory(timeStart, timeEnd);
+    }
     
-    // await Future.delayed(const Duration(seconds: 2));
-
-
-    final List<Message>  newMessages = [
-      Message(text: 'Hello, how can I assist you today?', type: MessageType.ai),
-      Message(text: 'I am feeling a bit down today.', type: MessageType.user),
-    ];
 
     messages.insertAll(0, newMessages);
 
