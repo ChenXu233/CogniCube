@@ -37,7 +37,7 @@ class AuthViewModel with ChangeNotifier {
 
       await Future.delayed(const Duration(seconds: 1));
 
-      RegisterApiService.getRegisternResponse(username, password, email);
+      RegisterApiService.getRegisterResponse(username, password, email);
     
       _isAuthenticated = true;
       _errorMessage = null;

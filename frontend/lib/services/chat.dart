@@ -15,7 +15,7 @@ class ChatApiService {
 
     try {
       final response = await http.post(
-        Uri.parse('${Constants.backendUrl}/ai/conversation?token=${token}'),
+        Uri.parse('${Constants.backendUrl}/ai/conversation?token=$token'),
         headers: {
           'Content-Type': 'application/json',
         },

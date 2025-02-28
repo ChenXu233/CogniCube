@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
 
 class RegisterApiService {
-  static Future<String> getRegisternResponse(
+  static Future<String> getRegisterResponse(
     String username,
     String password,
     String email,
