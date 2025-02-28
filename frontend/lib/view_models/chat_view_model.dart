@@ -14,8 +14,8 @@ class ChatViewModel extends ChangeNotifier {
 
     isLoadingMore = true;
     notifyListeners();
-
-    await Future.delayed(const Duration(seconds: 2));
+    
+    // await Future.delayed(const Duration(seconds: 2));
 
 
     final List<Message>  newMessages = [
