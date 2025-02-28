@@ -79,7 +79,7 @@ async def get_conversation_history(
 
     # 构造返回数据
     history = [
-        {"message": convo.message, "timestamp": int(convo.time.timestamp())}
+        {"message": convo.text, "timestamp": int(convo.time.timestamp())}
         for convo in conversations
     ]
 
