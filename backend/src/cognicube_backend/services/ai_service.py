@@ -2,13 +2,18 @@ from openai import AsyncOpenAI
 from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from openai.types.chat import (
+    ChatCompletionMessageParam, 
+    ChatCompletionSystemMessageParam, 
+    ChatCompletionUserMessageParam, 
+    ChatCompletionAssistantMessageParam
+)
 
 from cognicube_backend.models.conversation import Conversation, Who
 from cognicube_backend.schemas.message import Message
 from cognicube_backend.config import CONFIG
 
 SESSION: Optional[AsyncOpenAI] = None
-
 
 async def get_ai_session() -> AsyncOpenAI:
     """返回一个全局的 AsyncOpenAI 实例"""
@@ -17,12 +22,11 @@ async def get_ai_session() -> AsyncOpenAI:
         SESSION = AsyncOpenAI(api_key=CONFIG.AI_API_KEY, base_url=CONFIG.AI_API_URL)
     return SESSION
 
-
 class AIChatService:
     def __init__(self, db: Session):
         self.db = db
         self.SESSION = get_ai_session()
-        self.model_name = "deepseek-chat"
+        self.model_name = CONFIG.AI_MODEL_NAME
         self.api_key = CONFIG.AI_API_KEY
         self.api_base = CONFIG.AI_API_URL
         self.prompt = CONFIG.AI_PROMPT
@@ -31,6 +35,12 @@ class AIChatService:
 
     def build_history(self, user_id: int):
         """构建历史对话记录"""
+        self.history = [
+            {
+                "role": "system",
+                "content": self.prompt,
+            }
+        ]
         records = (
             self.db.query(Conversation)
             .filter_by(user_id=user_id)
@@ -48,13 +58,26 @@ class AIChatService:
             )
         return self.history
 
+    def convert_to_message_param(self, message: dict[str, str]) -> ChatCompletionMessageParam:
+        role = message["role"]
+        content = message["content"]
+        if role == "system":
+            return ChatCompletionSystemMessageParam(role=role, content=content)
+        elif role == "user":
+            return ChatCompletionUserMessageParam(role=role, content=content)
+        elif role == "assistant":
+            return ChatCompletionAssistantMessageParam(role=role, content=content)
+        else:
+            raise ValueError(f"Unknown role: {role}")
+
     async def chat(self, user_id: int, user_message: str):
         """AI 聊天接口"""
         self.client = await get_ai_session()
         self.build_history(user_id)
         self.history.extend([{"content": user_message, "role": "user"}])
         response = await self.client.chat.completions.create(
-            model=self.model_name, messages=self.history
+            model=self.model_name, 
+            messages=[self.convert_to_message_param(message) for message in self.history]
         )
         return response
 
@@ -80,7 +103,7 @@ class AIChatService:
         """简化保存 AI 对话记录的过程"""
         message = Message(
             text=text,
-            who=str(Who.AI),
+            who="AI",
             reply_to=reply_to,
             timestamp=None,
             message_id=None,

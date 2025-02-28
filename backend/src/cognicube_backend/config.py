@@ -13,7 +13,8 @@ class Setting(BaseSettings):
     MAIL_FROM_NAME: str
     USER_DB_URL: str = "sqlite:///./tests/databases/test.db"
     JWT_SECRET_KEY: str = "secret"
-    AI_API_URL: str
+    AI_API_URL: str = "https://api.siliconflow.cn/v1"
+    AI_MODEL_NAME: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
     AI_API_KEY: str
     AI_PROMPT: str
 
@@ -30,3 +31,4 @@ def get_config():
 
 
 CONFIG = get_config()
+print(CONFIG)

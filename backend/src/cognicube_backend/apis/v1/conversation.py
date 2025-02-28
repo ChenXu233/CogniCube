@@ -35,7 +35,18 @@ async def create_conversation(
     ai_response = await ai_service.chat(user_id, text.text)
     ai_response_text: str = ai_response.choices[0].message.content  # type: ignore
     await ai_service.save_ai_message_record(user_id=user_id, text=ai_response_text)
-    return {"reply": ai_response}
+    
+    _ai_message = db.query(Conversation).filter(Conversation.user_id == user_id).filter(Conversation.who == Who.AI).order_by(Conversation.time.desc()).first()
+    if not _ai_message:
+        raise HTTPException(status_code=404, detail="AI回复不存在")
+    ai_message = Message(
+        text=ai_response_text,
+        who="AI",
+        reply_to=_ai_message.reply_to,
+        timestamp= _ai_message.time.timestamp(),
+        message_id=_ai_message.message_id,
+        )
+    return {"message": ai_message}
 
 
 @ai.get("/history")

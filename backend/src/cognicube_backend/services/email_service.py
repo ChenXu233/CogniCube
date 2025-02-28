@@ -41,3 +41,5 @@ async def send_verification_email(
     except Exception as e:
         print(f"Failed to send verification email to {email}: {e}")
     print(f"Verification email sent to {email}.")
+    
+    return
