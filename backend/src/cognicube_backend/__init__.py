@@ -29,6 +29,7 @@ APP.include_router(auth)
 APP.include_router(signup)
 APP.include_router(ai)
 
+
 @APP.on_event("shutdown")
 async def shutdown_event():
     """应用关闭时，清理全局 aiohttp session"""

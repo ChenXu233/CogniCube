@@ -92,7 +92,9 @@ async def verify_email(token: str, db: Session = Depends(get_db)):
         db.commit()
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Error verifying email: {str(e)}") from e
+        raise HTTPException(
+            status_code=500, detail=f"Error verifying email: {str(e)}"
+        ) from e
 
     html_page = generate_html_page(db_user.username)
     return HTMLResponse(content=html_page, status_code=200)

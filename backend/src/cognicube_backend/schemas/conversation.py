@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from cognicube_backend.schemas.message import Message
 
+
 class ConversationRequest(BaseModel):
     text: str = Field(..., min_length=1, description="对话内容")
 
