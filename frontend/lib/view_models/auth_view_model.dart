@@ -18,6 +18,7 @@ class AuthViewModel with ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<void> _checkAuthStatus() async {
+    print(prefs.getString('auth_token'));
     _isAuthenticated = prefs.getString('auth_token') != null;
     notifyListeners();
   }

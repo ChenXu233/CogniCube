@@ -22,7 +22,7 @@ class LoginApiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("token", data['access_token']);
+        await prefs.setString("auth_token", data['access_token']);
         return data['response'] ?? "No response";
       }
       throw "API Error: ${response.statusCode}";
