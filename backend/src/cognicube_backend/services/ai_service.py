@@ -37,7 +37,7 @@ class AIChatService:
         """构建历史对话记录"""
         self.history = [
             {
-                "role": "system",
+                "role": Who.SYSTEM.value,
                 "content": self.prompt,
             }
         ]
@@ -52,32 +52,32 @@ class AIChatService:
         for record in records:
             self.history.append(
                 {
-                    "role": "user" if record.who == Who.USER else "assistant",
+                    "role": record.who.value,
                     "content": record.text,
                 }
             )
         return self.history
 
-    def convert_to_message_param(self, message: dict[str, str]) -> ChatCompletionMessageParam:
-        role = message["role"]
-        content = message["content"]
-        if role == "system":
-            return ChatCompletionSystemMessageParam(role=role, content=content)
-        elif role == "user":
-            return ChatCompletionUserMessageParam(role=role, content=content)
-        elif role == "assistant":
-            return ChatCompletionAssistantMessageParam(role=role, content=content)
-        else:
-            raise ValueError(f"Unknown role: {role}")
+    # def convert_to_message_param(self, message: dict[str, str]) -> ChatCompletionMessageParam:
+    #     role = message["role"]
+    #     content = message["content"]
+    #     if role == Who.SYSTEM.value:
+    #         return ChatCompletionSystemMessageParam(role=role, content=content)
+    #     elif role == Who.USER.value:
+    #         return ChatCompletionUserMessageParam(role=role, content=content)
+    #     elif role == Who.AI.value:
+    #         return ChatCompletionAssistantMessageParam(role=role, content=content)
+    #     else:
+    #         raise ValueError(f"Unknown role: {role}")
 
     async def chat(self, user_id: int, user_message: str):
         """AI 聊天接口"""
         self.client = await get_ai_session()
         self.build_history(user_id)
-        self.history.extend([{"content": user_message, "role": "user"}])
+        self.history.extend([{"content": user_message, "role": Who.USER.value}])
         response = await self.client.chat.completions.create(
-            model=self.model_name, 
-            messages=[self.convert_to_message_param(message) for message in self.history]
+            model=self.model_name,
+            messages=self.history,
         )
         return response
 
@@ -103,7 +103,7 @@ class AIChatService:
         """简化保存 AI 对话记录的过程"""
         message = Message(
             text=text,
-            who="AI",
+            who=Who.AI.value,
             reply_to=reply_to,
             timestamp=None,
             message_id=None,

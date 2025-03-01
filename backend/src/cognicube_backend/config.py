@@ -16,7 +16,7 @@ class Setting(BaseSettings):
     AI_API_URL: str = "https://api.siliconflow.cn/v1"
     AI_MODEL_NAME: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
     AI_API_KEY: str
-    AI_PROMPT: str
+    AI_PROMPT: str = ""
 
     class Config:
         """读取配置文件"""
