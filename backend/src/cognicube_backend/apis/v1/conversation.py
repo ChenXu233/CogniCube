@@ -20,8 +20,8 @@ ai = APIRouter(prefix="/apis/v1/ai")
 
 @ai.post("/conversation", response_model=ConversationResponse)
 async def create_conversation(
+    text: ConversationRequest,
     user_id: int = Depends(get_jwt_token_user_id),
-    text: ConversationRequest = Depends(ConversationRequest),
     db: Session = Depends(get_db),
 ):
     user = db.query(User).filter(User.id == user_id).first()
@@ -46,7 +46,7 @@ async def create_conversation(
         timestamp= _ai_message.time.timestamp(),
         message_id=_ai_message.message_id,
         )
-    return {"message": ai_message}
+    return ConversationResponse(message=ai_message)
 
 
 @ai.get("/history")

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/message_model.dart';
 import '../services/chat.dart';
+import '../utils/constants.dart';
 
 class ChatViewModel extends ChangeNotifier {
   final TextEditingController messageController = TextEditingController();
@@ -10,18 +11,24 @@ class ChatViewModel extends ChangeNotifier {
   List<Message> messages = [];
 
    Future<void> fetchMoreMessages() async {
+    ChatApiService chatApiService = await ChatApiService.create();
     if (isLoadingMore) return;
 
     isLoadingMore = true;
     notifyListeners();
+
+    final List<Message>  newMessages = [];
     
-    // await Future.delayed(const Duration(seconds: 2));
-
-
-    final List<Message>  newMessages = [
-      Message(text: 'Hello, how can I assist you today?', type: MessageType.ai),
-      Message(text: 'I am feeling a bit down today.', type: MessageType.user),
-    ];
+    if (Constants.useMockResponses){
+      newMessages.addAll([
+        Message(text: 'Hello, how can I assist you today?', type: MessageType.ai),
+        Message(text: 'I am feeling a bit down today.', type: MessageType.user),
+      ]);
+    }else{
+      double timeEnd = DateTime.now().millisecondsSinceEpoch.toDouble()/1000;
+      double timeStart = timeEnd - 60*60*24;
+      newMessages.addAll(await chatApiService.getChatHistory(timeStart, timeEnd));
+    }
 
     messages.insertAll(0, newMessages);
 
@@ -45,6 +52,7 @@ class ChatViewModel extends ChangeNotifier {
   }
 
   void sendMessage(String text) async {
+    ChatApiService chatApiService = await ChatApiService.create();
     if (text.trim().isEmpty) return;
 
     // 添加用户消息
@@ -59,7 +67,7 @@ class ChatViewModel extends ChangeNotifier {
 
     try {
       // 获取 AI 响应
-      final aiResponse = await ChatApiService.getAIResponse(text);
+      final aiResponse = await chatApiService.getAIResponse(text);
       print(aiResponse);
       messages.removeLast(); // 移除加载状态
       messages.add(Message(text: aiResponse, type: MessageType.ai));
