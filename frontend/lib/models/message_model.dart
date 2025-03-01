@@ -1,15 +1,17 @@
-enum MessageType { user, ai, loading }
+// enum MessageType { user, ai, loading }
 
 class Message {
   final String text;
   final DateTime timestamp;
-  final MessageType type;
-  final String? id;
+  final String type;
+  final int? id;
+  final int? reply_to;
 
   Message({
     required this.text,
     required this.type,
     this.id,
+    this.reply_to,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 
@@ -17,15 +19,15 @@ class Message {
     return Message(
       text: json['text'],
       type: json['who'],
-      id: json['id'],
-      timestamp: DateTime.parse(json['timestamp']),
+      id: json['message_id'],
+      timestamp: DateTime.fromMillisecondsSinceEpoch((json['timestamp']*1000).toInt()),
+      reply_to: json['reply_to'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'text': text,
-      'type': type.name,
       'id': id,      
     };
   }

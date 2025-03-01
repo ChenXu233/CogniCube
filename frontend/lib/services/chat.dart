@@ -35,6 +35,8 @@ class ChatApiService {
 
   Future<List<Message>> getChatHistory(double timeStart, double timeEnd) async {
     _validateTimeRange(timeStart, timeEnd);
+    int _timeStart = timeStart.toInt();
+    int _timeEnd = timeEnd.toInt();
 
     if (Constants.useMockResponses) {
       await Future.delayed(_mockDelay);
@@ -43,16 +45,18 @@ class ChatApiService {
 
     try {
       final uri = Uri.parse(
-        '${Constants.backendUrl}/ai/conversation?'
-        'time_start=$timeStart&time_end=$timeEnd'
+        '${Constants.backendUrl}/ai/history?'
+        'start_time=$_timeStart&end_time=$_timeEnd'
       );
+      print(uri); // 调试日志
 
       final response = await http.get(uri, headers: _headers)
         .timeout(const Duration(seconds: 30));
+      print(response.body); // 调试日志
 
       return _handleResponse<List<Message>>(
         response,
-        parse: (data) => (data['messages'] as List)
+        parse: (data) => (data['history'] as List)
           .map((e) => Message.fromJson(e))
           .toList(),
       );
@@ -127,8 +131,8 @@ class ChatApiService {
   }
 
   List<Message> _mockHistoryMessages() => [
-    Message(text: '历史消息1：你好！', type: MessageType.ai),
-    Message(text: '历史消息2：有什么可以帮助你的？', type: MessageType.ai),
+    Message(text: '历史消息1：你好！', type: "AI"),
+    Message(text: '历史消息2：有什么可以帮助你的？', type: "AI"),
   ];
 }
 

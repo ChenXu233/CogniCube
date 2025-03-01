@@ -21,8 +21,8 @@ class ChatViewModel extends ChangeNotifier {
     
     if (Constants.useMockResponses){
       newMessages.addAll([
-        Message(text: 'Hello, how can I assist you today?', type: MessageType.ai),
-        Message(text: 'I am feeling a bit down today.', type: MessageType.user),
+        Message(text: 'Hello, how can I assist you today?', type: "AI"),
+        Message(text: 'I am feeling a bit down today.', type: "USER"),
       ]);
     }else{
       double timeEnd = DateTime.now().millisecondsSinceEpoch.toDouble()/1000;
@@ -56,12 +56,12 @@ class ChatViewModel extends ChangeNotifier {
     if (text.trim().isEmpty) return;
 
     // 添加用户消息
-    messages.add(Message(text: text, type: MessageType.user));
+    messages.add(Message(text: text, type: "USER"));
     notifyListeners();
     scrollToBottom();
 
     // 添加加载状态
-    messages.add(Message(text: '', type: MessageType.loading));
+    messages.add(Message(text: '', type: "LOADING"));
     notifyListeners();
     scrollToBottom();
 
@@ -70,12 +70,12 @@ class ChatViewModel extends ChangeNotifier {
       final aiResponse = await chatApiService.getAIResponse(text);
       print(aiResponse);
       messages.removeLast(); // 移除加载状态
-      messages.add(Message(text: aiResponse, type: MessageType.ai));
+      messages.add(Message(text: aiResponse, type: "AI"));
       notifyListeners();
       scrollToBottom();
     } catch (e) {
       messages.removeLast(); // 移除加载状态
-      messages.add(Message(text: 'Error: $e', type: MessageType.ai));
+      messages.add(Message(text: 'Error: $e', type: "AI"));
       notifyListeners();
       scrollToBottom();
     }

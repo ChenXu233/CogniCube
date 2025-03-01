@@ -17,7 +17,11 @@ class _ChatPageState extends State<ChatScreen> {
   void initState() {
     super.initState();
     chatVM = context.read<ChatViewModel>();
-    chatVM.fetchMoreMessages();
+    try{
+       chatVM.fetchMoreMessages();
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
