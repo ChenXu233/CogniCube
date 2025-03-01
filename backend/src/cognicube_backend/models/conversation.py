@@ -7,8 +7,9 @@ from cognicube_backend.databases.database import Base
 
 
 class Who(str,Enum):
-    USER = "User"
-    AI = "AI"
+    USER = "user"
+    AI = "assistant"
+    SYSTEM = "system"
 
 
 class Conversation(Base):
