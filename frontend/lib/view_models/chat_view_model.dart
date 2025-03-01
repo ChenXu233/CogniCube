@@ -11,6 +11,7 @@ class ChatViewModel extends ChangeNotifier {
   List<Message> messages = [];
 
    Future<void> fetchMoreMessages() async {
+    messages.clear();
     ChatApiService chatApiService = await ChatApiService.create();
     if (isLoadingMore) return;
 
@@ -21,8 +22,8 @@ class ChatViewModel extends ChangeNotifier {
     
     if (Constants.useMockResponses){
       newMessages.addAll([
-        Message(text: 'Hello, how can I assist you today?', type: "AI"),
-        Message(text: 'I am feeling a bit down today.', type: "USER"),
+        Message(text: 'Hello, how can I assist you today?', type: "ai"),
+        Message(text: 'I am feeling a bit down today.', type: "user"),
       ]);
     }else{
       double timeEnd = DateTime.now().millisecondsSinceEpoch.toDouble()/1000;
@@ -56,12 +57,12 @@ class ChatViewModel extends ChangeNotifier {
     if (text.trim().isEmpty) return;
 
     // 添加用户消息
-    messages.add(Message(text: text, type: "USER"));
+    messages.add(Message(text: text, type: "user"));
     notifyListeners();
     scrollToBottom();
 
     // 添加加载状态
-    messages.add(Message(text: '', type: "LOADING"));
+    messages.add(Message(text: '', type: "ai"));
     notifyListeners();
     scrollToBottom();
 
@@ -70,12 +71,12 @@ class ChatViewModel extends ChangeNotifier {
       final aiResponse = await chatApiService.getAIResponse(text);
       print(aiResponse);
       messages.removeLast(); // 移除加载状态
-      messages.add(Message(text: aiResponse, type: "AI"));
+      messages.add(Message(text: aiResponse, type: "user"));
       notifyListeners();
       scrollToBottom();
     } catch (e) {
       messages.removeLast(); // 移除加载状态
-      messages.add(Message(text: 'Error: $e', type: "AI"));
+      messages.add(Message(text: 'Error: $e', type: "ai"));
       notifyListeners();
       scrollToBottom();
     }
