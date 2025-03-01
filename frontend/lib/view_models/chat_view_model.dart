@@ -22,7 +22,7 @@ class ChatViewModel extends ChangeNotifier {
     
     if (Constants.useMockResponses){
       newMessages.addAll([
-        Message(text: 'Hello, how can I assist you today?', type: "ai"),
+        Message(text: 'Hello, how can I assist you today?', type: "assistant"),
         Message(text: 'I am feeling a bit down today.', type: "user"),
       ]);
     }else{
@@ -62,7 +62,7 @@ class ChatViewModel extends ChangeNotifier {
     scrollToBottom();
 
     // 添加加载状态
-    messages.add(Message(text: '', type: "ai"));
+    messages.add(Message(text: '', type: "assistant"));
     notifyListeners();
     scrollToBottom();
 
@@ -76,7 +76,7 @@ class ChatViewModel extends ChangeNotifier {
       scrollToBottom();
     } catch (e) {
       messages.removeLast(); // 移除加载状态
-      messages.add(Message(text: 'Error: $e', type: "ai"));
+      messages.add(Message(text: 'Error: $e', type: "assistant"));
       notifyListeners();
       scrollToBottom();
     }

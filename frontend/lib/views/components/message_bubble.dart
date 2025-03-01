@@ -9,7 +9,7 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.type == "user";
-    final isLoading = message.type == "Loading";
+    final isLoading = message.type == "loading";
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
