@@ -1,9 +1,9 @@
-import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../utils/constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/message_model.dart';
+  import 'dart:async';
+  import 'dart:convert';
+  import 'package:http/http.dart' as http;
+  import '../utils/constants.dart';
+  import 'package:shared_preferences/shared_preferences.dart';
+  import '../models/message_model.dart';
 
 class ChatApiService {
   static const _mockDelay = Duration(seconds: 1);

@@ -4,8 +4,21 @@ import '../../../view_models/chat_view_model.dart';
 import '../../../view_models/auth_view_model.dart'; // 新增
 import '../../../views/components/message_bubble.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
+
+  @override
+  _ChatPageState createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatScreen> {
+  late ChatViewModel chatVM;
+  @override
+  void initState() {
+    super.initState();
+    chatVM = context.read<ChatViewModel>();
+    chatVM.fetchMoreMessages();
+  }
 
   @override
   Widget build(BuildContext context) {
