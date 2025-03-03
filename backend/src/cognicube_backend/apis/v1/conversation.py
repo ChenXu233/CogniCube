@@ -14,11 +14,13 @@ from cognicube_backend.schemas.conversation import (
     ConversationRequest,
     ConversationResponse,
 )
+from cognicube_backend.utils.decorator import verify_email_verified
 
 ai = APIRouter(prefix="/apis/v1/ai")
 
 
 @ai.post("/conversation", response_model=ConversationResponse)
+@verify_email_verified(get_db)
 async def create_conversation(
     text: ConversationRequest,
     user_id: int = Depends(get_jwt_token_user_id),
@@ -50,6 +52,7 @@ async def create_conversation(
 
 
 @ai.get("/history")
+@verify_email_verified(get_db)
 async def get_conversation_history(
     # token: str = Query(..., description="用户的JWT访问令牌"),
     start_time: int = Query(..., description="起始时间戳（包含）"),
