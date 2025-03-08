@@ -63,7 +63,7 @@ class ChatApiService {
     } on TimeoutException {
       throw ApiException('请求超时');
     } catch (e) {
-      throw ApiException('获取历史记录失败: ${_sanitizeError(e)}');
+      // throw ApiException('获取历史记录失败: ${_sanitizeError(e)}');
     }
   }
 

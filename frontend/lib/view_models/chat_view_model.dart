@@ -62,7 +62,7 @@ class ChatViewModel extends ChangeNotifier {
     scrollToBottom();
 
     // 添加加载状态
-    messages.add(Message(text: '', type: "assistant"));
+    messages.add(Message(text: '', type: "loading"));
     notifyListeners();
     scrollToBottom();
 
@@ -71,7 +71,7 @@ class ChatViewModel extends ChangeNotifier {
       final aiResponse = await chatApiService.getAIResponse(text);
       print(aiResponse);
       messages.removeLast(); // 移除加载状态
-      messages.add(Message(text: aiResponse, type: "user"));
+      messages.add(Message(text: aiResponse, type: "assistant"));
       notifyListeners();
       scrollToBottom();
     } catch (e) {

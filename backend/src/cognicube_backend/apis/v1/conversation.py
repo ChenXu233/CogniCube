@@ -8,7 +8,7 @@ from cognicube_backend.models.conversation import Conversation, Who
 from cognicube_backend.services.ai_service import (
     AIChatService,
 )
-from cognicube_backend.schemas.message import Message
+from cognicube_backend.schemas.message import Message,Text
 from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 from cognicube_backend.schemas.conversation import (
     ConversationRequest,
@@ -22,7 +22,7 @@ ai = APIRouter(prefix="/apis/v1/ai")
 @ai.post("/conversation", response_model=ConversationResponse)
 @verify_email_verified(get_db)
 async def create_conversation(
-    text: ConversationRequest,
+    message: ConversationRequest,
     user_id: int = Depends(get_jwt_token_user_id),
     db: Session = Depends(get_db),
 ):
@@ -30,31 +30,28 @@ async def create_conversation(
     if not user:
         raise HTTPException(status_code=404, detail="用户不存在")
 
-    _message = Message(text=text.text, who=Who.USER.value)
-
     ai_service = AIChatService(db)
-    await ai_service.save_message_record(user_id, _message)
-    ai_response = await ai_service.chat(user_id, text.text)
+    await ai_service.save_message_record(user_id, message.message)
+    ai_response = await ai_service.chat(user_id, message.message.plain_text)
     ai_response_text: str = ai_response.choices[0].message.content  # type: ignore
-    await ai_service.save_ai_message_record(user_id=user_id, text=ai_response_text)
+    ai_message = Message(
+        plain_text=ai_response_text,
+        message_type="text",
+        who=Who.AI.value,
+        message=[Text(content=ai_response_text)],
+    )
+    await ai_service.save_message_record(user_id, ai_message)
     
     _ai_message = db.query(Conversation).filter(Conversation.user_id == user_id).filter(Conversation.who == Who.AI.value).order_by(Conversation.time.desc()).first()
     if not _ai_message:
         raise HTTPException(status_code=404, detail="AI回复不存在")
-    ai_message = Message(
-        text=ai_response_text,
-        who=Who.AI.value,
-        reply_to=_ai_message.reply_to,
-        timestamp= _ai_message.time.timestamp(),
-        message_id=_ai_message.message_id,
-        )
+
     return ConversationResponse(message=ai_message)
 
 
 @ai.get("/history")
 @verify_email_verified(get_db)
 async def get_conversation_history(
-    # token: str = Query(..., description="用户的JWT访问令牌"),
     start_time: int = Query(..., description="起始时间戳（包含）"),
     end_time: int = Query(..., description="结束时间戳（包含）"),
     user_id: int = Depends(get_jwt_token_user_id),
@@ -83,11 +80,14 @@ async def get_conversation_history(
     # 构造返回数据
     history = [
         Message(
-            text=convo.text,
+            message=convo.message,
+            plain_text=convo.plain_text,
             who=convo.who.value,
-            reply_to=convo.reply_to,
-            timestamp=convo.time.timestamp(),
+            message_type=convo.message_type,
             message_id=convo.message_id,
+            timestamp=convo.time.timestamp(),
+            extensions=convo.extensions,
+            reply_to=convo.reply_to,
         ) for convo in conversations
     ]
 

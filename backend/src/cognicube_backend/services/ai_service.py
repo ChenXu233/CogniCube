@@ -1,13 +1,7 @@
 from openai import AsyncOpenAI
 from typing import Optional
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from openai.types.chat import (
-    ChatCompletionMessageParam, 
-    ChatCompletionSystemMessageParam, 
-    ChatCompletionUserMessageParam, 
-    ChatCompletionAssistantMessageParam
-)
 
 from cognicube_backend.models.conversation import Conversation, Who
 from cognicube_backend.schemas.message import Message
@@ -58,18 +52,6 @@ class AIChatService:
             )
         return self.history
 
-    # def convert_to_message_param(self, message: dict[str, str]) -> ChatCompletionMessageParam:
-    #     role = message["role"]
-    #     content = message["content"]
-    #     if role == Who.SYSTEM.value:
-    #         return ChatCompletionSystemMessageParam(role=role, content=content)
-    #     elif role == Who.USER.value:
-    #         return ChatCompletionUserMessageParam(role=role, content=content)
-    #     elif role == Who.AI.value:
-    #         return ChatCompletionAssistantMessageParam(role=role, content=content)
-    #     else:
-    #         raise ValueError(f"Unknown role: {role}")
-
     async def chat(self, user_id: int, user_message: str):
         """AI 聊天接口"""
         self.client = await get_ai_session()
@@ -77,7 +59,7 @@ class AIChatService:
         self.history.extend([{"content": user_message, "role": Who.USER.value}])
         response = await self.client.chat.completions.create(
             model=self.model_name,
-            messages=self.history,
+            messages=self.history, # type: ignore
         )
         return response
 
@@ -85,9 +67,12 @@ class AIChatService:
         """简化保存对话记录的过程"""
         message_record = Conversation(
             user_id=user_id,
-            text=message.text,
             who=message.who,
             reply_to=message.reply_to,
+            message=message.message,
+            message_type=message.message_type,
+            extensions=message.extensions,
+            plain_text=message.plain_text,
         )
         try:
             self.db.add(message_record)
@@ -96,16 +81,3 @@ class AIChatService:
         except Exception as e:
             self.db.rollback()
             raise HTTPException(status_code=500, detail=f"消息保存失败: {str(e)}")
-
-    async def save_ai_message_record(
-        self, user_id: int, text: str, reply_to: int | None = None
-    ):
-        """简化保存 AI 对话记录的过程"""
-        message = Message(
-            text=text,
-            who=Who.AI.value,
-            reply_to=reply_to,
-            timestamp=None,
-            message_id=None,
-        )
-        return await self.save_message_record(user_id, message)
