@@ -13,6 +13,7 @@ from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 from cognicube_backend.schemas.conversation import (
     ConversationRequest,
     ConversationResponse,
+    ConversationHistoryResponse,
 )
 from cognicube_backend.utils.decorator import verify_email_verified
 
@@ -49,7 +50,7 @@ async def create_conversation(
     return ConversationResponse(message=ai_message)
 
 
-@ai.get("/history")
+@ai.get("/history", response_model=ConversationHistoryResponse)
 @verify_email_verified(get_db)
 async def get_conversation_history(
     start_time: int = Query(..., description="起始时间戳（包含）"),
