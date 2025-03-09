@@ -28,4 +28,3 @@ class Conversation(Base):
     message_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     extensions: Mapped[dict[str, Any]] = mapped_column(JSON)
     plain_text: Mapped[str] = mapped_column(String)
-    message_type: Mapped[str] = mapped_column(String)

@@ -47,7 +47,7 @@ class AIChatService:
             self.history.append(
                 {
                     "role": record.who.value,
-                    "content": record.text,
+                    "content": record.plain_text,
                 }
             )
         return self.history
@@ -69,8 +69,7 @@ class AIChatService:
             user_id=user_id,
             who=message.who,
             reply_to=message.reply_to,
-            message=message.message,
-            message_type=message.message_type,
+            message=[i.model_dump() for i in message.messages],
             extensions=message.extensions,
             plain_text=message.plain_text,
         )

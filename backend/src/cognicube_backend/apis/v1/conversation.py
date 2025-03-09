@@ -8,7 +8,7 @@ from cognicube_backend.models.conversation import Conversation, Who
 from cognicube_backend.services.ai_service import (
     AIChatService,
 )
-from cognicube_backend.schemas.message import Message,Text
+from cognicube_backend.schemas.message import Message,Text, MessageType
 from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 from cognicube_backend.schemas.conversation import (
     ConversationRequest,
@@ -32,14 +32,14 @@ async def create_conversation(
         raise HTTPException(status_code=404, detail="用户不存在")
 
     ai_service = AIChatService(db)
+
     await ai_service.save_message_record(user_id, message.message)
     ai_response = await ai_service.chat(user_id, message.message.plain_text)
     ai_response_text: str = ai_response.choices[0].message.content  # type: ignore
     ai_message = Message(
         plain_text=ai_response_text,
-        message_type="text",
         who=Who.AI.value,
-        message=[Text(content=ai_response_text)],
+        messages=[Text(content=ai_response_text)],
     )
     await ai_service.save_message_record(user_id, ai_message)
     
@@ -81,10 +81,9 @@ async def get_conversation_history(
     # 构造返回数据
     history = [
         Message(
-            message=convo.message,
+            messages=convo.message,
             plain_text=convo.plain_text,
             who=convo.who.value,
-            message_type=convo.message_type,
             message_id=convo.message_id,
             timestamp=convo.time.timestamp(),
             extensions=convo.extensions,
