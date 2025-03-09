@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/message_model.dart';
+import '../models/message_model.dart' as message_model;
 import '../services/chat.dart';
 import '../utils/constants.dart';
 
@@ -8,7 +8,7 @@ class ChatViewModel extends ChangeNotifier {
   final ScrollController scrollController = ScrollController();
   bool isSendButtonEnabled = false;
   bool isLoadingMore = false;
-  List<Message> messages = [];
+  List<message_model.Message> messages = [];
 
    Future<void> fetchMoreMessages() async {
     messages.clear();
@@ -18,12 +18,15 @@ class ChatViewModel extends ChangeNotifier {
     isLoadingMore = true;
     notifyListeners();
 
-    final List<Message>  newMessages = [];
+    final List<message_model.Message>  newMessages = [];
     
     if (Constants.useMockResponses){
       newMessages.addAll([
-        Message(text: 'Hello, how can I assist you today?', type: "assistant"),
-        Message(text: 'I am feeling a bit down today.', type: "user"),
+        message_model.Message(
+          messages: [message_model.Text(text: '历史消息1：你好，有什么可以帮助你的？')],
+          who: 'assistant',
+          extension: {}
+        ),
       ]);
     }else{
       double timeEnd = DateTime.now().millisecondsSinceEpoch.toDouble()/1000;
@@ -57,12 +60,20 @@ class ChatViewModel extends ChangeNotifier {
     if (text.trim().isEmpty) return;
 
     // 添加用户消息
-    messages.add(Message(text: text, type: "user"));
+    messages.add(message_model.Message(
+      messages: [message_model.Text(text: text)],
+      who: 'assistant',
+      extension: {}
+    ));
     notifyListeners();
     scrollToBottom();
 
     // 添加加载状态
-    messages.add(Message(text: '', type: "loading"));
+    messages.add(message_model.Message(
+      messages: [message_model.Text(text: '正在加载...')],
+      who: 'loading',
+      extension: {}
+    ));
     notifyListeners();
     scrollToBottom();
 
@@ -71,12 +82,20 @@ class ChatViewModel extends ChangeNotifier {
       final aiResponse = await chatApiService.getAIResponse(text);
       print(aiResponse);
       messages.removeLast(); // 移除加载状态
-      messages.add(Message(text: aiResponse, type: "assistant"));
+      messages.add(message_model.Message(
+        messages: [message_model.Text(text: aiResponse)],
+        who: 'assistant',
+        extension: {}
+      ));
       notifyListeners();
       scrollToBottom();
     } catch (e) {
       messages.removeLast(); // 移除加载状态
-      messages.add(Message(text: 'Error: $e', type: "assistant"));
+      messages.add(message_model.Message(
+        messages: [message_model.Text(text: '发生错误，请稍后再试:$e')],
+        who: 'assistant',
+        extension: {}
+      ));
       notifyListeners();
       scrollToBottom();
     }

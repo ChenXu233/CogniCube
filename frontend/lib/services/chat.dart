@@ -3,7 +3,7 @@
   import 'package:http/http.dart' as http;
   import '../utils/constants.dart';
   import 'package:shared_preferences/shared_preferences.dart';
-  import '../models/message_model.dart';
+  import '../models/message_model.dart' as message_model;
 
 class ChatApiService {
   static const _mockDelay = Duration(seconds: 1);
@@ -33,10 +33,10 @@ class ChatApiService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<List<Message>> getChatHistory(double timeStart, double timeEnd) async {
+  Future<List<message_model.Message>> getChatHistory(double timeStart, double timeEnd) async {
     _validateTimeRange(timeStart, timeEnd);
-    int _timeStart = timeStart.toInt();
-    int _timeEnd = timeEnd.toInt();
+    int timeStart0 = timeStart.toInt();
+    int timeEnd0 = timeEnd.toInt();
 
     if (Constants.useMockResponses) {
       await Future.delayed(_mockDelay);
@@ -46,7 +46,7 @@ class ChatApiService {
     try {
       final uri = Uri.parse(
         '${Constants.backendUrl}/ai/history?'
-        'start_time=$_timeStart&end_time=$_timeEnd'
+        'start_time=$timeStart0&end_time=$timeEnd0'
       );
       print(uri); // 调试日志
 
@@ -54,16 +54,16 @@ class ChatApiService {
         .timeout(const Duration(seconds: 30));
       print(response.body); // 调试日志
 
-      return _handleResponse<List<Message>>(
+      return _handleResponse<List<message_model.Message>>(
         response,
         parse: (data) => (data['history'] as List)
-          .map((e) => Message.fromJson(e))
+          .map((e) => message_model.Message.fromJson(e))
           .toList(),
       );
     } on TimeoutException {
       throw ApiException('请求超时');
     } catch (e) {
-      // throw ApiException('获取历史记录失败: ${_sanitizeError(e)}');
+      throw ApiException('获取历史记录失败: ${_sanitizeError(e)}');
     }
   }
 
@@ -74,10 +74,13 @@ class ChatApiService {
     }
 
     try {
-      final body = jsonEncode({
-        'text': message,
-        'reply_to': null,
-      });
+      final body = {
+        'messages':message_model.Message(
+          messages: [message_model.Text(text: message)],
+          who: 'user',
+          extension: {}
+        ).toJson()
+      };
 
       final response = await http.post(
         Uri.parse('${Constants.backendUrl}/ai/conversation'),
@@ -129,10 +132,12 @@ class ChatApiService {
       throw ArgumentError('结束时间不能早于开始时间');
     }
   }
-
-  List<Message> _mockHistoryMessages() => [
-    Message(text: '历史消息1：你好！', type: "AI"),
-    Message(text: '历史消息2：有什么可以帮助你的？', type: "AI"),
+  List<message_model.Message> _mockHistoryMessages() => [
+    message_model.Message(
+      messages: [message_model.Text(text: '历史消息1：你好，有什么可以帮助你的？')],
+      who: 'assistant',
+      extension: {}
+    ),
   ];
 }
 

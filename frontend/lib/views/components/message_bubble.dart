@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import '../../models/message_model.dart';
+import '../../models/message_model.dart' as message_model;
 
 class MessageBubble extends StatelessWidget {
-  final Message message;
+  final message_model.Message message;
 
   const MessageBubble({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
-    final isUser = message.type == "user";
-    final isLoading = message.type == "loading";
+    final isUser = message.who == "user";
+    final isLoading = message.who == "loading";
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -57,7 +57,7 @@ class MessageBubble extends StatelessWidget {
                           ],
                         )
                       : Text(
-                          message.text,
+                          message.plainText,
                           style: TextStyle(
                             color: isUser ? Colors.white : Colors.black87,
                             fontSize: 16,
