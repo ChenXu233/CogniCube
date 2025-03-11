@@ -1,9 +1,10 @@
-  import 'dart:async';
-  import 'dart:convert';
-  import 'package:http/http.dart' as http;
-  import '../utils/constants.dart';
-  import 'package:shared_preferences/shared_preferences.dart';
-  import '../models/message_model.dart' as message_model;
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../utils/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/message_model.dart' as message_model;
+import '../../view_models/auth_view_model.dart';
 
 class ChatApiService {
   static const _mockDelay = Duration(seconds: 1);
@@ -13,10 +14,7 @@ class ChatApiService {
   Map<String, String> get _headers {
     final token = _prefs.getString('auth_token') ?? '';
     print('[DEBUG] 当前使用Token: ${token.isEmpty ? "空" : "***"}'); // 调试日志
-    return {
-      'Content-Type': 'application/json',
-      'token': token,
-    };
+    return {'Content-Type': 'application/json', 'token': token};
   }
 
   // ChatApiService();
@@ -33,7 +31,10 @@ class ChatApiService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<List<message_model.Message>> getChatHistory(double timeStart, double timeEnd) async {
+  Future<List<message_model.Message>> getChatHistory(
+    double timeStart,
+    double timeEnd,
+  ) async {
     _validateTimeRange(timeStart, timeEnd);
     int timeStart0 = timeStart.toInt();
     int timeEnd0 = timeEnd.toInt();
@@ -46,19 +47,27 @@ class ChatApiService {
     try {
       final uri = Uri.parse(
         '${Constants.backendUrl}/ai/history?'
-        'start_time=$timeStart0&end_time=$timeEnd0'
+        'start_time=$timeStart0&end_time=$timeEnd0',
       );
-      print(uri); // 调试日志
 
-      final response = await http.get(uri, headers: _headers)
-        .timeout(const Duration(seconds: 30));
+      final response = await http
+          .get(uri, headers: _headers)
+          .timeout(const Duration(seconds: 30));
+
+      print('[DEBUG]: 状态码${response.statusCode}');
+      if (response.statusCode == 401) {
+        _handleUnauthorized();
+        throw ApiException('未授权，请重新登录');
+      }
       print(response.body); // 调试日志
 
       return _handleResponse<List<message_model.Message>>(
         response,
-        parse: (data) => (data['history'] as List)
-          .map((e) => message_model.Message.fromJson(e))
-          .toList(),
+        parse:
+            (data) =>
+                (data['history'] as List)
+                    .map((e) => message_model.Message.fromJson(e))
+                    .toList(),
       );
     } on TimeoutException {
       throw ApiException('请求超时');
@@ -75,18 +84,21 @@ class ChatApiService {
 
     try {
       final body = {
-        'messages':message_model.Message(
-          messages: [message_model.Text(text: message)],
-          who: 'user',
-          extension: {}
-        ).toJson()
+        'messages':
+            message_model.Message(
+              messages: [message_model.Text(text: message)],
+              who: 'user',
+              extension: {},
+            ).toJson(),
       };
 
-      final response = await http.post(
-        Uri.parse('${Constants.backendUrl}/ai/conversation'),
-        headers: _headers,
-        body: body,
-      ).timeout(const Duration(seconds: 60));
+      final response = await http
+          .post(
+            Uri.parse('${Constants.backendUrl}/ai/conversation'),
+            headers: _headers,
+            body: body,
+          )
+          .timeout(const Duration(seconds: 60));
 
       return _handleResponse<String>(
         response,
@@ -106,15 +118,18 @@ class ChatApiService {
     return token.isEmpty ? str : str.replaceAll(token, '***');
   }
 
-  T _handleResponse<T>(http.Response response, {required T Function(dynamic) parse}) {
+  T _handleResponse<T>(
+    http.Response response, {
+    required T Function(dynamic) parse,
+  }) {
     if (response.statusCode == 401) {
       throw ApiException('身份验证过期，请重新登录');
     }
-    
+
     if (response.statusCode != 200) {
       throw ApiException('服务器错误: ${response.statusCode}');
     }
-    
+
     try {
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       print(data);
@@ -132,19 +147,25 @@ class ChatApiService {
       throw ArgumentError('结束时间不能早于开始时间');
     }
   }
+
   List<message_model.Message> _mockHistoryMessages() => [
     message_model.Message(
       messages: [message_model.Text(text: '历史消息1：你好，有什么可以帮助你的？')],
       who: 'assistant',
-      extension: {}
+      extension: {},
     ),
   ];
+
+  Future<void> _handleUnauthorized() {
+    AuthViewModel(prefs: _prefs).logout();
+    return Future.value();
+  }
 }
 
 class ApiException implements Exception {
   final String message;
   const ApiException(this.message);
-  
+
   @override
   String toString() => message;
 }

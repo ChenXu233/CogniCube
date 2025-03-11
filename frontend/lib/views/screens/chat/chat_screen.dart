@@ -18,8 +18,8 @@ class _ChatPageState extends State<ChatScreen> {
   void initState() {
     super.initState();
     chatVM = context.read<ChatViewModel>();
-    try{
-       chatVM.fetchMoreMessages();
+    try {
+      chatVM.fetchMoreMessages();
     } catch (e) {
       print(e);
     }
@@ -37,7 +37,7 @@ class _ChatPageState extends State<ChatScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => _logout(context),
-          )
+          ),
         ],
       ),
       body: Column(
@@ -81,11 +81,10 @@ class _ChatPageState extends State<ChatScreen> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Text(
-          viewModel.isLoadingMore ? 'Loading more messages...' : 'No more messages',
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 12,
-          ),
+          viewModel.isLoadingMore
+              ? 'Loading more messages...'
+              : 'No more messages',
+          style: TextStyle(color: Colors.grey[600], fontSize: 12),
         ),
       ),
     );
@@ -129,9 +128,13 @@ class _ChatPageState extends State<ChatScreen> {
             IconButton(
               icon: const Icon(Icons.send_rounded),
               color: Colors.blue,
-              onPressed: viewModel.isSendButtonEnabled
-                  ? () => _sendMessage(context, viewModel.messageController.text)
-                  : null, // 禁用发送按钮
+              onPressed:
+                  viewModel.isSendButtonEnabled
+                      ? () => _sendMessage(
+                        context,
+                        viewModel.messageController.text,
+                      )
+                      : null, // 禁用发送按钮
             ),
           ],
         ),

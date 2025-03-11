@@ -14,11 +14,14 @@ class AppRouter {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-          builder: (_) => Consumer<AuthViewModel>(
-            builder: (ctx, authVM, _) => authVM.isAuthenticated 
-                ? const ChatScreen() 
-                : const LoginScreen()
-          )
+          builder:
+              (_) => Consumer<AuthViewModel>(
+                builder:
+                    (ctx, authVM, _) =>
+                        authVM.isAuthenticated
+                            ? const ChatScreen()
+                            : const LoginScreen(),
+              ),
         );
       case '/login':
         return MaterialPageRoute(builder: (_) => const LoginScreen());
@@ -26,11 +29,14 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const RegistrationScreen());
       case '/chat':
         return MaterialPageRoute(
-          builder: (_) => Consumer<AuthViewModel>(
-            builder: (ctx, authVM, _) => authVM.isAuthenticated 
-                ? const ChatScreen()
-                : const LoginScreen()
-          )
+          builder:
+              (_) => Consumer<AuthViewModel>(
+                builder:
+                    (ctx, authVM, _) =>
+                        authVM.isAuthenticated
+                            ? const ChatScreen()
+                            : const LoginScreen(),
+              ),
         );
       default:
         return null;

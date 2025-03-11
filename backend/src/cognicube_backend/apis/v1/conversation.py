@@ -8,7 +8,7 @@ from cognicube_backend.models.conversation import Conversation, Who
 from cognicube_backend.services.ai_service import (
     AIChatService,
 )
-from cognicube_backend.schemas.message import Message,Text, MessageType
+from cognicube_backend.schemas.message import Message,Text
 from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 from cognicube_backend.schemas.conversation import (
     ConversationRequest,

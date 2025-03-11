@@ -6,11 +6,12 @@ import '../utils/constants.dart';
 class ChatViewModel extends ChangeNotifier {
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
+  final FocusNode messageFocusNode = FocusNode();
   bool isSendButtonEnabled = false;
   bool isLoadingMore = false;
   List<message_model.Message> messages = [];
 
-   Future<void> fetchMoreMessages() async {
+  Future<void> fetchMoreMessages() async {
     messages.clear();
     ChatApiService chatApiService = await ChatApiService.create();
     if (isLoadingMore) return;
@@ -18,20 +19,22 @@ class ChatViewModel extends ChangeNotifier {
     isLoadingMore = true;
     notifyListeners();
 
-    final List<message_model.Message>  newMessages = [];
-    
-    if (Constants.useMockResponses){
+    final List<message_model.Message> newMessages = [];
+
+    if (Constants.useMockResponses) {
       newMessages.addAll([
         message_model.Message(
           messages: [message_model.Text(text: '历史消息1：你好，有什么可以帮助你的？')],
           who: 'assistant',
-          extension: {}
+          extension: {},
         ),
       ]);
-    }else{
-      double timeEnd = DateTime.now().millisecondsSinceEpoch.toDouble()/1000;
-      double timeStart = timeEnd - 60*60*24;
-      newMessages.addAll(await chatApiService.getChatHistory(timeStart, timeEnd));
+    } else {
+      double timeEnd = DateTime.now().millisecondsSinceEpoch.toDouble() / 1000;
+      double timeStart = timeEnd - 60 * 60 * 24;
+      newMessages.addAll(
+        await chatApiService.getChatHistory(timeStart, timeEnd),
+      );
     }
 
     messages.insertAll(0, newMessages);
@@ -60,20 +63,24 @@ class ChatViewModel extends ChangeNotifier {
     if (text.trim().isEmpty) return;
 
     // 添加用户消息
-    messages.add(message_model.Message(
-      messages: [message_model.Text(text: text)],
-      who: 'assistant',
-      extension: {}
-    ));
+    messages.add(
+      message_model.Message(
+        messages: [message_model.Text(text: text)],
+        who: 'assistant',
+        extension: {},
+      ),
+    );
     notifyListeners();
     scrollToBottom();
 
     // 添加加载状态
-    messages.add(message_model.Message(
-      messages: [message_model.Text(text: '正在加载...')],
-      who: 'loading',
-      extension: {}
-    ));
+    messages.add(
+      message_model.Message(
+        messages: [message_model.Text(text: '正在加载...')],
+        who: 'loading',
+        extension: {},
+      ),
+    );
     notifyListeners();
     scrollToBottom();
 
@@ -82,20 +89,24 @@ class ChatViewModel extends ChangeNotifier {
       final aiResponse = await chatApiService.getAIResponse(text);
       print(aiResponse);
       messages.removeLast(); // 移除加载状态
-      messages.add(message_model.Message(
-        messages: [message_model.Text(text: aiResponse)],
-        who: 'assistant',
-        extension: {}
-      ));
+      messages.add(
+        message_model.Message(
+          messages: [message_model.Text(text: aiResponse)],
+          who: 'assistant',
+          extension: {},
+        ),
+      );
       notifyListeners();
       scrollToBottom();
     } catch (e) {
       messages.removeLast(); // 移除加载状态
-      messages.add(message_model.Message(
-        messages: [message_model.Text(text: '发生错误，请稍后再试:$e')],
-        who: 'assistant',
-        extension: {}
-      ));
+      messages.add(
+        message_model.Message(
+          messages: [message_model.Text(text: '发生错误，请稍后再试:$e')],
+          who: 'assistant',
+          extension: {},
+        ),
+      );
       notifyListeners();
       scrollToBottom();
     }
@@ -104,7 +115,7 @@ class ChatViewModel extends ChangeNotifier {
     updateSendButtonState(false); // 清空输入框后禁用发送按钮
   }
 
-   @override
+  @override
   void dispose() {
     messageController.dispose();
     scrollController.dispose(); // 确保释放 ScrollController

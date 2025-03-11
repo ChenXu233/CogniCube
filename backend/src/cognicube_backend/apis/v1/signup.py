@@ -26,6 +26,7 @@ async def signup_user(
         .filter((User.username == user.username) | (User.email == user.email))
         .first()
     )
+    
 
     # 生成用户验证token，并在5分钟后过期
     verfication_token = str(uuid.uuid4())

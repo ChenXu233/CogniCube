@@ -141,16 +141,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
           ),
           onPressed: authVM.isLoading ? null : _submitForm,
-          child: authVM.isLoading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : const Text('注册账号'),
+          child:
+              authVM.isLoading
+                  ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                  : const Text('注册账号'),
         );
       },
     );
@@ -166,10 +167,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             TextSpan(text: '已有账号？'),
             TextSpan(
               text: '立即登录',
-              style: TextStyle(
-                color: Colors.blue,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -191,19 +189,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       if (authVM.isAuthenticated && mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/login',
-          (route) => false,
-        );
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
         );
       }
     }

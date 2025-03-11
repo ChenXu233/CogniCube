@@ -99,16 +99,17 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           onPressed: authVM.isLoading ? null : _submitForm,
-          child: authVM.isLoading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : const Text('立即登录'),
+          child:
+              authVM.isLoading
+                  ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                  : const Text('立即登录'),
         );
       },
     );
@@ -124,10 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
             TextSpan(text: '没有账号？'),
             TextSpan(
               text: '注册新账号',
-              style: TextStyle(
-                color: Colors.blue,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -135,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
- void _submitForm() async {
+  void _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
 
     final authVM = context.read<AuthViewModel>();
@@ -148,19 +146,12 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (authVM.isAuthenticated && mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/chat',
-          (route) => false,
-        );
+        Navigator.pushNamedAndRemoveUntil(context, '/chat', (route) => false);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
         );
       }
     }

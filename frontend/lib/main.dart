@@ -6,14 +6,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'view_models/auth_view_model.dart';
 import 'view_models/chat_view_model.dart';
 
-
 import 'utils/routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   final prefs = await SharedPreferences.getInstance();
-  
+
   runApp(
     MultiProvider(
       providers: [
@@ -54,9 +53,7 @@ class App extends StatelessWidget {
         foregroundColor: Colors.black,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
