@@ -13,7 +13,7 @@ class ChatApiService {
   // 修改为实时获取token的header
   Map<String, String> get _headers {
     final token = _prefs.getString('auth_token') ?? '';
-    print('[DEBUG] 当前使用Token: ${token.isEmpty ? "空" : "***"}'); // 调试日志
+    print('[DEBUG] 当前使用Token: ${token.isEmpty ? "空" : token}'); // 调试日志
     return {'Content-Type': 'application/json', 'token': token};
   }
 
@@ -83,14 +83,15 @@ class ChatApiService {
     }
 
     try {
-      final body = {
-        'messages':
+      final body = jsonEncode({
+        'message':
             message_model.Message(
               messages: [message_model.Text(text: message)],
               who: 'user',
               extension: {},
             ).toJson(),
-      };
+      });
+      print("[DEBUG]: 请求体: $body");
 
       final response = await http
           .post(
@@ -102,7 +103,10 @@ class ChatApiService {
 
       return _handleResponse<String>(
         response,
-        parse: (data) => data['message']['text'] ?? "未收到有效响应",
+        parse: (data) {
+          var messages = data['message']['messages'] as List;
+          return messages.map((msg) => msg['content']).join('\n') ?? "未收到有效响应";
+        },
       );
     } on TimeoutException {
       throw ApiException('请求超时');

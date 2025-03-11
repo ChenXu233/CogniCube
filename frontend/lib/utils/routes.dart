@@ -7,7 +7,7 @@ import '../view_models/auth_view_model.dart';
 // Screens
 import '../views/screens/chat/chat_screen.dart';
 import '../views/screens/auth/login_screen.dart';
-import '../views/screens/auth/registration_screen.dart'; // 新增注册页导入
+import '../views/screens/auth/registration_screen.dart';
 
 class AppRouter {
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {

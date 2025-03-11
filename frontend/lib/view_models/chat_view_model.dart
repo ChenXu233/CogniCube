@@ -66,7 +66,7 @@ class ChatViewModel extends ChangeNotifier {
     messages.add(
       message_model.Message(
         messages: [message_model.Text(text: text)],
-        who: 'assistant',
+        who: 'user',
         extension: {},
       ),
     );
