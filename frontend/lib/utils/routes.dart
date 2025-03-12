@@ -9,13 +9,18 @@ import '../view_models/auth_view_model.dart';
 import '../views/screens/chat/chat_screen.dart';
 import '../views/screens/auth/login_screen.dart';
 import '../views/screens/auth/registration_screen.dart';
+import '../views/screens/home_screen.dart';
 
 final goRouter = GoRouter(
-  initialLocation: '/chat',
+  initialLocation: '/home',
   routes: [
     GoRoute(
       path: '/',
       pageBuilder: (context, state) => const MaterialPage(child: LoginScreen()),
+    ),
+    GoRoute(
+      path: '/home',
+      pageBuilder: (context, state) => const MaterialPage(child: HomeScreen()),
     ),
     GoRoute(
       path: '/login',
