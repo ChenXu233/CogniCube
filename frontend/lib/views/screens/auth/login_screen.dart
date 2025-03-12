@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_view_model.dart';
 
@@ -117,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildRegisterLink() {
     return TextButton(
-      onPressed: () => Navigator.pushReplacementNamed(context, '/register'),
+      onPressed: () => context.go('/register'),
       child: RichText(
         text: TextSpan(
           style: Theme.of(context).textTheme.bodyMedium,
@@ -146,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (authVM.isAuthenticated && mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, '/chat', (route) => false);
+        context.go('/chat');
       }
     } catch (e) {
       if (mounted) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_view_model.dart';
 
@@ -42,11 +43,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               const SizedBox(height: 20),
               _buildPasswordField(),
               const SizedBox(height: 20),
-              _buildConfirmPasswordField(),
+              _buildConfirmPasswordField(context),
               const SizedBox(height: 30),
-              _buildSubmitButton(),
+              _buildSubmitButton(context),
               const SizedBox(height: 15),
-              _buildLoginLink(),
+              _buildLoginLink(context),
             ],
           ),
         ),
@@ -112,7 +113,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  Widget _buildConfirmPasswordField() {
+  Widget _buildConfirmPasswordField(BuildContext context) {
     return TextFormField(
       controller: _confirmPasswordController,
       obscureText: true,
@@ -122,7 +123,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         border: OutlineInputBorder(),
       ),
       textInputAction: TextInputAction.done,
-      onFieldSubmitted: (_) => _submitForm(),
+      onFieldSubmitted: (_) => _submitForm(context),
       validator: (value) {
         if (value != _passwordController.text) return '密码不一致';
         return null;
@@ -130,7 +131,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  Widget _buildSubmitButton() {
+  Widget _buildSubmitButton(BuildContext context) {
     return Consumer<AuthViewModel>(
       builder: (context, authVM, _) {
         return ElevatedButton(
@@ -140,7 +141,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          onPressed: authVM.isLoading ? null : _submitForm,
+          onPressed: authVM.isLoading ? null : () => _submitForm(context),
           child:
               authVM.isLoading
                   ? const SizedBox(
@@ -157,9 +158,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  Widget _buildLoginLink() {
+  Widget _buildLoginLink(BuildContext context) {
     return TextButton(
-      onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+      onPressed: () => context.go('/login'),
       child: RichText(
         text: TextSpan(
           style: Theme.of(context).textTheme.bodyMedium,
@@ -175,7 +176,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  void _submitForm() async {
+  void _submitForm(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
 
     final authVM = context.read<AuthViewModel>();
@@ -189,7 +190,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       if (authVM.isAuthenticated && mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+        context.go('/login');
       }
     } catch (e) {
       if (mounted) {

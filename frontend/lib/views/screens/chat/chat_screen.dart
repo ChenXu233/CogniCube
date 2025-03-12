@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/chat_view_model.dart';
 import '../../../view_models/auth_view_model.dart'; // 新增
@@ -73,7 +74,7 @@ class _ChatPageState extends State<ChatScreen> {
 
   void _logout(BuildContext context) {
     Provider.of<AuthViewModel>(context, listen: false).logout();
-    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    context.go('/login');
   }
 
   Widget _buildLoadMoreHint(ChatViewModel viewModel) {
