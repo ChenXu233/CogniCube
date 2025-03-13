@@ -36,15 +36,15 @@ final goRouter = GoRouter(
       pageBuilder: (context, state) => const MaterialPage(child: ChatScreen()),
     ),
   ],
-  redirect: (context, state) {
-    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-    final isLoggedIn = authViewModel.isAuthenticated;
+  // redirect: (context, state) {
+  //   final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+  //   final isLoggedIn = authViewModel.isAuthenticated;
 
-    if (!isLoggedIn && state.fullPath != '/login') {
-      return '/login'; // 未登录跳转登录页
-    }
-    return null; // 允许访问
-  },
+  //   if (!isLoggedIn && state.fullPath != '/login') {
+  //     return '/login'; // 未登录跳转登录页
+  //   }
+  //   return null; // 允许访问
+  // },
 );
 
 // class AppRouter {
