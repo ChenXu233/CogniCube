@@ -6,7 +6,9 @@ from typing import Optional, Any, List
 
 from cognicube_backend.databases.database import Base
 from cognicube_backend.schemas.message import Text, Expression
-class Who(str,Enum):
+
+
+class Who(str, Enum):
     USER = "user"
     AI = "assistant"
     SYSTEM = "system"
@@ -23,7 +25,7 @@ class Conversation(Base):
     reply_to: Mapped[Optional[int]] = mapped_column(
         Integer, ForeignKey("conversations.message_id")
     )
-    user_id: Mapped[int] = mapped_column(Integer, index=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), index=True)
     message: Mapped[List[Text | Expression]] = mapped_column(JSON)
     message_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     extensions: Mapped[dict[str, Any]] = mapped_column(JSON)
