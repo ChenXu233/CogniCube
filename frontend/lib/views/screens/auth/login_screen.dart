@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (authVM.isAuthenticated && mounted) {
-        context.go('/chat');
+        context.push('/home');
       }
     } catch (e) {
       if (mounted) {

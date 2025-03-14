@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           PageView(
             controller: _pageController,
             onPageChanged: (index) => setState(() => _currentIndex = index),
-            children: const [
+            children: const [ 
               Center(child: Text('聊天页面')),
               Center(child: Text('统计数据页面')),
               Center(child: Text('个人资料页面')),
@@ -77,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             left: 0,
             right: 0,
             child: buildStaticBlurNavigationBar(context, _currentIndex, (
+
               index,
             ) {
               _pageController.animateToPage(

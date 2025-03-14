@@ -39,7 +39,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'AI Chat',
+      title: 'CogniCube',
       theme: _buildTheme(),
       routerConfig: goRouter,
       debugShowCheckedModeBanner: false,
