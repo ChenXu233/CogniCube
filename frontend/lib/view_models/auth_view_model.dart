@@ -17,11 +17,13 @@ class AuthViewModel with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  
   Future<void> _checkAuthStatus() async {
     print(prefs.getString('auth_token'));
     _isAuthenticated = prefs.getString('auth_token') != null;
     notifyListeners();
   }
+  
 
   void clearError() {
     _errorMessage = null;
@@ -48,7 +50,7 @@ class AuthViewModel with ChangeNotifier {
       notifyListeners();
     }
   }
-
+  
   void _validateRegistrationFields(String username, String email, String password) {
     // TODO：增加正则表达式验证
     // final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -88,7 +90,8 @@ class AuthViewModel with ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await prefs.remove('auth_token');
+    await prefs.remove('token');
+    await prefs.remove('userData');
     _isAuthenticated = false;
     notifyListeners();
   }

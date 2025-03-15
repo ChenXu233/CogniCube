@@ -1,30 +1,37 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 
-import 'package:cognicube/main.dart';
+void main() => runApp(MaterialApp(home: Scaffold(body: AnimationTest())));
 
-void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const App());
+class AnimationTest extends StatefulWidget {
+  @override
+  _AnimationTestState createState() => _AnimationTestState();
+}
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+class _AnimationTestState extends State<AnimationTest>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+  }
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder:
+          (context, child) => Transform.rotate(
+            angle: _controller.value * 2 * math.pi,
+            child: child,
+          ),
+      child: const FlutterLogo(size: 200),
+    );
+  }
 }
