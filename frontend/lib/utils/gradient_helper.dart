@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-const Color primaryColor = Color.fromRGBO(253, 92, 108, 0.6);
-const Color primaryGradientColor = Color.fromRGBO(133, 200, 251, 0.6);
+const Color primaryColor = Color.fromARGB(136, 244, 128, 146);
+const Color primaryGradientColor = Color.fromARGB(168, 102, 178, 241);
 
 RadialGradient createPrimaryGradient() {
   return RadialGradient(

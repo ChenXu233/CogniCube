@@ -16,12 +16,12 @@ Widget buildStaticBlurAppBar(
           children: [
             IconButton(
               icon: const Icon(Icons.person, color: Colors.black),
-              onPressed: () => pageController.jumpToPage(2),
+              onPressed: () => pageController.jumpToPage(3),
             ),
             const Expanded(child: Center()),
             IconButton(
               icon: const Icon(Icons.settings, color: Colors.black),
-              onPressed: () => pageController.jumpToPage(3),
+              onPressed: () => pageController.jumpToPage(4),
             ),
           ],
         ),

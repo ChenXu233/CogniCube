@@ -3,6 +3,7 @@ import '../components/app_bar.dart';
 import '../components/navigation_bar.dart';
 import '../../utils/gradient_helper.dart';
 import 'dart:ui' as ui;
+import 'cbt/CBT_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -61,13 +62,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           PageView(
             controller: _pageController,
             onPageChanged: (index) => setState(() => _currentIndex = index),
-            children: const [
+            children: [
               Center(child: Text('聊天页面')),
               Center(child: Text('统计数据页面')),
+              CBTScreen(),
               Center(child: Text('个人资料页面')),
               Center(child: Text('设置页面')),
             ],
           ),
+
           buildStaticBlurAppBar(context, _pageController),
           Positioned(
             bottom: 0,
