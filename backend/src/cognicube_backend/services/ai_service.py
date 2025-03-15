@@ -9,6 +9,7 @@ from cognicube_backend.config import CONFIG
 
 SESSION: Optional[AsyncOpenAI] = None
 
+
 async def get_ai_session() -> AsyncOpenAI:
     """返回一个全局的 AsyncOpenAI 实例"""
     global SESSION
@@ -16,8 +17,9 @@ async def get_ai_session() -> AsyncOpenAI:
         SESSION = AsyncOpenAI(api_key=CONFIG.AI_API_KEY, base_url=CONFIG.AI_API_URL)
     return SESSION
 
+
 class AIChatService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, max_token: int = 4096):
         self.db = db
         self.SESSION = get_ai_session()
         self.model_name = CONFIG.AI_MODEL_NAME
@@ -26,6 +28,7 @@ class AIChatService:
         self.prompt = CONFIG.AI_PROMPT
         self.client: AsyncOpenAI | None = None
         self.history = []
+        self.max_token = max_token
 
     def build_history(self, user_id: int):
         """构建历史对话记录"""
@@ -59,7 +62,7 @@ class AIChatService:
         self.history.extend([{"content": user_message, "role": Who.USER.value}])
         response = await self.client.chat.completions.create(
             model=self.model_name,
-            messages=self.history, # type: ignore
+            messages=self.history,  # type: ignore
         )
         return response
 

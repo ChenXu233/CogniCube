@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../components/app_bar.dart';
 import '../components/navigation_bar.dart';
 import '../../utils/gradient_helper.dart';
+import 'dart:ui' as ui;
+import 'cbt/CBT_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,7 +16,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late PageController _pageController;
   int _currentIndex = 0;
   late AnimationController _gradientController;
-  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -24,9 +25,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(seconds: 15),
     )..repeat(reverse: true);
-
-    _animation = Tween<double>(begin: 0, end: 1).animate(_gradientController)
-      ..addListener(() => setState(() {}));
   }
 
   @override
@@ -39,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       body: Stack(
         children: [
           AnimatedBuilder(
@@ -49,28 +46,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      gradient: createPrimaryGradient(_animation.value),
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: createSecondaryGradient(_animation.value),
+                      gradient: createPrimaryGradient(),
                     ),
                   ),
                 ],
               );
             },
           ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
+            ),
+          ),
           PageView(
             controller: _pageController,
             onPageChanged: (index) => setState(() => _currentIndex = index),
-            children: const [ 
+            children: const [
               Center(child: Text('聊天页面')),
               Center(child: Text('统计数据页面')),
               Center(child: Text('个人资料页面')),
               Center(child: Text('设置页面')),
             ],
           ),
+
           buildStaticBlurAppBar(context, _pageController),
           Positioned(
             bottom: 0,
