@@ -15,7 +15,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late PageController _pageController;
   int _currentIndex = 0;
   late AnimationController _gradientController;
-  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -25,9 +24,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(seconds: 15),
     )..repeat(reverse: true);
-
-    _animation = Tween<double>(begin: 0, end: 1).animate(_gradientController)
-      ..addListener(() => setState(() {}));
   }
 
   @override
