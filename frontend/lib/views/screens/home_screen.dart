@@ -3,7 +3,6 @@ import '../components/app_bar.dart';
 import '../components/navigation_bar.dart';
 import '../../utils/gradient_helper.dart';
 import 'dart:ui' as ui;
-import 'cbt/CBT_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
