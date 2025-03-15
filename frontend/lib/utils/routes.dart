@@ -8,7 +8,8 @@ import '../views/screens/chat/chat_screen.dart';
 import '../views/screens/auth/login_screen.dart';
 import '../views/screens/auth/registration_screen.dart';
 import '../views/screens/home_screen.dart';
-import '../views/screens/cbt/CBT_screen.dart';
+import '../views/screens/CBT/CBT_screen.dart';
+import '../views/screens/CBT/tests_assessment_screen.dart';
 import '../views/screens/user/profile_screen.dart';
 
 final goRouter = GoRouter(
@@ -36,6 +37,7 @@ final goRouter = GoRouter(
       path: '/home',
       pageBuilder: (context, state) => const MaterialPage(child: HomeScreen()),
     ),
+    // 认证模块
     GoRoute(
       path: '/login',
       pageBuilder: (context, state) => const MaterialPage(child: LoginScreen()),
@@ -45,19 +47,26 @@ final goRouter = GoRouter(
       pageBuilder:
           (context, state) => const MaterialPage(child: RegistrationScreen()),
     ),
+    // 功能模块
     GoRoute(
       path: '/chat',
       pageBuilder: (context, state) => const MaterialPage(child: ChatScreen()),
     ),
-    GoRoute(path: '/', builder: (context, state) => CBTScreen()),
+    // CBT功能模块（嵌套路由）
+    GoRoute(
+      path: '/cbt',
+      pageBuilder: (context, state) => MaterialPage(child: CBTScreen()),
+      routes: [
+        GoRoute(
+          path: '/cbt/tests/:assessmentId',
+          pageBuilder:
+              (context, state) => MaterialPage(
+                child: AssessmentScreen(
+                  assessmentId: state.pathParameters['assessmentId']!,
+                ),
+              ),
+        ),
+      ],
+    ),
   ],
-  // redirect: (context, state) {
-  //   final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-  //   final isLoggedIn = authViewModel.isAuthenticated;
-
-  //   if (!isLoggedIn && state.fullPath != '/login') {
-  //     return '/login'; // 未登录跳转登录页
-  //   }
-  //   return null; // 允许访问
-  // },
 );

@@ -58,15 +58,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
             ),
           ),
-          PageView(
-            controller: _pageController,
-            onPageChanged: (index) => setState(() => _currentIndex = index),
-            children: const [
-              Center(child: Text('聊天页面')),
-              Center(child: Text('统计数据页面')),
-              Center(child: Text('个人资料页面')),
-              Center(child: Text('设置页面')),
-            ],
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: kToolbarHeight + 16,
+                bottom: kBottomNavigationBarHeight + 16,
+              ),
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) => setState(() => _currentIndex = index),
+                children: [
+                  Center(child: Text('聊天页面')),
+                  Center(child: Text('统计数据页面')),
+                  Center(child: CBTScreen()),
+                  Center(child: Text('个人资料页面')),
+                  Center(child: Text('设置页面')),
+                ],
+              ),
+            ),
           ),
 
           buildStaticBlurAppBar(context, _pageController),
@@ -75,7 +84,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             left: 0,
             right: 0,
             child: buildStaticBlurNavigationBar(context, _currentIndex, (
-
               index,
             ) {
               _pageController.animateToPage(
