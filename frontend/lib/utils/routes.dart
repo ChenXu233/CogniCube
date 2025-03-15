@@ -8,6 +8,7 @@ import '../views/screens/chat/chat_screen.dart';
 import '../views/screens/auth/login_screen.dart';
 import '../views/screens/auth/registration_screen.dart';
 import '../views/screens/home_screen.dart';
+import '../views/screens/cbt/CBT_screen.dart';
 
 final goRouter = GoRouter(
   initialLocation: '/home',
@@ -33,6 +34,7 @@ final goRouter = GoRouter(
       path: '/chat',
       pageBuilder: (context, state) => const MaterialPage(child: ChatScreen()),
     ),
+    GoRoute(path: '/', builder: (context, state) => CBTScreen()),
   ],
   // redirect: (context, state) {
   //   final authViewModel = Provider.of<AuthViewModel>(context, listen: false);

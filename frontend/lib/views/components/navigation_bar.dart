@@ -19,6 +19,7 @@ Widget buildStaticBlurNavigationBar(
           children: [
             buildNavItem(Icons.chat, 0, currentIndex, onTap),
             buildNavItem(Icons.insert_chart, 1, currentIndex, onTap),
+            buildNavItem(Icons.apps, 2, currentIndex, onTap),
           ],
         ),
       ),
