@@ -144,6 +144,8 @@ class _ChatPageState extends State<ChatScreen> {
   }
 
   void _sendMessage(BuildContext context, String text) {
+    final viewModel = context.read<ChatViewModel>();
+    viewModel.messageController.clear();
     if (text.trim().isEmpty) return;
     context.read<ChatViewModel>().sendMessage(text);
     FocusScope.of(context).unfocus();

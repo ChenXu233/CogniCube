@@ -10,4 +10,4 @@ class ExpressionRequest(BaseModel):
 
 
 class ExpressionResponse(BaseModel):
-    result: str = Field(..., description="The result of the expression evaluation")
+    result: str

@@ -28,16 +28,11 @@ void main() async {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark, // 状态栏图标颜色
       systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarContrastEnforced: false,
       systemNavigationBarDividerColor: Colors.transparent, // 新增配置
       systemNavigationBarIconBrightness: Brightness.dark, // 导航栏图标颜色
     ),
   );
-
-  // 添加屏幕方向锁定（可选）
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
 
   runApp(
     MultiProvider(

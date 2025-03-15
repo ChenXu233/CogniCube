@@ -8,12 +8,18 @@ expression = APIRouter(prefix="/expression")
 
 
 @expression.post(
-    "/",
+    "/upload",
     response_model=ExpressionResponse,
 )
 async def expression_post(request: ExpressionRequest, db=Depends(get_db)):
-    expression = Expression(**request.dict())
+    expression = Expression(
+        description=request.description,
+        base64=request.base64,
+        application_emotion_type=request.application_emotion_type,
+    )
     db.add(expression)
     db.commit()
     db.refresh(expression)
-    return request.description
+    return ExpressionResponse(
+        result=request.description,
+    )
