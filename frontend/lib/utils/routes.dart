@@ -44,38 +44,3 @@ final goRouter = GoRouter(
   //   return null; // 允许访问
   // },
 );
-
-// class AppRouter {
-//   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
-//     switch (settings.name) {
-//       case '/':
-//         return MaterialPageRoute(
-//           builder:
-//               (_) => Consumer<AuthViewModel>(
-//                 builder:
-//                     (ctx, authVM, _) =>
-//                         authVM.isAuthenticated
-//                             ? const ChatScreen()
-//                             : const LoginScreen(),
-//               ),
-//         );
-//       case '/login':
-//         return MaterialPageRoute(builder: (_) => const LoginScreen());
-//       case '/register':
-//         return MaterialPageRoute(builder: (_) => const RegistrationScreen());
-//       case '/chat':
-//         return MaterialPageRoute(
-//           builder:
-//               (_) => Consumer<AuthViewModel>(
-//                 builder:
-//                     (ctx, authVM, _) =>
-//                         authVM.isAuthenticated
-//                             ? const ChatScreen()
-//                             : const LoginScreen(),
-//               ),
-//         );
-//       default:
-//         return null;
-//     }
-//   }
-// }

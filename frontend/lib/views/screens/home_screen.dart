@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/app_bar.dart';
 import '../components/navigation_bar.dart';
 import '../../utils/gradient_helper.dart';
+import 'dart:ui' as ui;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       body: Stack(
         children: [
           AnimatedBuilder(
@@ -49,17 +49,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      gradient: createPrimaryGradient(_animation.value),
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: createSecondaryGradient(_animation.value),
+                      gradient: createPrimaryGradient(),
                     ),
                   ),
                 ],
               );
             },
+          ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
+            ),
           ),
           PageView(
             controller: _pageController,
