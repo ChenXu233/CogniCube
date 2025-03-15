@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../../../view_models/auth_view_model.dart'; // 新增引入认证视图模型
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,6 +17,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authViewModel = Provider.of<AuthViewModel>(context); // 新增：获取认证状态
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: CustomScrollView(
@@ -42,17 +46,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // 用户身份模块
               _buildUserIdentityCard(),
               const SizedBox(height: 24),
-
-              // AI互动数据面板
-              _buildDataCard(
-                title: '互动数据统计',
-                children: [
-                  _buildDataItem(Icons.chat_bubble, '本月对话次数', '128次'),
-                  _buildDataItem(Icons.access_time, '最活跃时段', '20:00-22:00'),
-                  _buildDataItem(Icons.tag, '常用话题', '情绪'),
-                ],
-              ),
-              const SizedBox(height: 16),
 
               // 个性化设置
               _buildDataCard(
@@ -83,13 +76,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ],
               ),
+              
+              // 新增：底部操作按钮
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: authViewModel.isAuthenticated 
+                        ? Colors.red.shade400 
+                        : Colors.blue.shade400,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (authViewModel.isAuthenticated) {
+                        authViewModel.logout();
+                        context.go('/login');
+                      } else {
+                        context.go('/login');
+                      }
+                    },
+                    child: Text(
+                      authViewModel.isAuthenticated ? '退出登录' : '立即登录',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ]),
           ),
         ],
       ),
     );
   }
-
   Widget _buildUserIdentityCard() {
     return Transform.translate(
       offset: const Offset(0, -40),
