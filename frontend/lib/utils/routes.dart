@@ -9,9 +9,10 @@ import '../views/screens/auth/login_screen.dart';
 import '../views/screens/auth/registration_screen.dart';
 import '../views/screens/home_screen.dart';
 import '../views/screens/cbt/CBT_screen.dart';
+import '../views/screens/user/profile_screen.dart';
 
 final goRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/home',
   routes: [
     GoRoute(
       path: '/',
@@ -19,16 +20,18 @@ final goRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/home',
-          pageBuilder: (context, state) => const MaterialPage(child: HomeScreen()),
+          pageBuilder:
+              (context, state) => const MaterialPage(child: HomeScreen()),
         ),
       ],
     ),
-    
+
     GoRoute(
       path: '/profile',
-      pageBuilder: (context, state) => const MaterialPage(child: ProfileScreen()),
+      pageBuilder:
+          (context, state) => const MaterialPage(child: ProfileScreen()),
     ),
-    
+
     GoRoute(
       path: '/home',
       pageBuilder: (context, state) => const MaterialPage(child: HomeScreen()),

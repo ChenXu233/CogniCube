@@ -17,7 +17,7 @@ Widget buildStaticBlurAppBar(
           children: [
             IconButton(
               icon: const Icon(Icons.person, color: Colors.black),
-              onPressed: () => pageController.jumpToPage(3),
+              onPressed: () => context.push('/profile'),
             ),
             const Expanded(child: Center()),
             IconButton(
