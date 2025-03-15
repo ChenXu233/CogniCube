@@ -1,10 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from cognicube_backend.apis.v1.auth import auth
-from cognicube_backend.apis.v1.signup import signup
-from cognicube_backend.apis.v1.conversation import ai
 from cognicube_backend.databases import init_db
+from cognicube_backend.apis import router_manager
 
 
 APP = FastAPI(debug=True)
@@ -19,12 +17,9 @@ APP.add_middleware(
 
 init_db()
 
+router_manager.init_router(APP)
+
 
 @APP.get("/")
 async def root():
     return {"message": "please don't use this endpoint"}
-
-
-APP.include_router(auth)
-APP.include_router(signup)
-APP.include_router(ai)
