@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 // View Models
-import '../view_models/auth_view_model.dart';
 
 // Screens
 import '../views/screens/chat/chat_screen.dart';

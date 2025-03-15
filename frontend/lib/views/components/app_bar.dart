@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 Widget buildStaticBlurAppBar(
   BuildContext context,
-  PageController _pageController,
+  PageController pageController,
 ) {
   return ClipRect(
     child: BackdropFilter(
@@ -16,12 +16,12 @@ Widget buildStaticBlurAppBar(
           children: [
             IconButton(
               icon: const Icon(Icons.person, color: Colors.black),
-              onPressed: () => _pageController.jumpToPage(2),
+              onPressed: () => pageController.jumpToPage(2),
             ),
             const Expanded(child: Center()),
             IconButton(
               icon: const Icon(Icons.settings, color: Colors.black),
-              onPressed: () => _pageController.jumpToPage(3),
+              onPressed: () => pageController.jumpToPage(3),
             ),
           ],
         ),
