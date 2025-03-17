@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class MoodTrackerScreen extends StatefulWidget {
   const MoodTrackerScreen({super.key});
@@ -8,16 +9,51 @@ class MoodTrackerScreen extends StatefulWidget {
 }
 
 class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
+  // ========== 修改后的音乐播放部分 ========== //
+  late AudioPlayer _audioPlayer;
+  bool isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer = AudioPlayer();
+    _setupAudio(); // 修改初始化方法
+  }
+
+  Future<void> _setupAudio() async {
+    // 添加状态监听
+    _audioPlayer.onPlayerStateChanged.listen((state) {
+      setState(() => isPlaying = state == PlayerState.playing);
+    });
+
+    // 预加载音频源
+    try {
+      await _audioPlayer.setSource(AssetSource('music.mp3'));
+      await _audioPlayer.resume(); // 改为 resume()
+    } catch (e) {
+      print("初始化音频失败: $e");
+    }
+  }
+
+  void _toggleMusic() async {
+    if (isPlaying) {
+      await _audioPlayer.pause();
+    } else {
+      await _audioPlayer.resume(); // 恢复播放
+    }
+  }
+  // ========== 修改结束 ========== //
+
+  // 原有情绪跟踪部分
   int? selectedMood;
   final TextEditingController _noteController = TextEditingController();
 
-  // 调整情绪颜色为更温馨的色调
   final List<Map<String, dynamic>> moods = [
-    {'emoji': '😡', 'label': '愤怒', 'color': Color(0xFFFFCCCC)}, // 淡红色
-    {'emoji': '😟', 'label': '低落', 'color': Color(0xFFFFD699)}, // 淡橙色
-    {'emoji': '😐', 'label': '一般', 'color': Color(0xFFFFF4C2)}, // 淡黄色
-    {'emoji': '🙂', 'label': '开心', 'color': Color(0xFFCCE6CC)}, // 淡绿色
-    {'emoji': '😄', 'label': '超棒', 'color': Color(0xFFCCE6FF)}, // 淡蓝色
+    {'emoji': '😡', 'label': '愤怒', 'color': Color(0xFFFFCCCC)},
+    {'emoji': '😟', 'label': '低落', 'color': Color(0xFFFFD699)},
+    {'emoji': '😐', 'label': '一般', 'color': Color(0xFFFFF4C2)},
+    {'emoji': '🙂', 'label': '开心', 'color': Color(0xFFCCE6CC)},
+    {'emoji': '😄', 'label': '超棒', 'color': Color(0xFFCCE6FF)},
   ];
 
   void _submitMood() {
@@ -31,9 +67,7 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
     String moodLabel = moods[selectedMood!]['label'];
     String note = _noteController.text;
 
-    // ✅ 这里可以把情绪 & 记录保存到数据库
     print('已记录：情绪 - $moodLabel，日志 - $note');
-
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('已记录：$moodLabel')));
@@ -49,13 +83,25 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('情绪追踪'),
-        backgroundColor: Color(0xFFFFB6C1), // 浅粉色
+        backgroundColor: Color(0xFFFFB6C1),
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: Icon(
+              isPlaying
+                  ? Icons
+                      .music_note // 播放时显示音乐图标
+                  : Icons.music_off, // 暂停时显示禁止图标
+              color: Colors.white, // 保持白色与主题一致
+            ),
+            onPressed: _toggleMusic,
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFFFF0F5), Color(0xFFFFF8E1)], // 淡粉色到奶油色渐变
+            colors: [Color(0xFFFFF0F5), Color(0xFFFFF8E1)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -71,11 +117,9 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF6D4C41),
-                ), // 深棕色
+                ),
               ),
               const SizedBox(height: 16),
-
-              // 选择情绪
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(moods.length, (index) {
@@ -109,7 +153,7 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
                             fontWeight: FontWeight.w600,
                             color:
                                 selectedMood == index
-                                    ? Color(0xFF6D4C41) // 深棕色
+                                    ? Color(0xFF6D4C41)
                                     : Colors.black54,
                           ),
                         ),
@@ -118,17 +162,14 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
                   );
                 }),
               ),
-
               const SizedBox(height: 24),
-
-              // 记录日志
               const Text(
                 '想说点什么？',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF6D4C41),
-                ), // 深棕色
+                ),
               ),
               const SizedBox(height: 8),
               TextField(
@@ -137,28 +178,22 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
                 decoration: InputDecoration(
                   hintText: '写下您的感受...',
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.8), // 半透明白色
+                  fillColor: Colors.white.withOpacity(0.8),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Color(0xFFFFB6C1),
-                      width: 2,
-                    ), // 浅粉色边框
+                    borderSide: BorderSide(color: Color(0xFFFFB6C1), width: 2),
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
-
-              // 提交按钮
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFFB6C1), // 浅粉色
+                    backgroundColor: Color(0xFFFFB6C1),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 32,
                       vertical: 12,

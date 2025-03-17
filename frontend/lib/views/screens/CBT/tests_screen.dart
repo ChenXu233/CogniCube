@@ -11,8 +11,8 @@ class TestsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('心理自测量表'),
-        backgroundColor: Colors.blue.shade800,
-        foregroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(198, 238, 167, 208),
+        foregroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -59,7 +59,7 @@ class AssessmentCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade900,
+                  color: const Color.fromARGB(255, 212, 138, 194),
                 ),
               ),
               const SizedBox(height: 8),
