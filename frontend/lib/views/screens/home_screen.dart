@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/app_bar.dart';
 import '../components/navigation_bar.dart';
 import '../../utils/gradient_helper.dart';
+import '../../views/screens/cbt/cbt_screen.dart';
 import 'dart:ui' as ui;
 
 class HomeScreen extends StatefulWidget {

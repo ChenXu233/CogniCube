@@ -3,16 +3,12 @@ import 'package:go_router/go_router.dart';
 
 class CBTScreen extends StatelessWidget {
   final List<Map<String, dynamic>> features = [
-    {'icon': Icons.mood, 'label': 'Mood Tracker', 'route': '/cbt/mood'},
-    {'icon': Icons.checklist, 'label': 'Tests', 'route': '/tests'},
-    {'icon': Icons.air, 'label': 'Breathings', 'route': '/breathings'},
-    {
-      'icon': Icons.self_improvement,
-      'label': 'Affirmations',
-      'route': '/affirmations',
-    },
-    {'icon': Icons.emoji_events, 'label': 'Challenges', 'route': '/challenges'},
-    {'icon': Icons.spa, 'label': 'Meditations', 'route': '/meditations'},
+    {'icon': Icons.mood, 'label': '情绪追踪', 'route': '/cbt/mood'},
+    {'icon': Icons.checklist, 'label': '测试', 'route': '/cbt/tests'},
+    {'icon': Icons.air, 'label': '深呼吸', 'route': '/breathings'},
+    {'icon': Icons.self_improvement, 'label': '打坐', 'route': '/affirmations'},
+    {'icon': Icons.emoji_events, 'label': '挑战', 'route': '/challenges'},
+    {'icon': Icons.spa, 'label': '冥想', 'route': '/meditations'},
   ];
 
   @override
@@ -49,44 +45,44 @@ class _FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 100,
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.grey.shade200, width: 1),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              // 左侧图标区域
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade100,
-                  borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
+      onTap: () => context.go(routePath), // ✅ 确保传递完整路径
+      child: SizedBox(
+        height: 100,
+        child: Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.grey.shade200, width: 1),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, size: 28, color: Colors.blue.shade800),
                 ),
-                child: Icon(icon, size: 28, color: Colors.blue.shade800),
-              ),
-              const SizedBox(width: 16),
-
-              // 文字描述
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blue.shade900,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue.shade900,
+                    ),
                   ),
                 ),
-              ),
-
-              // 开始按钮
-              _StartButton(onPressed: () => context.go(routePath)),
-            ],
+                _StartButton(
+                  onPressed: () => context.go(routePath),
+                ), // ✅ 确保传递完整路径
+              ],
+            ),
           ),
         ),
       ),
