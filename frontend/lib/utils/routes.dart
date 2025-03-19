@@ -13,28 +13,27 @@ import '../views/screens/CBT/tests_assessment_screen.dart';
 import '../views/screens/user/profile_screen.dart';
 import '../views/screens/CBT/tests_screen.dart';
 import '../views/screens/CBT/moodtracker_screen.dart';
+import '../views/screens/setting/setting_screen.dart';
 
 final goRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/',
   routes: [
     GoRoute(
       path: '/',
-      pageBuilder: (context, state) => const MaterialPage(child: LoginScreen()),
+      pageBuilder: (context, state) => const MaterialPage(child: HomeScreen()),
       routes: [
         GoRoute(
-          path: '/home',
+          path: '/profile',
           pageBuilder:
-              (context, state) => const MaterialPage(child: HomeScreen()),
+              (context, state) => const MaterialPage(child: ProfileScreen()),
+        ),
+        GoRoute(
+          path: '/setting',
+          pageBuilder:
+              (context, state) => const MaterialPage(child: SettingsScreen()),
         ),
       ],
     ),
-
-    GoRoute(
-      path: '/profile',
-      pageBuilder:
-          (context, state) => const MaterialPage(child: ProfileScreen()),
-    ),
-
     GoRoute(
       path: '/home',
       pageBuilder: (context, state) => const MaterialPage(child: HomeScreen()),

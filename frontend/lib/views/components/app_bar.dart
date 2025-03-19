@@ -22,7 +22,7 @@ Widget buildStaticBlurAppBar(
             const Expanded(child: Center()),
             IconButton(
               icon: const Icon(Icons.settings, color: Colors.black),
-              onPressed: () => pageController.jumpToPage(4),
+              onPressed: () => context.push('/setting'),
             ),
           ],
         ),

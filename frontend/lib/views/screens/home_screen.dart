@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late PageController _pageController;
-  int _currentIndex = 0;
+  int _currentIndex = 1;
   late AnimationController _gradientController;
 
   @override
@@ -72,8 +72,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Center(child: Text('聊天页面')),
                   Center(child: Text('统计数据页面')),
                   Center(child: CBTScreen()),
-                  Center(child: Text('个人资料页面')),
-                  Center(child: Text('设置页面')),
                 ],
               ),
             ),

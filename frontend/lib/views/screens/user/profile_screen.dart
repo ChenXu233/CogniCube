@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_view_model.dart';
+import '../../../utils/gradient_helper.dart';
 import 'dart:ui' as ui;
 
 class ProfileScreen extends StatefulWidget {
@@ -12,58 +13,27 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  final List<Color> _ballColors = [
-    Colors.lightBlueAccent.withOpacity(0.4),
-    Colors.lightGreenAccent.withOpacity(0.4),
-    Colors.cyanAccent.withOpacity(0.4),
-  ];
+    with TickerProviderStateMixin {
+  late AnimationController _gradientController;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _gradientController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 15),
-    )..repeat();
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _gradientController.dispose();
     super.dispose();
-  }
-
-  Widget _buildBlurBall(double size, Color color, Offset offset) {
-    return Positioned(
-      left: offset.dx,
-      top: offset.dy,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: 1 + 0.2 * _controller.value,
-            child: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [color, color.withOpacity(0.1)],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     final authViewModel = Provider.of<AuthViewModel>(context);
-    final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
@@ -80,39 +50,25 @@ class _ProfileScreenState extends State<ProfileScreen>
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          // 背景渐变层
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color.fromARGB(255, 252, 202, 179),
-                    Colors.lightGreen.shade100,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-            ),
+          AnimatedBuilder(
+            animation: _gradientController,
+            builder: (context, _) {
+              return Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: createPrimaryGradient(),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
 
-          // 动态模糊小球
-          ..._ballColors.map(
-            (color) => _buildBlurBall(
-              200,
-              color,
-              Offset(
-                screenSize.width * 0.3 * (_ballColors.indexOf(color) + 1),
-                screenSize.height * 0.2 * (_ballColors.indexOf(color) + 1),
-              ),
-            ),
-          ),
-
-          // 高斯模糊层
           Positioned.fill(
             child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-              child: Container(color: Colors.transparent),
+              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
             ),
           ),
 
