@@ -73,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       children: [
                         Text('欢迎回来',
                             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                color: Colors.white,
+                                color: const Color.fromARGB(255, 255, 140, 140),
                                 fontWeight: FontWeight.w800,
                                 shadows: [Shadow(color: Colors.black.withOpacity(0.2), blurRadius: 6)])),
                         const SizedBox(height: 50),
@@ -99,11 +99,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Widget _buildUsernameField() {
     return TextFormField(
       controller: _usernameController,
-      style: const TextStyle(color: Colors.white, fontSize: 16),
+      style: const TextStyle(color: Color.fromARGB(255, 21, 21, 21), fontSize: 16),
       decoration: InputDecoration(
         labelText: '用户名',
-        labelStyle: const TextStyle(color: Colors.white70, fontSize: 15),
-        prefixIcon: const Icon(Icons.person_outlined, color: Colors.white70, size: 22),
+        labelStyle: const TextStyle(color: Color.fromARGB(179, 43, 43, 43), fontSize: 15),
+        prefixIcon: const Icon(Icons.person_outlined, color: Color.fromARGB(179, 43, 43, 43), size: 22),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide.none,
@@ -123,16 +123,16 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Widget _buildPasswordField() {
     return TextFormField(
       controller: _passwordController,
-      style: const TextStyle(color: Colors.white, fontSize: 16),
+      style: const TextStyle(color: Color.fromARGB(255, 21, 21, 21), fontSize: 16),
       obscureText: _obscurePassword,
       decoration: InputDecoration(
         labelText: '密码',
-        labelStyle: const TextStyle(color: Colors.white70, fontSize: 15),
-        prefixIcon: const Icon(Icons.lock_outlined, color: Colors.white70, size: 22),
+        labelStyle: const TextStyle(color: Color.fromARGB(179, 43, 43, 43), fontSize: 15),
+        prefixIcon: const Icon(Icons.lock_outlined, color: Color.fromARGB(179, 43, 43, 43), size: 22),
         suffixIcon: IconButton(
           icon: Icon(
             _obscurePassword ? Icons.visibility_off : Icons.visibility,
-            color: Colors.white70,
+            color: const Color.fromARGB(179, 94, 47, 47),
             size: 22,
           ),
           onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
@@ -164,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
-            backgroundColor: Colors.white.withOpacity(0.3),
+            backgroundColor: const Color.fromARGB(255, 255, 181, 97).withOpacity(0.3),
             elevation: 4,
             shadowColor: Colors.black.withOpacity(0.3),
           ),
@@ -175,12 +175,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   height: 24,
                   child: CircularProgressIndicator(
                     strokeWidth: 3,
-                    color: Colors.white,
+                    color: Color.fromARGB(255, 53, 53, 53),
                   ),
                 )
               : const Text('立即登录', 
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color.fromARGB(255, 53, 53, 53),
                     fontSize: 17,
                     fontWeight: FontWeight.w600
                   )),
@@ -198,12 +198,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           children: [
             const TextSpan(
               text: '没有账号？',
-              style: TextStyle(color: Colors.white70),
+              style: TextStyle(color: Color.fromARGB(179, 59, 59, 59)),
             ),
             TextSpan(
               text: '注册新账号',
               style: TextStyle(
-                color: Colors.cyanAccent.shade200,
+                color: const Color.fromARGB(255, 153, 186, 186),
                 fontWeight: FontWeight.w700,
                 decoration: TextDecoration.underline,
                 fontSize: 16.5,
