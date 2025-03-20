@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../data/assessment_data.dart';
+import '../../../models/assessment_model.dart';
 
 class TestsScreen extends StatelessWidget {
   const TestsScreen({super.key});
@@ -10,69 +11,61 @@ class TestsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('心理自测量表'),
-        backgroundColor: Colors.blue.shade800,
-        foregroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(198, 238, 167, 208),
+        foregroundColor: const Color.fromARGB(255, 255, 255, 255),
       ),
-      body: ListView.separated(
+      body: Padding(
         padding: const EdgeInsets.all(16),
-        itemCount: assessments.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (context, index) {
-          final assessment = assessments[index];
-          return _AssessmentCard(
-            title: assessment.title,
-            description: assessment.description,
-            onTap: () => context.go('/cbt/tests/${assessment.id}'),
-          );
-        },
+        child: ListView.separated(
+          itemCount: assessments.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final assessment = assessments[index];
+            return AssessmentCard(assessment: assessment);
+          },
+        ),
       ),
     );
   }
 }
 
-class _AssessmentCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final VoidCallback onTap;
+class AssessmentCard extends StatelessWidget {
+  final Assessment assessment;
 
-  const _AssessmentCard({
-    required this.title,
-    required this.description,
-    required this.onTap,
-  });
+  const AssessmentCard({super.key, required this.assessment});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white.withOpacity(0.8),
-      elevation: 2,
+      color: Colors.white,
+      elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: Colors.blue.shade100.withOpacity(0.3),
+          color: Colors.blue.shade100.withOpacity(0.5),
           width: 1,
         ),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
+        onTap: () => context.go('/cbt/tests/${assessment.id}'), // ✅ 确保路径正确
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                title,
+                assessment.title,
                 style: TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.blue.shade900,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(255, 212, 138, 194),
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                description,
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                assessment.description,
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
               ),
             ],
           ),
