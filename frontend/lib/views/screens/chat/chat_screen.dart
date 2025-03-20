@@ -31,16 +31,6 @@ class _ChatPageState extends State<ChatScreen> {
     final chatVM = context.watch<ChatViewModel>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AI Chat'),
-        elevation: 1,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _logout(context),
-          ),
-        ],
-      ),
       body: Column(
         children: [
           Expanded(
