@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -15,23 +14,19 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
 
-  // 合并系统 UI 配置（原代码有重复设置）
   SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.edgeToEdge,
-    overlays: [
-      SystemUiOverlay.top, // 保留状态栏
-      SystemUiOverlay.bottom, // 保留导航栏（透明模式需要）
-    ],
+    overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
   );
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark, // 状态栏图标颜色
+      statusBarIconBrightness: Brightness.dark,
       systemNavigationBarColor: Colors.transparent,
       systemNavigationBarContrastEnforced: false,
-      systemNavigationBarDividerColor: Colors.transparent, // 新增配置
-      systemNavigationBarIconBrightness: Brightness.dark, // 导航栏图标颜色
+      systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
 
@@ -56,10 +51,8 @@ class App extends StatelessWidget {
       theme: _buildTheme(),
       routerConfig: goRouter,
       debugShowCheckedModeBanner: false,
-      // 添加全局布局配置
       builder: (context, child) {
         return MediaQuery(
-          // 保留系统默认的 padding（关键修改）
           data: MediaQuery.of(context),
           child: Scaffold(
             resizeToAvoidBottomInset: true,
@@ -75,10 +68,7 @@ class App extends StatelessWidget {
 
   ThemeData _buildTheme() {
     return ThemeData(
-      // 保持原有主题配置
-      // 添加 material 组件密度配置
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      // 修改底部导航栏主题
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
         elevation: 8,
