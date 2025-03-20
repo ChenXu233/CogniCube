@@ -13,7 +13,6 @@ class ChatViewModel extends ChangeNotifier {
 
   Future<void> fetchMoreMessages() async {
     messages.clear();
-    ChatApiService chatApiService = await ChatApiService.create();
     if (isLoadingMore) return;
 
     isLoadingMore = true;
@@ -33,7 +32,7 @@ class ChatViewModel extends ChangeNotifier {
       double timeEnd = DateTime.now().millisecondsSinceEpoch.toDouble() / 1000;
       double timeStart = timeEnd - 60 * 60 * 24;
       newMessages.addAll(
-        await chatApiService.getChatHistory(timeStart, timeEnd),
+        await ChatApiService.getChatHistory(timeStart, timeEnd),
       );
     }
 
@@ -59,7 +58,6 @@ class ChatViewModel extends ChangeNotifier {
   }
 
   void sendMessage(String text) async {
-    ChatApiService chatApiService = await ChatApiService.create();
     if (text.trim().isEmpty) return;
 
     // 添加用户消息
@@ -86,7 +84,7 @@ class ChatViewModel extends ChangeNotifier {
 
     try {
       // 获取 AI 响应
-      final aiResponse = await chatApiService.getAIResponse(text);
+      final aiResponse = await ChatApiService.getAIResponse(text);
       print(aiResponse);
       messages.removeLast(); // 移除加载状态
       messages.add(
