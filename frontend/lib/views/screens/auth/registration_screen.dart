@@ -1,8 +1,8 @@
-// 修改后的注册页面完整代码
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_view_model.dart';
+import '../../../utils/gradient_helper.dart';
 import 'dart:ui' as ui;
 
 class RegistrationScreen extends StatefulWidget {
@@ -12,113 +12,56 @@ class RegistrationScreen extends StatefulWidget {
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
-class _RegistrationScreenState extends State<RegistrationScreen> with SingleTickerProviderStateMixin {
+class _RegistrationScreenState extends State<RegistrationScreen> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  late AnimationController _controller;
-  final List<Color> _ballColors = [
-    Colors.purpleAccent.withOpacity(0.6),
-    Colors.cyanAccent.withOpacity(0.6),
-    Colors.blueAccent.withOpacity(0.6),
-  ];
+  late AnimationController _gradientController;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _gradientController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 15),
-    )..repeat();
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _gradientController.dispose();
     super.dispose();
-  }
-
-  Widget _buildBlurBall(double size, Color color, Offset offset) {
-    return Positioned(
-      left: offset.dx,
-      top: offset.dy,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: 1 + 0.2 * _controller.value,
-            child: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [color, color.withOpacity(0.4)],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
-        ),
+        automaticallyImplyLeading: false,
       ),
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          // 更强烈的渐变背景
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF3A1C71),  // 深紫色
-                    Color(0xFFD76D77),  // 珊瑚色
-                    Color(0xFFFFAF7B),  // 橙黄色
-                  ],
+          AnimatedBuilder(
+            animation: _gradientController,
+            builder: (context, _) {
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: createPrimaryGradient(),
                 ),
-              ),
-            ),
+              );
+            },
           ),
-
-          // 动态模糊小球
-          ..._ballColors.map(
-            (color) => _buildBlurBall(
-              240,
-              color,
-              Offset(
-                screenSize.width * 0.3 * (_ballColors.indexOf(color) + 1),
-                screenSize.height * 0.2 * (_ballColors.indexOf(color) + 1),
-              ),
-            ),
-          ),
-
-          // 高斯模糊层
           Positioned.fill(
             child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 45, sigmaY: 45),
-              child: Container(color: Colors.black.withOpacity(0.15)),
+              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
             ),
           ),
-
-          // 内容层（使用Expanded填满剩余空间）
           Column(
             children: [
               Expanded(
@@ -171,7 +114,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.25),
+        fillColor: Colors.white.withOpacity(0.35),  // 透明度调整为35%
         contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
       ),
       textInputAction: TextInputAction.next,
@@ -196,7 +139,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.25),
+        fillColor: Colors.white.withOpacity(0.35),  // 透明度调整为35%
         contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
       ),
       keyboardType: TextInputType.emailAddress,
@@ -225,7 +168,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.25),
+        fillColor: Colors.white.withOpacity(0.35),  // 透明度调整为35%
         contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
       ),
       textInputAction: TextInputAction.next,
@@ -254,7 +197,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> with SingleTick
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.25),
+        fillColor: Colors.white.withOpacity(0.35),  // 透明度调整为35%
         contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
       ),
       textInputAction: TextInputAction.done,

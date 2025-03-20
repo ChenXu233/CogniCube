@@ -1,8 +1,8 @@
-// 修改后的登录页面完整代码
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_view_model.dart';
+import '../../../utils/gradient_helper.dart';
 import 'dart:ui' as ui;
 
 class LoginScreen extends StatefulWidget {
@@ -12,111 +12,55 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  late AnimationController _controller;
-  final List<Color> _ballColors = [
-    Colors.blueAccent.withOpacity(0.5),  // 加深小球颜色
-    Colors.purpleAccent.withOpacity(0.5),
-    Colors.cyanAccent.withOpacity(0.5),
-  ];
+  late AnimationController _gradientController;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _gradientController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 15),
-    )..repeat();
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _gradientController.dispose();
     super.dispose();
-  }
-
-  Widget _buildBlurBall(double size, Color color, Offset offset) {
-    return Positioned(
-      left: offset.dx,
-      top: offset.dy,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: 1 + 0.2 * _controller.value,
-            child: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [color, color.withOpacity(0.3)],  // 增加渐变对比
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
-        ),
+        automaticallyImplyLeading: false,
       ),
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          // 更深的渐变背景
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF2A2A72),  // 深蓝色
-                    Color(0xFF009FFD),  // 亮蓝色
-                  ],
+          AnimatedBuilder(
+            animation: _gradientController,
+            builder: (context, _) {
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: createPrimaryGradient(),
                 ),
-              ),
-            ),
+              );
+            },
           ),
-
-          // 动态模糊小球
-          ..._ballColors.map(
-            (color) => _buildBlurBall(
-              220,  // 增大小球尺寸
-              color,
-              Offset(
-                screenSize.width * 0.2 * (_ballColors.indexOf(color) + 1),
-                screenSize.height * 0.25 * (_ballColors.indexOf(color) + 1),
-              ),
-            ),
-          ),
-
-          // 高斯模糊层
           Positioned.fill(
             child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 40, sigmaY: 40),  // 增强模糊
-              child: Container(color: Colors.black.withOpacity(0.2)),
+              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
             ),
           ),
-
-          // 内容层（使用Column代替Padding实现满屏布局）
           Column(
             children: [
               Expanded(
@@ -130,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         Text('欢迎回来',
                             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                                 color: Colors.white,
-                                fontWeight: FontWeight.w800,  // 加粗字体
+                                fontWeight: FontWeight.w800,
                                 shadows: [Shadow(color: Colors.black.withOpacity(0.2), blurRadius: 6)])),
                         const SizedBox(height: 50),
                         _buildUsernameField(),
@@ -165,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.25),  // 更实心的填充色
+        fillColor: Colors.white.withOpacity(0.35),  // 透明度调整为35%
         contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
       ),
       textInputAction: TextInputAction.next,
@@ -198,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.25),
+        fillColor: Colors.white.withOpacity(0.35),  // 透明度调整为35%
         contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
       ),
       textInputAction: TextInputAction.done,
@@ -221,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               borderRadius: BorderRadius.circular(15),
             ),
             backgroundColor: Colors.white.withOpacity(0.3),
-            elevation: 4,  // 增加阴影
+            elevation: 4,
             shadowColor: Colors.black.withOpacity(0.3),
           ),
           onPressed: authVM.isLoading ? null : _submitForm,
@@ -259,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
             TextSpan(
               text: '注册新账号',
               style: TextStyle(
-                color: Colors.cyanAccent.shade200,  // 更亮的链接色
+                color: Colors.cyanAccent.shade200,
                 fontWeight: FontWeight.w700,
                 decoration: TextDecoration.underline,
                 fontSize: 16.5,

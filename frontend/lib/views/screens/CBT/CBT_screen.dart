@@ -99,12 +99,12 @@ class _StartButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FilledButton.tonal(
       style: ButtonStyle(
-        backgroundColor: MaterialStatePropertyAll(Colors.blue.shade100),
-        foregroundColor: MaterialStatePropertyAll(Colors.blue.shade800),
-        padding: const MaterialStatePropertyAll(
+        backgroundColor: WidgetStatePropertyAll(Colors.blue.shade100),
+        foregroundColor: WidgetStatePropertyAll(Colors.blue.shade800),
+        padding: const WidgetStatePropertyAll(
           EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         ),
-        shape: MaterialStatePropertyAll(
+        shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
