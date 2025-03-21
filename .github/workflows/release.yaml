@@ -205,7 +205,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-artifacts
-          path: frontend/build/windows/runner/Release/**
+          path: frontend/build/windows/x64/runner/Release/**
 
   release:
     name: Create GitHub Release
