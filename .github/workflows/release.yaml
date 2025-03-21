@@ -2,13 +2,15 @@ name: Flutter Multi-Platform Release
 
 on:
   push:
-    tags: ["v*"] # 仅在标签推送时触发
+    tags: 
+      - "v*" # 仅在标签推送时触发
   workflow_dispatch:
 
 env:
   FLUTTER_VERSION: "3.29.2" # 更新至最新稳定版
   BUILD_DIR: "build"
   ANDROID_KEYSTORE_PATH: "frontend/android/app/keystore.jks"
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   # bump-version:
