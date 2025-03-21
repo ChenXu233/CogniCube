@@ -2,14 +2,12 @@ name: Flutter Multi-Platform Release
 
 on:
   push:
-    tags:
-      - "v*"
-    branches:
-      - main
-  workflow_dispatch: # 允许手动触发
+    tags: ["v*"]
+    branches: [main]
+  workflow_dispatch:
 
 env:
-  FLUTTER_VERSION: "3.22.6" # 使用长期支持版本
+  FLUTTER_VERSION: "3.29.2" # 更新至最新稳定版
   BUILD_DIR: "build"
   ANDROID_KEYSTORE_PATH: "android/app/keystore.jks"
 
@@ -17,35 +15,55 @@ jobs:
   bump-version:
     name: Auto-Increment Version
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # 允许推送标签
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Bump version
+      - name: Configure Git
         run: |
-          # 处理首个版本场景
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Generate New Tag
+        run: |
+          # 处理首个版本和标签冲突
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
-          VERSION=${LEST_TAG#v}
-          # 使用awk处理语义化版本
+          VERSION=${LATEST_TAG#v}
+
           NEW_VERSION=$(echo $VERSION | awk -F. '{
-            if(NF==3) {$NF++} 
-            else if(NF<3) {for(i=NF+1;i<=3;i++) $i=0; $3++}
+            if (NF < 3) { 
+              for (i=1; i<=3; i++) if ($i == "") $i = 0;
+              $3++;
+            } else if (NF == 3) { $3++ }
             print $1"."$2"."$3
           }')
+
           NEW_TAG="v$NEW_VERSION"
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+          # 清理已存在的标签 
+          if git rev-parse "$NEW_TAG" >/dev/null 2>&1 || \
+             git ls-remote --tags origin "$NEW_TAG" | grep -q "$NEW_TAG"; then
+            git tag -d "$NEW_TAG" || true
+            git push origin ":refs/tags/$NEW_TAG" || true
+          fi
+
           git tag $NEW_TAG
-          git push origin $NEW_TAG
+          git push origin $NEW_TAG --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     name: Build All Platforms
     needs: bump-version
     runs-on: ubuntu-latest
-    timeout-minutes: 30 # 防止卡死
+    timeout-minutes: 30
     env:
-      JAVA_VERSION: "17" # 适配Flutter 3.22+要求
+      JAVA_VERSION: "17" # 适配 Flutter 3.27+
 
     steps:
       - name: Checkout code
@@ -62,51 +80,61 @@ jobs:
         with:
           channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true # 启用缓存加速
+          cache: true
 
-      - name: Install Linux Dependencies
+      - name: Install Dependencies
         run: |
           sudo apt update -y
-          sudo apt install -y ninja-build libgtk-3-dev
-
-      - name: Decode Keystore
-        env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: |
-          echo "$KEYSTORE_BASE64" | base64 -di > ${{ env.ANDROID_KEYSTORE_PATH }}
-          chmod 600 ${{ env.ANDROID_KEYSTORE_PATH }}
+          sudo apt install -y ninja-build libgtk-3-dev clang cmake  # 跨平台编译依赖
 
       - name: Configure Android Signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASS: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
-          echo "storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}" > android/key.properties
-          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
+          # 解码并配置密钥 
+          echo "$KEYSTORE_BASE64" | base64 -di > $ANDROID_KEYSTORE_PATH
+          chmod 600 $ANDROID_KEYSTORE_PATH
+
+          echo "storePassword=$STORE_PASS" > android/key.properties
+          echo "keyPassword=$KEY_PASS" >> android/key.properties
+          echo "keyAlias=$KEY_ALIAS" >> android/key.properties
           echo "storeFile=../app/keystore.jks" >> android/key.properties
 
       - name: Build Artifacts
         run: |
           flutter pub get
-          # Android构建
-          flutter build apk --release --split-per-abi  # 生成多架构APK
-          # Web构建
-          flutter build web --release --web-renderer canvaskit
-          # Linux构建
-          flutter build linux --release 
-          # Windows构建
+
+          # Android (拆分ABI和通用APK) 
+          flutter build apk --release --split-per-abi
+          flutter build apk --release  # 通用APK
+
+          # Web (优化性能) 
+          flutter build web --release --web-renderer canvaskit --dart-define=FLUTTER_WEB_CANVASKIT_URL=/canvaskit/
+
+          # Linux (生成AppImage)
+          flutter build linux --release
+          chmod +x build/linux/x64/release/bundle/*
+
+          # Windows (生成安装程序)
           flutter build windows --release
+          cd build/windows/runner/Release
+          makensis ../installer.nsis  # 需要提前准备NSIS脚本
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: multi-platform-builds
+          name: release-artifacts
           path: |
-            build/app/outputs/apk/release/*.apk
+            build/app/outputs/apk/**/*.apk
             build/web/**
             build/linux/x64/release/bundle/**
             build/windows/runner/Release/**
 
   release:
-    name: Create Release
+    name: Create GitHub Release
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -116,23 +144,23 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: multi-platform-builds
+          name: release-artifacts
           path: release-artifacts
 
-      - name: Create GitHub Release
+      - name: Generate Release Notes
+        run: |
+          echo "## Changelog" > release-notes.md
+          git log --pretty=format:"- %s (%h)" ${{ needs.bump-version.outputs.old_tag }}..${{ env.NEW_TAG }} >> release-notes.md
+
+      - name: Publish Release
         uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.NEW_TAG }}
+          body_path: release-notes.md
           files: |
             release-artifacts/**/*.apk
             release-artifacts/**/*.zip
+            release-artifacts/**/*.AppImage
             release-artifacts/**/*.exe
-          body: |
-            ## Changelog
-            Auto-generated build artifacts for:
-            - Android (ARM/x86_64)
-            - Web
-            - Linux
-            - Windows
+          draft: false
+          prerelease: ${{ contains(github.ref, 'beta') }}
