@@ -300,16 +300,10 @@ jobs:
           name: windows-artifacts
           path: release-artifacts/windows
 
-      - name: Generate Release Notes
-        run: |
-          echo "## Changelog" > release-notes.md
-          git log --pretty=format:"- %s (%h)" ${{ needs.bump-version.outputs.old_tag }}..${{ needs.bump-version.outputs.new_tag }} >> release-notes.md
-
       - name: Publish Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          tag_name: ${{ needs.bump-version.outputs.new_tag }}
-          body_path: release-notes.md
           files: |
             release-artifacts/**/*.apk
             release-artifacts/**/*.zip
