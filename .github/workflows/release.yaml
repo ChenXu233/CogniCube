@@ -110,10 +110,9 @@ jobs:
 
           flutter pub get
 
-          # Android (拆分ABI和通用APK) 
-          flutter build apk --release --split-per-abi
-          flutter build apk --release  # 通用APK
-          flutter build apk --no-enable-impeller # 禁用Impeller以兼容旧设备
+          # Android (优化性能)
+          flutter build apk --release --flavor with_impeller
+          flutter build apk --release --flavor without_impeller
 
           # Web (优化性能) 
           flutter build web --release --web-renderer canvaskit --dart-define=FLUTTER_WEB_CANVASKIT_URL=/canvaskit/

@@ -1,6 +1,5 @@
 import java.util.Properties
 
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -35,6 +34,20 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+
+    // 定义 Flavor 维度
+    flavorDimensions += listOf("impeller_mode")
+    productFlavors {
+        create("with_impeller") {
+            dimension = "impeller_mode"
+            // 注入 Manifest 占位符变量
+            manifestPlaceholders["enableImpeller"] = "true"
+        }
+        create("without_impeller") {
+            dimension = "impeller_mode"
+            manifestPlaceholders["enableImpeller"] = "false"
+        }
     }
 
     defaultConfig {
