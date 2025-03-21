@@ -255,7 +255,6 @@ jobs:
         with:
           name: windows-artifacts
           path: frontend/build/windows/x64/runner/Release/**
-          path: frontend/build/windows/x64/runner/Release/**
 
   release:
     name: Create GitHub Release
