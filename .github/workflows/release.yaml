@@ -13,49 +13,44 @@ env:
 
 jobs:
   bump-version:
-    name: Auto-Increment Version
+    name: Auto-Generate Version Tag
     runs-on: ubuntu-latest
     permissions:
-      contents: write # 允许推送标签
+      contents: write # 允许删除/推送标签
     outputs:
-      new_tag: ${{ env.NEW_TAG }}
+      new_tag: ${{ steps.tag-generation.outputs.NEW_TAG }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # 需要完整历史记录检查标签
 
-      - name: Configure Git
+      - name: 获取 Flutter 项目版本号
+        id: get-version
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
+          cd frontend  # 进入包含 pubspec.yaml 的目录
+          VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | tr -d '\n')
+          echo "PROJECT_VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Generate New Tag
+      - name: 生成并推送 Git 标签
+        id: tag-generation
         run: |
-          # 处理首个版本和标签冲突
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
-          VERSION=${LATEST_TAG#v}
+          # 组合标签名称 (例如 v1.2.3)
+          NEW_TAG="v${{ steps.get-version.outputs.PROJECT_VERSION }}"
+          echo "生成标签: $NEW_TAG"
 
-          NEW_VERSION=$(echo $VERSION | awk -F. '{
-            if (NF < 3) { 
-              for (i=1; i<=3; i++) if ($i == "") $i = 0;
-              $3++;
-            } else if (NF == 3) { $3++ }
-            print $1"."$2"."$3
-          }')
-
-          NEW_TAG="v$NEW_VERSION"
-          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
-
-          # 清理已存在的标签 
+          # 清理旧标签（如果存在）
           if git rev-parse "$NEW_TAG" >/dev/null 2>&1 || \
              git ls-remote --tags origin "$NEW_TAG" | grep -q "$NEW_TAG"; then
+            echo "发现已存在标签 $NEW_TAG，执行清理..."
             git tag -d "$NEW_TAG" || true
             git push origin ":refs/tags/$NEW_TAG" || true
           fi
 
+          # 创建新标签
           git tag $NEW_TAG
-          git push origin $NEW_TAG --force
+          git push origin $NEW_TAG
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -205,7 +200,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-artifacts
-          path: frontend/build/windows/runner/Release/**
+          path: frontend/build/windows/x64/runner/Release/**
 
   release:
     name: Create GitHub Release
@@ -242,12 +237,12 @@ jobs:
       - name: Generate Release Notes
         run: |
           echo "## Changelog" > release-notes.md
-          git log --pretty=format:"- %s (%h)" ${{ needs.bump-version.outputs.old_tag }}..${{ env.NEW_TAG }} >> release-notes.md
+          git log --pretty=format:"- %s (%h)" ${{ needs.bump-version.outputs.old_tag }}..${{ needs.bump-version.outputs.new_tag }} >> release-notes.md
 
       - name: Publish Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.NEW_TAG }}
+          tag_name: ${{ needs.bump-version.outputs.new_tag }} # 使用动态生成的标签
           body_path: release-notes.md
           files: |
             release-artifacts/**/*.apk
