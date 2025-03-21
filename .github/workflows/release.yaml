@@ -19,6 +19,7 @@ jobs:
       contents: write # 允许推送标签
     outputs:
       new_tag: ${{ env.NEW_TAG }}
+      old_tag: $LATEST_TAG
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -215,6 +216,10 @@ jobs:
       contents: write # 允许创建release
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Download Android Artifacts
         uses: actions/download-artifact@v4
         with:
