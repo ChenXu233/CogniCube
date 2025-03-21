@@ -54,13 +54,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-android:
-    name: Build Android
+  build-android-with-impeller:
+    name: Build Android (With Impeller)
     needs: bump-version
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      JAVA_VERSION: "17" # 适配 Flutter 3.27+
+      JAVA_VERSION: "17"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -81,7 +81,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update -y
-          sudo apt install -y ninja-build libgtk-3-dev clang cmake libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio  # 跨平台编译依赖
+          sudo apt install -y ninja-build libgtk-3-dev clang cmake libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
 
       - name: Configure Android Signing
         env:
@@ -90,7 +90,6 @@ jobs:
           KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         run: |
-          # 解码并配置密钥 
           echo "$KEYSTORE_BASE64" | base64 -di > $ANDROID_KEYSTORE_PATH
           chmod 600 $ANDROID_KEYSTORE_PATH
 
@@ -99,18 +98,73 @@ jobs:
           echo "keyAlias=$KEY_ALIAS" >> frontend/android/keystore.properties
           echo "storeFile=../app/keystore.jks" >> frontend/android/keystore.properties
 
-      - name: Build Android APKs
+      - name: Build APK with Impeller
         run: |
           cd frontend
           flutter pub get
           flutter build apk --release --flavor with_impeller
-          flutter build apk --release --flavor without_impeller
 
-      - name: Upload Android Artifacts
+      - name: Upload Impeller Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-artifacts
-          path: frontend/build/app/outputs/apk/**/*.apk
+          name: android-with-impeller
+          path: frontend/build/app/outputs/flutter-apk/app-with_impeller-release.apk
+
+  build-android-without-impeller:
+    name: Build Android (Without Impeller)
+    needs: bump-version
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      JAVA_VERSION: "17"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y ninja-build libgtk-3-dev clang cmake libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
+
+      - name: Configure Android Signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASS: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -di > $ANDROID_KEYSTORE_PATH
+          chmod 600 $ANDROID_KEYSTORE_PATH
+
+          echo "storePassword=$STORE_PASS" > frontend/android/keystore.properties
+          echo "keyPassword=$KEY_PASS" >> frontend/android/keystore.properties
+          echo "keyAlias=$KEY_ALIAS" >> frontend/android/keystore.properties
+          echo "storeFile=../app/keystore.jks" >> frontend/android/keystore.properties
+
+      - name: Build APK without Impeller
+        run: |
+          cd frontend
+          flutter pub get
+          flutter build apk --release --flavor without_impeller
+
+      - name: Upload Non-Impeller Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-without-impeller
+          path: frontend/build/app/outputs/flutter-apk/app-without_impeller-release.apk
 
   build-web:
     name: Build Web
@@ -204,17 +258,29 @@ jobs:
 
   release:
     name: Create GitHub Release
-    needs: [build-android, build-web, build-linux, build-windows]
+    needs:
+      [
+        build-android-with-impeller,
+        build-android-without-impeller,
+        build-web,
+        build-linux,
+        build-windows,
+      ]
     runs-on: ubuntu-latest
     permissions:
-      contents: write # 允许创建release
-
+      contents: write
     steps:
       - name: Download Android Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: android-artifacts
-          path: release-artifacts/android
+          name: android-with-impeller
+          path: release-artifacts/android/with_impeller
+
+      - name: Download Android Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: android-without-impeller
+          path: release-artifacts/android/without_impeller
 
       - name: Download Web Artifacts
         uses: actions/download-artifact@v4
@@ -242,12 +308,10 @@ jobs:
       - name: Publish Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ needs.bump-version.outputs.new_tag }} # 使用动态生成的标签
+          tag_name: ${{ needs.bump-version.outputs.new_tag }}
           body_path: release-notes.md
           files: |
             release-artifacts/**/*.apk
             release-artifacts/**/*.zip
-            release-artifacts/**/*.AppImage   
+            release-artifacts/**/*.AppImage
             release-artifacts/**/*.exe
-          draft: false
-          prerelease: ${{ contains(github.ref, 'beta') }}

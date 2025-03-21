@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../components/app_bar.dart';
-import '../../components/navigation_bar.dart';
 import '../../../utils/gradient_helper.dart';
 import 'dart:ui' as ui;
 
