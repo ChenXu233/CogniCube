@@ -115,7 +115,7 @@ jobs:
           flutter build apk --release --flavor without_impeller
 
           # Web (优化性能) 
-          flutter build web --release --web-renderer canvaskit --dart-define=FLUTTER_WEB_CANVASKIT_URL=/canvaskit/
+          flutter build web --release
 
           # Linux (生成AppImage)
           flutter build linux --release
@@ -123,8 +123,8 @@ jobs:
 
           # Windows (生成安装程序)
           flutter build windows --release
-          cd build/windows/runner/Release
-          makensis ../installer.nsis  # 需要提前准备NSIS脚本
+          # cd build/windows/runner/Release
+          # makensis ../installer.nsis  # 需要提前准备NSIS脚本
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
