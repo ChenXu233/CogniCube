@@ -9,7 +9,7 @@ on:
 env:
   FLUTTER_VERSION: "3.29.2" # 更新至最新稳定版
   BUILD_DIR: "build"
-  ANDROID_KEYSTORE_PATH: "frontend/android/keystore.jks"
+  ANDROID_KEYSTORE_PATH: "frontend/android/app/keystore.jks"
 
 jobs:
   bump-version:
@@ -98,13 +98,14 @@ jobs:
           echo "$KEYSTORE_BASE64" | base64 -di > $ANDROID_KEYSTORE_PATH
           chmod 600 $ANDROID_KEYSTORE_PATH
 
-          echo "storePassword=$STORE_PASS" > frontend/android/key.properties
-          echo "keyPassword=$KEY_PASS" >> frontend/android/key.properties
-          echo "keyAlias=$KEY_ALIAS" >> frontend/android/key.properties
-          echo "storeFile=../app/keystore.jks" >> frontend/android/key.properties
+          echo "storePassword=$STORE_PASS" > frontend/android/keystore.properties
+          echo "keyPassword=$KEY_PASS" >> frontend/android/keystore.properties
+          echo "keyAlias=$KEY_ALIAS" >> frontend/android/keystore.properties
+          echo "storeFile=../app/keystore.jks" >> frontend/android/keystore.properties
 
       - name: Build Artifacts
         run: |
+
           cd frontend
 
           flutter pub get
