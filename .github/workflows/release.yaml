@@ -18,8 +18,7 @@ jobs:
     permissions:
       contents: write # 允许推送标签
     outputs:
-      new_tag: ${{ env.NEW_TAG }}
-      old_tag: $LATEST_TAG
+      new_tag: ${{ steps.generate_tag.outputs.NEW_TAG }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,6 +31,7 @@ jobs:
           git config user.email "actions@github.com"
 
       - name: Generate New Tag
+        id: generate_tag
         run: |
           # 处理首个版本和标签冲突
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.1.0")
@@ -47,6 +47,7 @@ jobs:
 
           NEW_TAG="v$NEW_VERSION"
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
 
           # 清理已存在的标签 
           if git rev-parse "$NEW_TAG" >/dev/null 2>&1 || \
@@ -247,7 +248,7 @@ jobs:
       - name: Publish Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.NEW_TAG }}
+          tag_name: ${{ needs.bump-version.outputs.new_tag }}
           files: |
             release-artifacts/**/*.apk
             release-artifacts/**/*.zip
