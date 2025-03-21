@@ -9,7 +9,7 @@ on:
   workflow_dispatch: # 允许手动触发
 
 env:
-  FLUTTER_VERSION: "3.22.6" # 使用长期支持版本
+  FLUTTER_VERSION: "3.29.2" # 使用长期支持版本
   BUILD_DIR: "build"
   ANDROID_KEYSTORE_PATH: "android/app/keystore.jks"
 
