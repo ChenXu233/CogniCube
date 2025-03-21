@@ -3,7 +3,6 @@ name: Flutter Multi-Platform Release
 on:
   push:
     tags: ["v*"] # 仅在标签推送时触发
-    branches: [main]
   workflow_dispatch:
 
 env:
@@ -12,51 +11,50 @@ env:
   ANDROID_KEYSTORE_PATH: "frontend/android/app/keystore.jks"
 
 jobs:
-  bump-version:
-    name: Auto-Generate Version Tag
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # 允许删除/推送标签
-    outputs:
-      new_tag: ${{ steps.tag-generation.outputs.NEW_TAG }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # 需要完整历史记录检查标签
+  # bump-version:
+  #   name: Auto-Generate Version Tag
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: write # 允许删除/推送标签
+  #   outputs:
+  #     new_tag: ${{ steps.tag-generation.outputs.NEW_TAG }}
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0 # 需要完整历史记录检查标签
 
-      - name: 获取 Flutter 项目版本号
-        id: get-version
-        run: |
-          cd frontend  # 进入包含 pubspec.yaml 的目录
-          VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | tr -d '\n')
-          echo "PROJECT_VERSION=$VERSION" >> $GITHUB_OUTPUT
+  #     - name: 获取 Flutter 项目版本号
+  #       id: get-version
+  #       run: |
+  #         cd frontend  # 进入包含 pubspec.yaml 的目录
+  #         VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | tr -d '\n')
+  #         echo "PROJECT_VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: 生成并推送 Git 标签
-        id: tag-generation
-        run: |
-          # 组合标签名称 (例如 v1.2.3)
-          NEW_TAG="v${{ steps.get-version.outputs.PROJECT_VERSION }}"
-          echo "生成标签: $NEW_TAG"
+  #     - name: 生成并推送 Git 标签
+  #       id: tag-generation
+  #       run: |
+  #         # 组合标签名称 (例如 v1.2.3)
+  #         NEW_TAG="v${{ steps.get-version.outputs.PROJECT_VERSION }}"
+  #         echo "生成标签: $NEW_TAG"
 
-          # 清理旧标签（如果存在）
-          if git rev-parse "$NEW_TAG" >/dev/null 2>&1 || \
-             git ls-remote --tags origin "$NEW_TAG" | grep -q "$NEW_TAG"; then
-            echo "发现已存在标签 $NEW_TAG，执行清理..."
-            git tag -d "$NEW_TAG" || true
-            git push origin ":refs/tags/$NEW_TAG" || true
-          fi
+  #         # 清理旧标签（如果存在）
+  #         if git rev-parse "$NEW_TAG" >/dev/null 2>&1 || \
+  #            git ls-remote --tags origin "$NEW_TAG" | grep -q "$NEW_TAG"; then
+  #           echo "发现已存在标签 $NEW_TAG，执行清理..."
+  #           git tag -d "$NEW_TAG" || true
+  #           git push origin ":refs/tags/$NEW_TAG" || true
+  #         fi
 
-          # 创建新标签
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
-          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         # 创建新标签
+  #         git tag $NEW_TAG
+  #         git push origin $NEW_TAG
+  #         echo "NEW_TAG=$NEW_TAG" >> $GITHUB_OUTPUT
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-android-with-impeller:
     name: Build Android (With Impeller)
-    needs: bump-version
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -112,7 +110,6 @@ jobs:
 
   build-android-without-impeller:
     name: Build Android (Without Impeller)
-    needs: bump-version
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -168,7 +165,6 @@ jobs:
 
   build-web:
     name: Build Web
-    needs: bump-version
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -196,7 +192,6 @@ jobs:
 
   build-linux:
     name: Build Linux
-    needs: bump-version
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -230,7 +225,6 @@ jobs:
 
   build-windows:
     name: Build Windows
-    needs: bump-version
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
@@ -302,6 +296,7 @@ jobs:
 
       - name: Publish Release
         uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags')
         with:
           files: |
             release-artifacts/**/*.apk
