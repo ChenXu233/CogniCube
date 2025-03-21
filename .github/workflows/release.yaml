@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write # 允许推送标签
+    outputs:
+      new_tag: ${{ env.NEW_TAG }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -57,14 +59,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build:
-    name: Build All Platforms
+  build-android:
+    name: Build Android
     needs: bump-version
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       JAVA_VERSION: "17" # 适配 Flutter 3.27+
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -103,52 +104,140 @@ jobs:
           echo "keyAlias=$KEY_ALIAS" >> frontend/android/keystore.properties
           echo "storeFile=../app/keystore.jks" >> frontend/android/keystore.properties
 
-      - name: Build Artifacts
+      - name: Build Android APKs
         run: |
-
           cd frontend
-
           flutter pub get
-
-          # Android (优化性能)
           flutter build apk --release --flavor with_impeller
           flutter build apk --release --flavor without_impeller
 
-          # Web (优化性能) 
+      - name: Upload Android Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-artifacts
+          path: build/app/outputs/apk/**/*.apk
+
+  build-web:
+    name: Build Web
+    needs: bump-version
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Build Web
+        run: |
+          cd frontend
+          flutter pub get
           flutter build web --release
 
-          # Linux (生成AppImage)
+      - name: Upload Web Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-artifacts
+          path: build/web/**
+
+  build-linux:
+    name: Build Linux
+    needs: bump-version
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y ninja-build libgtk-3-dev clang cmake libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio  # 跨平台编译依赖
+
+      - name: Build Linux
+        run: |
+          cd frontend
+          flutter pub get
           flutter build linux --release
           chmod +x build/linux/x64/release/bundle/*
 
-          # Windows (生成安装程序)
-          flutter build windows --release
-          # cd build/windows/runner/Release
-          # makensis ../installer.nsis  # 需要提前准备NSIS脚本
-
-      - name: Upload Artifacts
+      - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: release-artifacts
-          path: |
-            build/app/outputs/apk/**/*.apk
-            build/web/**
-            build/linux/x64/release/bundle/**
-            build/windows/runner/Release/**
+          name: linux-artifacts
+          path: build/linux/x64/release/bundle/**
+
+  build-windows:
+    name: Build Windows
+    needs: bump-version
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Build Windows
+        run: |
+          cd frontend
+          flutter pub get
+          flutter build windows --release
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: build/windows/runner/Release/**
 
   release:
     name: Create GitHub Release
-    needs: build
+    needs: [build-android, build-web, build-linux, build-windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write # 允许创建release
 
     steps:
-      - name: Download Artifacts
+      - name: Download Android Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: release-artifacts
-          path: release-artifacts
+          name: android-artifacts
+          path: release-artifacts/android
+
+      - name: Download Web Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: web-artifacts
+          path: release-artifacts/web
+
+      - name: Download Linux Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-artifacts
+          path: release-artifacts/linux
+
+      - name: Download Windows Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-artifacts
+          path: release-artifacts/windows
 
       - name: Generate Release Notes
         run: |

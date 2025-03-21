@@ -4,6 +4,7 @@ import '../components/navigation_bar.dart';
 import '../../utils/gradient_helper.dart';
 import '../../views/screens/CBT/CBT_screen.dart';
 import '../../views/screens/chat/chat_screen.dart';
+import './statistics/statistics_screen.dart';
 import 'dart:ui' as ui;
 
 class HomeScreen extends StatefulWidget {
@@ -71,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 onPageChanged: (index) => setState(() => _currentIndex = index),
                 children: [
                   Center(child: ChatScreen()),
-                  Center(child: Text('统计数据页面')),
+                  Center(child: WeatherScreen()),
                   Center(child: CBTScreen()),
                 ],
               ),
