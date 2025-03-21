@@ -47,6 +47,7 @@ jobs:
 
           NEW_TAG="v$NEW_VERSION"
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_OUTPUT
           echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
 
           # 清理已存在的标签 
