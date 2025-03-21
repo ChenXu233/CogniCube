@@ -244,16 +244,10 @@ jobs:
           name: windows-artifacts
           path: release-artifacts/windows
 
-      - name: Generate Release Notes
-        run: |
-          echo "## Changelog" > release-notes.md
-          git log --pretty=format:"- %s (%h)" ${{ needs.bump-version.outputs.old_tag }}..${{ env.NEW_TAG }} >> release-notes.md
-
       - name: Publish Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.NEW_TAG }}
-          body_path: release-notes.md
           files: |
             release-artifacts/**/*.apk
             release-artifacts/**/*.zip
