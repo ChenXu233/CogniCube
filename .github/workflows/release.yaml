@@ -9,7 +9,7 @@ on:
 env:
   FLUTTER_VERSION: "3.29.2" # 更新至最新稳定版
   BUILD_DIR: "build"
-  ANDROID_KEYSTORE_PATH: "frontend/android/app/keystore.jks"
+  ANDROID_KEYSTORE_PATH: "frontend/android/keystore.jks"
 
 jobs:
   bump-version:
