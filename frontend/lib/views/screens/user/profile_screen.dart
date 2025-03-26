@@ -16,6 +16,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     with TickerProviderStateMixin {
   late AnimationController _gradientController;
 
+//2over
   @override
   void initState() {
     super.initState();
@@ -50,6 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
+          //an
           AnimatedBuilder(
             animation: _gradientController,
             builder: (context, _) {
