@@ -12,7 +12,7 @@ Widget buildStaticBlurAppBar(
       child: Container(
         height: kToolbarHeight + MediaQuery.of(context).padding.top,
         padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-        decoration: BoxDecoration(color: Colors.white.withOpacity(0)),
+        decoration: BoxDecoration(color: Colors.transparent),
         child: Row(
           children: [
             IconButton(
