@@ -13,6 +13,3 @@ class UserContext(Base):
     context_manager: Mapped[ContextManager] = mapped_column(
         PickleType, comment="用户对话上下文对象"
     )
-
-
-# TODO: 通过用户上下文表进行优化（空间换时间）
