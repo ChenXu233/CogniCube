@@ -68,7 +68,7 @@ class AIChatService:
         self.context_manager.add_message("user", user_message)
         response = await self.client.chat.completions.create(
             model=self.model_name,
-            messages=self.get_context(),  # type: ignore
+            messages=self.get_context(),
         )
         return response
 

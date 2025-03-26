@@ -1,5 +1,10 @@
 from typing import List, Dict, Literal, Optional
-from openai.types.chat import ChatCompletionMessageParam
+from openai.types.chat import (
+    ChatCompletionMessageParam,
+    ChatCompletionUserMessageParam,
+    ChatCompletionSystemMessageParam,
+    ChatCompletionAssistantMessageParam,
+)
 import re
 
 # 模型上下文长度配置表（单位：tokens）
@@ -83,8 +88,11 @@ class ContextManager:
         self.current_tokens += token_cost
         self._enforce_token_limit()
 
-    def get_context(self, reserved_tokens: Optional[int] = None) -> List[Dict]:
+    def get_context(
+        self, reserved_tokens: Optional[int] = None
+    ) -> List[ChatCompletionMessageParam]:
         """动态调整预留空间的上下文"""
+        openai_context = []
         reserved = reserved_tokens or self.reserved_tokens
         temp_max_ctx = max(0, self.max_total_tokens - reserved)
 
@@ -94,8 +102,14 @@ class ContextManager:
         while current_temp_tokens > temp_max_ctx and temp_stack:
             removed = temp_stack.pop(0)
             current_temp_tokens -= removed["tokens"]
-
-        return [{"role": m["role"], "content": m["content"]} for m in temp_stack]
+        for i in temp_stack:
+            if i["role"] == "user":
+                openai_context.append(ChatCompletionUserMessageParam(**i))
+            elif i["role"] == "assistant":
+                openai_context.append(ChatCompletionAssistantMessageParam(**i))
+            else:
+                openai_context.append(ChatCompletionSystemMessageParam(**i))
+        return openai_context
 
     def _calc_token(self, role: str, content: str) -> int:
         """通过 LangChain 计算完整消息 token"""
