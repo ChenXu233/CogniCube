@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cognicube/views/screens/CBT/tests_result_screen.dart';
 import '../../../data/assessment_data.dart';
 import '../../../models/assessment_model.dart';
 
@@ -41,25 +42,17 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
       0,
       (sum, value) => sum + (value ?? 0),
     );
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('测评结果'),
-            content: Text('您的得分：$score\n${_getResultDescription(score)}'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('完成'),
-              ),
-            ],
-          ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => TestsResultScreen(
+              // 使用新类名
+              assessment: assessment,
+              score: score,
+            ),
+      ),
     );
-  }
-
-  String _getResultDescription(int score) {
-    // 根据量表评分标准实现
-    return '根据PHQ-9量表标准，建议：${score > 14 ? '立即寻求专业帮助' : '关注情绪变化'}';
   }
 
   @override

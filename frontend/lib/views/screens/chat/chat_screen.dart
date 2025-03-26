@@ -29,6 +29,7 @@ class _ChatPageState extends State<ChatScreen> {
     final chatVM = context.watch<ChatViewModel>();
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Column(
         children: [
           Expanded(

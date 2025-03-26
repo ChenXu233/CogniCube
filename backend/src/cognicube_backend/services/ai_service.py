@@ -3,7 +3,10 @@ from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+
+from .ai.context_manager import ContextManager
 from cognicube_backend.models.conversation import Conversation, Who
+from cognicube_backend.models.context import UserContext
 from cognicube_backend.schemas.message import Message
 from cognicube_backend.config import CONFIG
 
@@ -19,55 +22,58 @@ async def get_ai_session() -> AsyncOpenAI:
 
 
 class AIChatService:
-    def __init__(self, db: Session, max_token: int = 4096):
+    def __init__(self, user_id: int, db: Session):
+        self.user_id = user_id
         self.db = db
-        self.SESSION = get_ai_session()
         self.model_name = CONFIG.AI_MODEL_NAME
         self.api_key = CONFIG.AI_API_KEY
         self.api_base = CONFIG.AI_API_URL
         self.prompt = CONFIG.AI_PROMPT
         self.client: AsyncOpenAI | None = None
-        self.history = []
-        self.max_token = max_token
+        self.context_manager: ContextManager = self.get_context_manager()
 
-    def build_history(self, user_id: int):
-        """构建历史对话记录"""
-        self.history = [
-            {
-                "role": Who.SYSTEM.value,
-                "content": self.prompt,
-            }
-        ]
-        records = (
-            self.db.query(Conversation)
-            .filter_by(user_id=user_id)
-            .order_by(Conversation.message_id.desc())
-            .limit(50)
-            .all()
-        )
-
-        for record in records:
-            self.history.append(
-                {
-                    "role": record.who.value,
-                    "content": record.plain_text,
-                }
+    def get_context_manager(self) -> ContextManager:
+        if (
+            user_context := self.db.query(UserContext)
+            .filter_by(user_id=self.user_id)
+            .first()
+        ):
+            pass
+        else:
+            user_context = ContextManager()
+            self.db.add(
+                UserContext(user_id=self.user_id, context_manager=self.context_manager)
             )
-        return self.history
+        return user_context
 
-    async def chat(self, user_id: int, user_message: str):
+    def update_context_manager(self):
+        user_context = (
+            self.db.query(UserContext).filter_by(user_id=self.user_id).first()
+        )
+        if not self.context_manager:
+            raise Exception("Context manager is not initialized")
+        if not user_context:
+            raise Exception("user context is not initialized")
+        user_context.context_manager = self.context_manager
+        self.db.commit()
+
+    def get_context(self):
+        """获取上下文"""
+
+        return self.context_manager.get_context()
+
+    async def chat(self, user_message: str):
         """AI 聊天接口"""
         self.client = await get_ai_session()
-        self.build_history(user_id)
-        self.history.extend([{"content": user_message, "role": Who.USER.value}])
+        self.context_manager.add_message("user", user_message)
         response = await self.client.chat.completions.create(
             model=self.model_name,
-            messages=self.history,  # type: ignore
+            messages=self.get_context(),
         )
         return response
 
     async def save_message_record(self, user_id: int, message: Message):
-        """简化保存对话记录的过程"""
+        """保存对话记录"""
         message_record = Conversation(
             user_id=user_id,
             who=message.who,
