@@ -5,10 +5,8 @@ class CBTScreen extends StatelessWidget {
   final List<Map<String, dynamic>> features = [
     {'icon': Icons.mood, 'label': '情绪追踪', 'route': '/cbt/mood'},
     {'icon': Icons.checklist, 'label': '测试', 'route': '/cbt/tests'},
-    {'icon': Icons.air, 'label': '深呼吸', 'route': '/breathings'},
-    {'icon': Icons.self_improvement, 'label': '打坐', 'route': '/affirmations'},
+    {'icon': Icons.air, 'label': '倒计时', 'route': '/countdown'},
     {'icon': Icons.emoji_events, 'label': '挑战', 'route': '/challenges'},
-    {'icon': Icons.spa, 'label': '冥想', 'route': '/meditations'},
   ];
 
   @override
