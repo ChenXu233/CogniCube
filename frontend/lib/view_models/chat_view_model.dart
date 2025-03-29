@@ -70,6 +70,9 @@ class ChatViewModel extends ChangeNotifier {
     );
     notifyListeners();
     scrollToBottom();
+  
+    messageController.clear();
+    updateSendButtonState(false);
 
     // 添加加载状态
     messages.add(
@@ -109,8 +112,6 @@ class ChatViewModel extends ChangeNotifier {
       scrollToBottom();
     }
 
-    messageController.clear();
-    updateSendButtonState(false); // 清空输入框后禁用发送按钮
   }
 
   @override

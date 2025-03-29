@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'target_screen.dart';
 
 class MoodTrackerScreen extends StatefulWidget {
   const MoodTrackerScreen({super.key});
@@ -85,19 +86,29 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
         title: const Text('情绪追踪'),
         backgroundColor: Color(0xFFFFB6C1),
         foregroundColor: Colors.white,
+        leading: IconButton(
+          // 自定义返回按钮
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacement(
+              // 替换当前路由更合适
+              context,
+              MaterialPageRoute(builder: (context) => TargetScreen()),
+            );
+          },
+        ),
         actions: [
+          // 保留音乐按钮
           IconButton(
             icon: Icon(
-              isPlaying
-                  ? Icons
-                      .music_note // 播放时显示音乐图标
-                  : Icons.music_off, // 暂停时显示禁止图标
-              color: Colors.white, // 保持白色与主题一致
+              isPlaying ? Icons.music_note : Icons.music_off,
+              color: Colors.white,
             ),
             onPressed: _toggleMusic,
           ),
         ],
       ),
+
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

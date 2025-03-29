@@ -45,7 +45,7 @@ class _ChatPageState extends State<ChatScreen> {
                 padding: const EdgeInsets.only(top: 16),
                 controller: chatVM.scrollController,
                 itemCount: chatVM.messages.length + 1,
-                itemBuilder: (context, index) {
+                 itemBuilder: (context, index) {
                   if (index == chatVM.messages.length) {
                     return _buildLoadMoreHint(chatVM);
                   }
@@ -129,7 +129,6 @@ class _ChatPageState extends State<ChatScreen> {
 
   void _sendMessage(BuildContext context, String text) {
     final viewModel = context.read<ChatViewModel>();
-    viewModel.messageController.clear();
     if (text.trim().isEmpty) return;
     context.read<ChatViewModel>().sendMessage(text);
     FocusScope.of(context).unfocus();
