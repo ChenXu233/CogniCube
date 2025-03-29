@@ -1,5 +1,5 @@
 from openai import AsyncOpenAI
-from typing import Dict, Optional
+from typing import Optional
 
 from .context_manager import ContextManager
 from .tool_chain_manager import ToolChainManager

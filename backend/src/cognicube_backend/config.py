@@ -24,7 +24,7 @@ class Setting(BaseSettings):
         env_file = ".env"
 
 
-@lru_cache
+# @lru_cache
 def get_config():
     """返回设置对象，且保证只读取一次"""
     return Setting()  # type: ignore

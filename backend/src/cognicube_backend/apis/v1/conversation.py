@@ -42,6 +42,7 @@ async def create_conversation(
         messages=[Text(content=ai_response_text)],
     )
     await ai_service.save_message_record(user_id, ai_message)
+    await ai_service.emotion_quantification(message.message.plain_text)
 
     _ai_message = (
         db.query(Conversation)

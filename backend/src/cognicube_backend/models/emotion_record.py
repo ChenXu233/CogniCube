@@ -1,44 +1,11 @@
 from datetime import datetime, UTC
 from typing import Optional
-from sqlalchemy import (
-    ForeignKey,
-    String,
-    DateTime,
-    CheckConstraint,
-    Integer,
-)
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-    relationship,
-    validates,
-)
+from sqlalchemy import String, DateTime, CheckConstraint, Integer
+from sqlalchemy.orm import Mapped, mapped_column, validates
 from cognicube_backend.databases.database import Base
 
 
-class EmotionType(Base):
-    """情绪类型定义表"""
-
-    __tablename__ = "emotion_types"
-
-    type_id: Mapped[int] = mapped_column(primary_key=True)
-    emotion_name: Mapped[str] = mapped_column(String(20), unique=True)
-    display_name: Mapped[str] = mapped_column(String(50))
-    is_primary: Mapped[bool] = mapped_column(default=True)
-    description: Mapped[Optional[str]] = mapped_column(String(200))
-
-    # 关系
-    records: Mapped[list["EmotionRecord"]] = relationship(
-        back_populates="emotion_type_ref"
-    )
-
-    def __repr__(self) -> str:
-        return f"<EmotionType {self.emotion_name}>"
-
-
 class EmotionRecord(Base):
-    """情绪量化记录表"""
-
     __tablename__ = "emotion_records"
 
     record_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -47,10 +14,7 @@ class EmotionRecord(Base):
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
 
-    # 使用 emotion_name 作为外键
-    emotion_type: Mapped[str] = mapped_column(
-        String(20), ForeignKey("emotion_types.emotion_name")
-    )
+    emotion_type: Mapped[str] = mapped_column(String(50))
 
     intensity_score: Mapped[float] = mapped_column(
         CheckConstraint("intensity_score BETWEEN 0 AND 1")
@@ -63,7 +27,6 @@ class EmotionRecord(Base):
 
     @validates("valence", "arousal", "dominance")
     def validate_scores(self, key: str, value: float) -> float:
-        """验证分数范围"""
         if key == "valence" and not (-1 <= value <= 1):
             raise ValueError("Valence must be between -1 and 1")
         if key in ("arousal", "dominance") and not (0 <= value <= 1):
