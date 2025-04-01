@@ -110,8 +110,8 @@ class AIChatService:
         },
         "dominance": {
             "description": "支配度（可选）",
-            "约束": "浮点数，范围[0.0-1.0]或null，0=被支配，1=掌控",
-            "示例": null
+            "约束": "浮点数，范围[0.0-1.0]，0=被支配，1=掌控",
+            "示例": 0.12
         },
     },
     "输出示例": {
@@ -161,7 +161,6 @@ class AIChatService:
             reply_to=message.reply_to,
             message=[i.model_dump() for i in message.messages],
             extensions=message.extensions,
-            plain_text=message.plain_text,
         )
         try:
             self.db.add(message_record)

@@ -127,4 +127,4 @@ class ContextManager:
         return {"model": self.model, "context_length": self.max_total_tokens}
 
     def __str__(self) -> str:
-        return f"ContextManager(model={self.model}, max_total_tokens={self.max_total_tokens}, reserved_tokens={self.reserved_tokens})"
+        return f"ContextManager(model={self.model}, max_total_tokens={self.max_total_tokens}, reserved_tokens={self.reserved_tokens})，message={self._message_queue}"

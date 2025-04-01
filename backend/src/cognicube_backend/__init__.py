@@ -7,6 +7,7 @@ from cognicube_backend.apis import router_manager
 
 APP = FastAPI(debug=True)
 
+
 APP.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # 允许所有来源，或者指定特定的来源
