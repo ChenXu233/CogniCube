@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from cognicube_backend.logger import logger
 from functools import lru_cache
 
 
@@ -31,4 +32,4 @@ def get_config():
 
 
 CONFIG = get_config()
-print(CONFIG)
+logger.debug(CONFIG)
