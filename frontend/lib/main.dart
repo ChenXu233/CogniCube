@@ -1,26 +1,34 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:go_router/go_router.dart';
+// View Models
 import 'view_models/auth_view_model.dart';
 import 'view_models/chat_view_model.dart';
-import 'utils/app_routes.dart'; // 仅保留一个路由配置文件
+
+import 'utils/routes.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 系统UI配置
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  final prefs = await SharedPreferences.getInstance();
+
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.edgeToEdge,
+    overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+  );
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
       systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarContrastEnforced: false,
+      systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
-
-  final prefs = await SharedPreferences.getInstance();
 
   runApp(
     MultiProvider(
@@ -28,20 +36,20 @@ void main() async {
         ChangeNotifierProvider(create: (ctx) => AuthViewModel(prefs: prefs)),
         ChangeNotifierProvider(create: (_) => ChatViewModel()),
       ],
-      child: const MyApp(),
+      child: const App(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'CogniCube',
       theme: _buildTheme(),
-      routerConfig: goRouter, // 确保与 app_routes.dart 中的变量名一致
+      routerConfig: goRouter,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         return MediaQuery(

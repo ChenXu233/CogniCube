@@ -15,7 +15,10 @@ import '../views/screens/CBT/tests_screen.dart';
 import '../views/screens/CBT/moodtracker_screen.dart';
 import '../views/screens/setting/setting_screen.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 final goRouter = GoRouter(
+  navigatorKey: navigatorKey, 
   initialLocation: '/',
   routes: [
     GoRoute(
