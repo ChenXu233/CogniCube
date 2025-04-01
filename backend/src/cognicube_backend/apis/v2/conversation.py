@@ -84,7 +84,9 @@ async def get_task_status(
 
     return TaskStatusResponse(
         status=task.status,
-        result=task.result_data,
+        result=ConversationResponse(message=Message(**task.result_data))
+        if task.status == TaskStatus.COMPLETED
+        else None,
         created_at=int(task.created_at.timestamp()),
         updated_at=int(task.updated_at.timestamp()) if task.updated_at else None,
     )

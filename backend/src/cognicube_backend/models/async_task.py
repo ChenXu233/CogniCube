@@ -4,10 +4,12 @@ from sqlalchemy import Enum as SAEnum
 from datetime import datetime
 from enum import Enum
 
+from cognicube_backend.schemas.conversation import ConversationResponse
+
 Base = declarative_base()
 
 
-class TaskStatus(Enum):
+class TaskStatus(str, Enum):
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
