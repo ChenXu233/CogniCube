@@ -6,7 +6,14 @@ import '../../../utils/gradient_helper.dart';
 import 'dart:ui' as ui;
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final String? redirectMessage;  // 新增重定向消息参数
+  final String? fromLocation;    // 新增来源路径参数
+
+  const LoginScreen({
+    super.key,
+    this.redirectMessage,
+    this.fromLocation,
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -26,6 +33,18 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       vsync: this,
       duration: const Duration(seconds: 15),
     )..repeat(reverse: true);
+    
+    // 显示重定向提示消息
+    if (widget.redirectMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(widget.redirectMessage!),
+            backgroundColor: Colors.orange[700],
+          ),
+        );
+      });
+    }
   }
 
   @override
@@ -154,6 +173,31 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       },
     );
   }
+  Widget _buildRegisterLink() {
+    return TextButton(
+      onPressed: () => context.go('/register'),
+      child: RichText(
+        text: TextSpan(
+          style: const TextStyle(fontSize: 16),
+          children: [
+            const TextSpan(
+              text: '没有账号？',
+              style: TextStyle(color: Color.fromARGB(179, 59, 59, 59)),
+            ),
+            TextSpan(
+              text: '注册新账号',
+              style: TextStyle(
+                color: const Color.fromARGB(255, 153, 186, 186),
+                fontWeight: FontWeight.w700,
+                decoration: TextDecoration.underline,
+                fontSize: 16.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildSubmitButton() {
     return Consumer<AuthViewModel>(
@@ -189,32 +233,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     );
   }
 
-  Widget _buildRegisterLink() {
-    return TextButton(
-      onPressed: () => context.go('/register'),
-      child: RichText(
-        text: TextSpan(
-          style: const TextStyle(fontSize: 16),
-          children: [
-            const TextSpan(
-              text: '没有账号？',
-              style: TextStyle(color: Color.fromARGB(179, 59, 59, 59)),
-            ),
-            TextSpan(
-              text: '注册新账号',
-              style: TextStyle(
-                color: const Color.fromARGB(255, 153, 186, 186),
-                fontWeight: FontWeight.w700,
-                decoration: TextDecoration.underline,
-                fontSize: 16.5,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -228,12 +246,17 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       );
 
       if (authVM.isAuthenticated && mounted) {
-        context.push('/home');
+        // 修改跳转逻辑：优先跳转来源页面
+        final targetLocation = widget.fromLocation ?? '/';
+        if (mounted) context.go(targetLocation);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red[700],
+          ),
         );
       }
     }

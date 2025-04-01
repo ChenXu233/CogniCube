@@ -16,6 +16,10 @@ class AuthViewModel with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  Future<void> initialize() async {
+    await _checkAuthStatus();
+  }
+
   Future<void> _checkAuthStatus() async {
     print(prefs.getString('auth_token'));
     _isAuthenticated = prefs.getString('auth_token') != null;
@@ -34,17 +38,24 @@ class AuthViewModel with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      AuthService.register(username, email, password);
-
-      _isAuthenticated = true;
+        final token = await AuthService.register(username, email, password);
+      
+      // 保存token到SharedPreferences
+      await prefs.setString('auth_token', token);
+      
+      // 更新认证状态
+      await _checkAuthStatus();
+      
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
+      _isAuthenticated = false;
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
+
 
   void _validateRegistrationFields(
     String username,
@@ -68,14 +79,14 @@ class AuthViewModel with ChangeNotifier {
 
       _isLoading = true;
       notifyListeners();
-
-      await Future.delayed(const Duration(seconds: 1));
-
-      if (password.length < 8) throw '密码至少需要8位';
-
-      await AuthService.login(username, password);
-
-      _isAuthenticated = true;
+      // 修改为获取返回的token
+      final token = await AuthService.login(username, password);
+      
+      // 保存token到SharedPreferences
+      await prefs.setString('auth_token', token);
+      
+      // 更新认证状态
+      await _checkAuthStatus();
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
