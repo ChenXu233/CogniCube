@@ -1,6 +1,5 @@
 from pydantic_settings import BaseSettings
 from cognicube_backend.logger import logger
-from functools import lru_cache
 
 
 class Setting(BaseSettings):

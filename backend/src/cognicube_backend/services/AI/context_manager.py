@@ -116,6 +116,7 @@ class ContextManager:
         return context
 
     def _calc_token(self, role: str, content: str) -> int:
+        """计算总token数量"""
         return token_counter(str({"role": role, "content": content}))
 
     def correct_token(self, token: int):
