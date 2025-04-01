@@ -19,27 +19,30 @@ import '../views/screens/setting/setting_screen.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 final goRouter = GoRouter(
-  navigatorKey: navigatorKey, 
+  navigatorKey: navigatorKey,
   initialLocation: '/',
   debugLogDiagnostics: true,
-  
 
-  redirect: (BuildContext context, GoRouterState state) { // ✅ GoRouterState来自go_router包
+  redirect: (BuildContext context, GoRouterState state) {
     final auth = Provider.of<AuthViewModel>(context, listen: false);
-    final currentPath = state.uri.path; // 使用uri.path
+    final currentPath = state.uri.path;
     final isLoggingIn = currentPath.startsWith('/login');
-    if (!auth.isAuthenticated ) {
-    final from = Uri.encodeComponent(currentPath);
-    return '/login?from=$from&message=请先登录';
-  }
+    final from = state.uri.queryParameters['from'];
 
-  if (auth.isAuthenticated && (isLoggingIn )) {
-    return state.uri.queryParameters['from'] ?? '/'; // 使用uri.queryParameters
-  }
+    if (!auth.isAuthenticated && !isLoggingIn) {
+      final encodedFrom = Uri.encodeComponent(currentPath);
+      return '/login?from=$encodedFrom&message=请先登录';
+    }
+
+    if (auth.isAuthenticated &&
+        isLoggingIn &&
+        from != null &&
+        from.isNotEmpty) {
+      return from;
+    }
 
     return null;
   },
-
   routes: [
     GoRoute(
       path: '/',
@@ -65,7 +68,6 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/login',
       pageBuilder: (context, state) => const MaterialPage(child: LoginScreen()),
-      
     ),
     GoRoute(
       path: '/register',

@@ -6,20 +6,17 @@ import '../../../utils/gradient_helper.dart';
 import 'dart:ui' as ui;
 
 class LoginScreen extends StatefulWidget {
-  final String? redirectMessage;  // 新增重定向消息参数
-  final String? fromLocation;    // 新增来源路径参数
+  final String? redirectMessage; // 新增重定向消息参数
+  final String? fromLocation; // 新增来源路径参数
 
-  const LoginScreen({
-    super.key,
-    this.redirectMessage,
-    this.fromLocation,
-  });
+  const LoginScreen({super.key, this.redirectMessage, this.fromLocation});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -33,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       vsync: this,
       duration: const Duration(seconds: 15),
     )..repeat(reverse: true);
-    
+
     // 显示重定向提示消息
     if (widget.redirectMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -68,9 +65,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             animation: _gradientController,
             builder: (context, _) {
               return Container(
-                decoration: BoxDecoration(
-                  gradient: createPrimaryGradient(),
-                ),
+                decoration: BoxDecoration(gradient: createPrimaryGradient()),
               );
             },
           ),
@@ -84,17 +79,26 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.only(top: 100, left: 20, right: 20, bottom: 40),
+                  padding: const EdgeInsets.only(
+                    top: 100,
+                    left: 20,
+                    right: 20,
+                    bottom: 40,
+                  ),
                   child: Form(
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text('欢迎回来',
-                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                color: const Color.fromARGB(255, 255, 140, 140),
-                                fontWeight: FontWeight.w800,
-                                shadows: [Shadow(color: Colors.black.withOpacity(0.2), blurRadius: 6)])),
+                        Text(
+                          '欢迎回来',
+                          style: Theme.of(
+                            context,
+                          ).textTheme.headlineMedium?.copyWith(
+                            color: const Color.fromARGB(255, 238, 175, 175),
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
                         const SizedBox(height: 50),
                         _buildUsernameField(),
                         const SizedBox(height: 25),
@@ -118,18 +122,31 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Widget _buildUsernameField() {
     return TextFormField(
       controller: _usernameController,
-      style: const TextStyle(color: Color.fromARGB(255, 21, 21, 21), fontSize: 16),
+      style: const TextStyle(
+        color: Color.fromARGB(255, 21, 21, 21),
+        fontSize: 16,
+      ),
       decoration: InputDecoration(
         labelText: '用户名',
-        labelStyle: const TextStyle(color: Color.fromARGB(179, 43, 43, 43), fontSize: 15),
-        prefixIcon: const Icon(Icons.person_outlined, color: Color.fromARGB(179, 43, 43, 43), size: 22),
+        labelStyle: const TextStyle(
+          color: Color.fromARGB(179, 43, 43, 43),
+          fontSize: 15,
+        ),
+        prefixIcon: const Icon(
+          Icons.person_outlined,
+          color: Color.fromARGB(179, 43, 43, 43),
+          size: 22,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.35),  // 透明度调整为35%
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
+        fillColor: Colors.white.withOpacity(0.35), // 透明度调整为35%
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 22,
+        ),
       ),
       textInputAction: TextInputAction.next,
       validator: (value) {
@@ -142,12 +159,22 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Widget _buildPasswordField() {
     return TextFormField(
       controller: _passwordController,
-      style: const TextStyle(color: Color.fromARGB(255, 21, 21, 21), fontSize: 16),
+      style: const TextStyle(
+        color: Color.fromARGB(255, 21, 21, 21),
+        fontSize: 16,
+      ),
       obscureText: _obscurePassword,
       decoration: InputDecoration(
         labelText: '密码',
-        labelStyle: const TextStyle(color: Color.fromARGB(179, 43, 43, 43), fontSize: 15),
-        prefixIcon: const Icon(Icons.lock_outlined, color: Color.fromARGB(179, 43, 43, 43), size: 22),
+        labelStyle: const TextStyle(
+          color: Color.fromARGB(179, 43, 43, 43),
+          fontSize: 15,
+        ),
+        prefixIcon: const Icon(
+          Icons.lock_outlined,
+          color: Color.fromARGB(179, 43, 43, 43),
+          size: 22,
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -161,8 +188,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.35),  // 透明度调整为35%
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
+        fillColor: Colors.white.withOpacity(0.35), // 透明度调整为35%
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 22,
+        ),
       ),
       textInputAction: TextInputAction.done,
       onFieldSubmitted: (_) => _submitForm(),
@@ -173,6 +203,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       },
     );
   }
+
   Widget _buildRegisterLink() {
     return TextButton(
       onPressed: () => context.go('/register'),
@@ -187,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             TextSpan(
               text: '注册新账号',
               style: TextStyle(
-                color: const Color.fromARGB(255, 153, 186, 186),
+                color: const Color.fromARGB(255, 71, 164, 252).withOpacity(0.5),
                 fontWeight: FontWeight.w700,
                 decoration: TextDecoration.underline,
                 fontSize: 16.5,
@@ -208,26 +239,34 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
-            backgroundColor: const Color.fromARGB(255, 255, 181, 97).withOpacity(0.3),
+            backgroundColor: const Color.fromARGB(
+              255,
+              238,
+              175,
+              175,
+            ).withOpacity(0.8),
             elevation: 4,
             shadowColor: Colors.black.withOpacity(0.3),
           ),
           onPressed: authVM.isLoading ? null : _submitForm,
-          child: authVM.isLoading
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    color: Color.fromARGB(255, 53, 53, 53),
+          child:
+              authVM.isLoading
+                  ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      color: Color.fromARGB(255, 53, 53, 53),
+                    ),
+                  )
+                  : const Text(
+                    '立即登录',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 53, 53, 53),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                )
-              : const Text('立即登录', 
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 53, 53, 53),
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600
-                  )),
         );
       },
     );
