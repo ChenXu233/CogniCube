@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:provider/provider.dart';
 // View Models
-
+import '../view_models/auth_view_model.dart';
 // Screens
 import '../views/screens/chat/chat_screen.dart';
 import '../views/screens/auth/login_screen.dart';
@@ -20,6 +21,25 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final goRouter = GoRouter(
   navigatorKey: navigatorKey, 
   initialLocation: '/',
+  debugLogDiagnostics: true,
+  
+
+  redirect: (BuildContext context, GoRouterState state) { // ✅ GoRouterState来自go_router包
+    final auth = Provider.of<AuthViewModel>(context, listen: false);
+    final currentPath = state.uri.path; // 使用uri.path
+    final isLoggingIn = currentPath.startsWith('/login');
+    if (!auth.isAuthenticated ) {
+    final from = Uri.encodeComponent(currentPath);
+    return '/login?from=$from&message=请先登录';
+  }
+
+  if (auth.isAuthenticated && (isLoggingIn )) {
+    return state.uri.queryParameters['from'] ?? '/'; // 使用uri.queryParameters
+  }
+
+    return null;
+  },
+
   routes: [
     GoRoute(
       path: '/',
@@ -45,6 +65,7 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/login',
       pageBuilder: (context, state) => const MaterialPage(child: LoginScreen()),
+      
     ),
     GoRoute(
       path: '/register',

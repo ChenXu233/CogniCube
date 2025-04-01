@@ -1,8 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/constants.dart';
+import '../view_models/auth_view_model.dart';
+import 'package:provider/provider.dart';
+// import  'package:flutter/material.dart';
+import 'routes.dart';
+
 
 class DioUtil {
+
   static final DioUtil _instance = DioUtil._internal();
   late Dio _dio;
   late SharedPreferences _prefs;
@@ -57,7 +63,13 @@ class DioUtil {
 
   void _performLogout() {
     _prefs.remove('auth_token');
-    // 这里可以添加路由跳转到登录页的逻辑
+    if (navigatorKey.currentContext != null) {
+    final authVM = Provider.of<AuthViewModel>(
+      navigatorKey.currentContext!,
+      listen: false,
+    );
+    authVM.logout();
+  }
   }
 
   Dio get dio => _dio;
