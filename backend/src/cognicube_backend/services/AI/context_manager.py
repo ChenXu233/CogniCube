@@ -116,6 +116,7 @@ class ContextManager:
         return context
 
     def _calc_token(self, role: str, content: str) -> int:
+        """计算总token数量"""
         return token_counter(str({"role": role, "content": content}))
 
     def correct_token(self, token: int):
@@ -127,4 +128,4 @@ class ContextManager:
         return {"model": self.model, "context_length": self.max_total_tokens}
 
     def __str__(self) -> str:
-        return f"ContextManager(model={self.model}, max_total_tokens={self.max_total_tokens}, reserved_tokens={self.reserved_tokens})"
+        return f"ContextManager(model={self.model}, max_total_tokens={self.max_total_tokens}, reserved_tokens={self.reserved_tokens})，message={self._message_queue}"

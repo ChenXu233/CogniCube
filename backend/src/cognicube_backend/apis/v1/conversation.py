@@ -34,15 +34,14 @@ async def create_conversation(
     ai_service = AIChatService(user_id, db)
 
     await ai_service.save_message_record(user_id, message.message)
-    ai_response = await ai_service.chat(message.message.plain_text)
+    ai_response = await ai_service.chat(message.message.get_plain_text())
     ai_response_text: str = ai_response.choices[0].message.content  # type: ignore
     ai_message = Message(
-        plain_text=ai_response_text,
         who=Who.AI.value,
-        messages=[Text(content=ai_response_text)],
+        messages=[Text(text=ai_response_text)],
     )
     await ai_service.save_message_record(user_id, ai_message)
-    await ai_service.emotion_quantification(message.message.plain_text)
+    await ai_service.emotion_quantification(message.message.get_plain_text())
 
     _ai_message = (
         db.query(Conversation)
@@ -89,7 +88,6 @@ async def get_conversation_history(
     history = [
         Message(
             messages=convo.message,
-            plain_text=convo.plain_text,
             who=convo.who.value,
             message_id=convo.message_id,
             timestamp=convo.time.timestamp(),
