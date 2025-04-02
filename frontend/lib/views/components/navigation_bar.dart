@@ -16,10 +16,10 @@ Widget buildStaticBlurNavigationBar(
         decoration: BoxDecoration(color: Colors.white.withOpacity(0.3)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            buildNavItem(Icons.chat, 0, currentIndex, onTap),
-            buildNavItem(Icons.insert_chart, 1, currentIndex, onTap),
-            buildNavItem(Icons.apps, 2, currentIndex, onTap),
+          children: [            
+            buildNavItem(Icons.apps, 0, currentIndex, onTap),
+            buildNavItem(Icons.chat, 1, currentIndex, onTap),
+            buildNavItem(Icons.insert_chart, 2, currentIndex, onTap),
             buildNavItem(Icons.person, 3, currentIndex, onTap),
           ],
         ),

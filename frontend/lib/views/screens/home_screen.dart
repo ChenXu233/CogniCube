@@ -70,10 +70,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 controller: _pageController,
                 onPageChanged: (index) => setState(() => _currentIndex = index),
                 children: [
+                  Center(child: CBTScreen()),
                   Center(child: ChatScreen()),
                   Center(child: WeatherScreen()),
-                  Center(child: CBTScreen()),
-                  Center(child: ProfileScreen ()),
+                  Center(child: ProfileScreen()),
                 ]
               ),
             ),
