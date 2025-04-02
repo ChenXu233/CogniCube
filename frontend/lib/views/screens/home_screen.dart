@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../components/app_bar.dart';
 import '../components/navigation_bar.dart';
 import '../../utils/gradient_helper.dart';
 import '../../views/screens/CBT/CBT_screen.dart';
 import '../../views/screens/chat/chat_screen.dart';
 import './statistics/statistics_screen.dart';
+import '../../views/screens/user/profile_screen.dart';
 import 'dart:ui' as ui;
 
 class HomeScreen extends StatefulWidget {
@@ -64,7 +64,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(
-                top: kToolbarHeight + 16,
                 bottom: kBottomNavigationBarHeight + 16,
               ),
               child: PageView(
@@ -74,12 +73,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Center(child: ChatScreen()),
                   Center(child: WeatherScreen()),
                   Center(child: CBTScreen()),
-                ],
+                  Center(child: ProfileScreen ()),
+                ]
               ),
             ),
           ),
 
-          buildStaticBlurAppBar(context, _pageController),
           Positioned(
             bottom: 0,
             left: 0,
@@ -94,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               );
             }),
           ),
-        ],
+         ],
       ),
     );
   }
