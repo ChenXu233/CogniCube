@@ -67,15 +67,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 top: kToolbarHeight + 16,
                 bottom: kBottomNavigationBarHeight + 16,
               ),
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) => setState(() => _currentIndex = index),
-                children: [
-                  Center(child: ChatScreen()),
-                  Center(child: WeatherScreen()),
-                  Center(child: CBTScreen()),
-                ],
-              ),
             ),
           ),
 

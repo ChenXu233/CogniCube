@@ -11,9 +11,6 @@ final GoRouter appRoutes = GoRouter(
     // 合并到原有路由结构中
     GoRoute(
       path: '/cbt',
-      pageBuilder:
-          (context, state) =>
-              MaterialPage(key: state.pageKey, child:  CBTScreen()),
       routes: [
         // 情绪追踪子路由
         GoRoute(

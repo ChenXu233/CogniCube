@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../models/assessment_model.dart';
+import '../../../../models/assessment_model.dart';
 
 class TestsResultScreen extends StatelessWidget {
   final Assessment assessment;

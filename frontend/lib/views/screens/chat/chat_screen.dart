@@ -45,7 +45,7 @@ class _ChatPageState extends State<ChatScreen> {
                 padding: const EdgeInsets.only(top: 16),
                 controller: chatVM.scrollController,
                 itemCount: chatVM.messages.length + 1,
-                 itemBuilder: (context, index) {
+                itemBuilder: (context, index) {
                   if (index == chatVM.messages.length) {
                     return _buildLoadMoreHint(chatVM);
                   }
