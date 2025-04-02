@@ -38,14 +38,14 @@ class AuthViewModel with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-        final token = await AuthService.register(username, email, password);
-      
+      final token = await AuthService.register(username, email, password);
+
       // 保存token到SharedPreferences
       await prefs.setString('auth_token', token);
-      
+
       // 更新认证状态
       await _checkAuthStatus();
-      
+
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
@@ -55,7 +55,6 @@ class AuthViewModel with ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   void _validateRegistrationFields(
     String username,
@@ -81,10 +80,10 @@ class AuthViewModel with ChangeNotifier {
       notifyListeners();
       // 修改为获取返回的token
       final token = await AuthService.login(username, password);
-      
+
       // 保存token到SharedPreferences
       await prefs.setString('auth_token', token);
-      
+
       // 更新认证状态
       await _checkAuthStatus();
       _errorMessage = null;
@@ -102,7 +101,7 @@ class AuthViewModel with ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await prefs.remove('token');
+    await prefs.remove('auth_token');
     await prefs.remove('userData');
     _isAuthenticated = false;
     notifyListeners();

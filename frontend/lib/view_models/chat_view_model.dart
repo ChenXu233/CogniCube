@@ -23,9 +23,8 @@ class ChatViewModel extends ChangeNotifier {
     if (Constants.useMockResponses) {
       newMessages.addAll([
         message_model.Message(
-          messages: [message_model.Text(text: '历史消息1：你好，有什么可以帮助你的？')],
+          messages: [message_model.TextModel(text: '历史消息1：你好，有什么可以帮助你的？')],
           who: 'assistant',
-          extension: {},
         ),
       ]);
     } else {
@@ -63,23 +62,21 @@ class ChatViewModel extends ChangeNotifier {
     // 添加用户消息
     messages.add(
       message_model.Message(
-        messages: [message_model.Text(text: text)],
+        messages: [message_model.TextModel(text: text)],
         who: 'user',
-        extension: {},
       ),
     );
     notifyListeners();
     scrollToBottom();
-  
+
     messageController.clear();
     updateSendButtonState(false);
 
     // 添加加载状态
     messages.add(
       message_model.Message(
-        messages: [message_model.Text(text: '正在加载...')],
+        messages: [message_model.TextModel(text: '正在加载...')],
         who: 'loading',
-        extension: {},
       ),
     );
     notifyListeners();
@@ -92,9 +89,8 @@ class ChatViewModel extends ChangeNotifier {
       messages.removeLast(); // 移除加载状态
       messages.add(
         message_model.Message(
-          messages: [message_model.Text(text: aiResponse)],
+          messages: [message_model.TextModel(text: aiResponse)],
           who: 'assistant',
-          extension: {},
         ),
       );
       notifyListeners();
@@ -103,15 +99,13 @@ class ChatViewModel extends ChangeNotifier {
       messages.removeLast(); // 移除加载状态
       messages.add(
         message_model.Message(
-          messages: [message_model.Text(text: '发生错误，请稍后再试:$e')],
+          messages: [message_model.TextModel(text: '发生错误，请稍后再试:$e')],
           who: 'assistant',
-          extension: {},
         ),
       );
       notifyListeners();
       scrollToBottom();
     }
-
   }
 
   @override

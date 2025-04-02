@@ -76,7 +76,7 @@ class MessageBubble extends StatelessWidget {
                                 ],
                               )
                               : Text(
-                                message.plainText,
+                                message.getPlainText(),
                                 style: TextStyle(
                                   color: isUser ? Colors.white : Colors.black87,
                                   fontSize: 16,
@@ -89,7 +89,13 @@ class MessageBubble extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  _formatTime(message.timestamp),
+                  _formatTime(
+                    message.timestamp != null
+                        ? DateTime.fromMillisecondsSinceEpoch(
+                          message.timestamp!.toInt(),
+                        )
+                        : null,
+                  ),
                   style: TextStyle(color: Colors.grey[600], fontSize: 10),
                 ),
               ),
@@ -138,7 +144,7 @@ class MessageBubble extends StatelessWidget {
       ],
     ).then((value) {
       if (value == 'reply') {
-        _replyToMessage(context, message.plainText);
+        _replyToMessage(context, message.getPlainText());
       }
     });
   }

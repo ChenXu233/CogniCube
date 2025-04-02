@@ -1,105 +1,70 @@
-class Text {
-  final String text;
-  final String type;
+import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-  Text({required this.text, String? type}) : type = type ?? 'text';
+part 'message_model.g.dart';
+part 'message_model.freezed.dart';
 
-  factory Text.fromJson(Map<String, dynamic> json) {
-    return Text(text: json['content'], type: json['type'] ?? 'text');
-  }
+// 消息类型枚举
+enum MessageType {
+  text('text'),
+  expression('expression');
 
-  Map<String, dynamic> toJson() {
-    return {'content': text, 'type': type};
-  }
+  final String value;
+  const MessageType(this.value);
 }
 
-class Expression {
-  final String expressionId;
-  final String content;
-  final String detail;
-  final String type;
+// 文本消息模型
+@freezed
+abstract class TextModel with _$TextModel {
+  const factory TextModel({
+    @Default(MessageType.text) MessageType type,
+    required String text,
+  }) = _TextModel;
 
-  Expression({
-    required this.expressionId,
-    required this.detail,
-    String? content,
-    String? type,
-  }) : type = type ?? 'expression',
-       content = content ?? '';
-
-  factory Expression.fromJson(Map<String, dynamic> json) {
-    return Expression(
-      expressionId: json['content'],
-      detail: '',
-      type: json['type'] ?? 'expression',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'content': expressionId, 'type': type};
-  }
+  factory TextModel.fromJson(Map<String, dynamic> json) =>
+      _$TextModelFromJson(json);
 }
 
-class Message {
-  final List<dynamic> messages;
-  final DateTime timestamp;
-  final String who;
-  final int? messageId;
-  final int? replyTo;
-  String plainText;
-  late Map<String, dynamic> extension;
+// 表情消息模型
+@freezed
+abstract class ExpressionModel with _$ExpressionModel {
+  const factory ExpressionModel({
+    @Default(MessageType.expression) MessageType type,
+    required int expressionId,
+    required String text,
+  }) = _ExpressionModel;
 
-  Message({
-    required this.messages,
-    required this.who,
-    this.messageId,
-    this.replyTo,
-    DateTime? timestamp,
-    Map<String, dynamic>? extensions,
-    required extension,
-  }) : timestamp = timestamp ?? DateTime.now(),
-       plainText = messages
-           .map<String>((m) => m.toJson()['content'])
-           .join(' '), // 假设 messages 中的元素都有 toString 方法
-       extension = extensions ?? {};
-
-  factory Message.fromJson(Map<String, dynamic> json) {
-    return Message(
-      messages:
-          json['messages'].map<dynamic>((m) {
-            switch (m['type']) {
-              case 'text':
-                return Text.fromJson(m);
-              case 'expression':
-                return Expression.fromJson(m);
-              default:
-                throw Exception('Unsupported message type');
-            }
-          }).toList(),
-      who: json['who'],
-      messageId: json['message_id'],
-      timestamp:
-          json['timestamp'] != null
-              ? DateTime.fromMillisecondsSinceEpoch(
-                (json['timestamp'] * 1000).toInt(),
-              )
-              : null,
-      replyTo: json['reply_to'],
-      extension: json['extensions'] ?? {},
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'messages': messages.map((m) => m.toJson()).toList(),
-      'message_id': messageId,
-      'timestamp': timestamp.millisecondsSinceEpoch ~/ 1000, // 转换为秒
-      'who': who,
-      'reply_to': replyTo,
-      'plain_text': plainText,
-      'extensions': extension,
-    };
-  }
+  factory ExpressionModel.fromJson(Map<String, dynamic> json) =>
+      _$ExpressionModelFromJson(json);
 }
 
-// 假设 Text 和 Expression 类已经定
+// 抽象消息基类
+@freezed
+abstract class Message with _$Message {
+  const factory Message({
+    required List<dynamic> messages, // 使用联合类型
+    int? replyTo,
+    double? timestamp,
+    required String who,
+    int? messageId,
+    @Default({}) Map<String, dynamic> extensions,
+  }) = _Message;
+
+  factory Message.fromJson(Map<String, dynamic> json) =>
+      _$MessageFromJson(json);
+}
+
+extension MessageExtensions on Message {
+  String getPlainText() {
+    String text = '';
+    for (var message in messages) {
+      if (message is TextModel) {
+        text += message.text;
+      } else if (message is ExpressionModel) {
+        text += message.text;
+      }
+    }
+    return text;
+  }
+}

@@ -10,6 +10,7 @@ from cognicube_backend.utils.jwt_generator import (
     create_jwt_token,
     get_jwt_token_user_id,
 )
+from cognicube_backend.logger import logger
 
 auth = APIRouter(prefix="/apis/v1/auth")
 
@@ -21,6 +22,7 @@ async def read_root():
 
 @auth.post("/login", response_model=TokenResponse)
 async def login(user: UserLogin, db: Session = Depends(get_db)):
+    logger.debug(f"User login: {user.username}")
     user_db = db.query(User).filter(User.username == user.username).first()
     if not user_db:
         raise HTTPException(status_code=404, detail="User not found")
@@ -41,7 +43,6 @@ async def login(user: UserLogin, db: Session = Depends(get_db)):
 @auth.post("/refresh")
 # 定义一个异步函数refresh，用于刷新用户的访问令牌
 async def refresh(user_id: int = Depends(get_jwt_token_user_id)):
-
     access_token = create_jwt_token(
         {"sub": str(user_id), "type": "access"}, timedelta(days=1)
     )

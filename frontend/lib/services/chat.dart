@@ -31,9 +31,8 @@ class ChatApiService {
       final body = {
         'message':
             message_model.Message(
-              messages: [message_model.Text(text: message)],
+              messages: [message_model.TextModel(text: message)],
               who: 'user',
-              extension: {},
             ).toJson(),
       };
 

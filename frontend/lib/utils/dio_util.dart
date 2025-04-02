@@ -63,7 +63,7 @@ class DioUtil {
         _gotoPage(navigatorKey.currentContext!, '/login');
       }
     }
-    handler.next(error);
+    // handler.next(error);
   }
 
   void _gotoPage(BuildContext context, String routeName) {
