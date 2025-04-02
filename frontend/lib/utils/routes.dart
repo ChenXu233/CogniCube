@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:provider/provider.dart';
 // View Models
-import '../view_models/auth_view_model.dart';
+import '../view_models/auth_view_model.dart'; // View Models
+
 // Screens
 import '../views/screens/chat/chat_screen.dart';
 import '../views/screens/auth/login_screen.dart';
 import '../views/screens/auth/registration_screen.dart';
 import '../views/screens/home_screen.dart';
 import '../views/screens/CBT/CBT_screen.dart';
-import '../views/screens/CBT/tests_assessment_screen.dart';
+import '../views/screens/CBT/tests/tests_assessment_screen.dart';
 import '../views/screens/user/profile_screen.dart';
-import '../views/screens/CBT/tests_screen.dart';
+import '../views/screens/CBT/tests/tests_screen.dart';
 import '../views/screens/CBT/moodtracker_screen.dart';
 import '../views/screens/setting/setting_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
 final goRouter = GoRouter(
   navigatorKey: navigatorKey,
   initialLocation: '/',

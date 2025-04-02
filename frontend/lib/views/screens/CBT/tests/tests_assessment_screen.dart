@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cognicube/views/screens/CBT/tests_result_screen.dart';
-import '../../../data/assessment_data.dart';
-import '../../../models/assessment_model.dart';
+import 'package:cognicube/views/screens/CBT/tests/tests_result_screen.dart';
+import '../../../../data/assessment_data.dart';
+import '../../../../models/assessment_model.dart';
 
 class AssessmentScreen extends StatefulWidget {
   final String assessmentId;

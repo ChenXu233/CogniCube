@@ -1,86 +1,54 @@
+// cbt_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../../../view_models/cbt_view_model.dart';
+import '../../../utils/gradient_helper.dart';
 
 class CBTScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> features = [
-    {'icon': Icons.mood, 'label': '情绪追踪', 'route': '/cbt/mood'},
-    {'icon': Icons.checklist, 'label': '测试', 'route': '/cbt/tests'},
-    {'icon': Icons.air, 'label': '倒计时', 'route': '/countdown'},
-    {'icon': Icons.emoji_events, 'label': '挑战', 'route': '/challenges'},
-  ];
+  const CBTScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: ListView.separated(
-          itemCount: features.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            return _FeatureCard(
-              icon: features[index]['icon'] as IconData,
-              label: features[index]['label'] as String,
-              routePath: features[index]['route'] as String,
-            );
-          },
-        ),
-      ),
+    return ChangeNotifierProvider(
+      create: (_) => CBTViewModel(),
+      child: _CBTScaffold(),
     );
   }
 }
 
-class _FeatureCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String routePath;
-
-  const _FeatureCard({
-    required this.icon,
-    required this.label,
-    required this.routePath,
-  });
-
+class _CBTScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => context.go(routePath), // ✅ 确保传递完整路径
-      child: SizedBox(
-        height: 100,
-        child: Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.grey.shade200, width: 1),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(icon, size: 28, color: Colors.blue.shade800),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    label,
+    final viewModel = context.read<CBTViewModel>();
+
+    return Container(
+      decoration: BoxDecoration(gradient: createPrimaryGradient()),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: ListView.separated(
+            itemCount: viewModel.features.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final feature = viewModel.features[index];
+              return Card(
+                elevation: 2,
+                child: ListTile(
+                  leading: _FeatureIcon(feature.icon),
+                  title: Text(
+                    feature.label,
                     style: TextStyle(
-                      fontSize: 18,
+                      color: primaryColor,
                       fontWeight: FontWeight.w600,
-                      color: Colors.blue.shade900,
                     ),
                   ),
+                  trailing: _ActionButton(
+                    onPressed: () => context.go(feature.routePath),
+                  ),
                 ),
-                _StartButton(
-                  onPressed: () => context.go(routePath),
-                ), // ✅ 确保传递完整路径
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
@@ -88,22 +56,37 @@ class _FeatureCard extends StatelessWidget {
   }
 }
 
-class _StartButton extends StatelessWidget {
+class _FeatureIcon extends StatelessWidget {
+  final IconData icon;
+
+  const _FeatureIcon(this.icon);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(icon, color: primaryColor),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const _StartButton({required this.onPressed});
+  const _ActionButton({required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return FilledButton.tonal(
       style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(Colors.blue.shade100),
-        foregroundColor: WidgetStatePropertyAll(Colors.blue.shade800),
+        backgroundColor: WidgetStatePropertyAll(primaryColor.withOpacity(0.2)),
+        foregroundColor: WidgetStatePropertyAll(primaryColor),
         padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        ),
-        shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          EdgeInsets.symmetric(horizontal: 16),
         ),
       ),
       onPressed: onPressed,
@@ -111,20 +94,10 @@ class _StartButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text('开始'),
-          SizedBox(width: 8),
-          Icon(Icons.arrow_forward, size: 18),
+          SizedBox(width: 4),
+          Icon(Icons.arrow_forward, size: 16),
         ],
       ),
     );
   }
 }
-
-// CBT_screen.dart
-final List<Map<String, dynamic>> features = [
-  {
-    'icon': Icons.mood,
-    'label': 'PHQ-9抑郁测试',
-    'route': '/cbt/tests/phq-9', // 匹配动态路由格式
-  },
-  {'icon': Icons.checklist, 'label': 'GAD-7焦虑测试', 'route': '/cbt/tests/gad-7'},
-];

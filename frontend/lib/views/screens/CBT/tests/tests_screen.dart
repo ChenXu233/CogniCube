@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../data/assessment_data.dart';
-import '../../../models/assessment_model.dart';
+import '../../../../data/assessment_data.dart';
+import '../../../../models/assessment_model.dart';
 
 class TestsScreen extends StatelessWidget {
   const TestsScreen({super.key});
