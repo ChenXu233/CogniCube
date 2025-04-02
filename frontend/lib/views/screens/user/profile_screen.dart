@@ -16,7 +16,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     with TickerProviderStateMixin {
   late AnimationController _gradientController;
 
-//2over
   @override
   void initState() {
     super.initState();
@@ -135,6 +134,38 @@ class _ProfileScreenState extends State<ProfileScreen>
                       },
                       child: Text(
                         authViewModel.isAuthenticated ? '退出登录' : '立即登录',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 72),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 90),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(
+                          255,
+                          236,
+                          171,
+                          171,
+                        ).withOpacity(0.8),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        context.push('/setting');
+                      },
+                      child: Text(
+                        '进入设置',
                         style: const TextStyle(
                           fontSize: 16,
                           color: Colors.white,
