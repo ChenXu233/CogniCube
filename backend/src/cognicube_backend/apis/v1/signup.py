@@ -1,17 +1,15 @@
 import uuid
-from datetime import datetime, timedelta, UTC, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 
-from fastapi.responses import HTMLResponse
-
-from cognicube_backend.schemas.user import UserCreate
-from cognicube_backend.services.email_service import send_verification_email
 from cognicube_backend.databases.database import get_db
 from cognicube_backend.models.user import User, create_user
+from cognicube_backend.schemas.user import UserCreate
+from cognicube_backend.services.email_service import send_verification_email
 from cognicube_backend.utils.create_html_page import generate_html_page
-
 
 signup = APIRouter(prefix="/apis/v1/auth")
 
@@ -26,7 +24,6 @@ async def signup_user(
         .filter((User.username == user.username) | (User.email == user.email))
         .first()
     )
-    
 
     # 生成用户验证token，并在5分钟后过期
     verfication_token = str(uuid.uuid4())

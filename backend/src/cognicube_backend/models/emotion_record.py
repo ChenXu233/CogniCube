@@ -1,7 +1,9 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Optional
-from sqlalchemy import String, DateTime, CheckConstraint, Integer
+
+from sqlalchemy import CheckConstraint, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, validates
+
 from cognicube_backend.databases.database import Base
 
 

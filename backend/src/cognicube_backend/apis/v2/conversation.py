@@ -1,31 +1,26 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from sqlalchemy.orm import Session
 import datetime
 
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from sqlalchemy.orm import Session
+
 from cognicube_backend.databases.database import get_db
-from cognicube_backend.models.user import User
+from cognicube_backend.models.async_task import AsyncTask, TaskStatus
 from cognicube_backend.models.conversation import Who
-from cognicube_backend.services.ai_service import (
-    AIChatService,
-)
-from cognicube_backend.schemas.message import Message, Text
-from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
-from cognicube_backend.schemas.conversation import (
-    ConversationRequest,
-    ConversationResponse,
-    ConversationHistoryResponse,
-)
-from cognicube_backend.models.async_task import (
-    AsyncTask,
-    TaskStatus,
-)
+from cognicube_backend.models.user import User
 from cognicube_backend.schemas.async_task import (  # 需要创建的新Schema
     AsyncTaskCreate,
     AsyncTaskResponse,
     TaskStatusResponse,
 )
+from cognicube_backend.schemas.conversation import (
+    ConversationHistoryResponse,
+    ConversationRequest,
+    ConversationResponse,
+)
+from cognicube_backend.schemas.message import Message, Text
+from cognicube_backend.services.ai_service import AIChatService
 from cognicube_backend.utils.decorator import verify_email_verified
-
+from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 
 ai = APIRouter(prefix="/apis/v2/ai")
 
@@ -84,9 +79,11 @@ async def get_task_status(
 
     return TaskStatusResponse(
         status=task.status,
-        result=ConversationResponse(message=Message(**task.result_data))
-        if task.status == TaskStatus.COMPLETED
-        else None,
+        result=(
+            ConversationResponse(message=Message(**task.result_data))
+            if task.status == TaskStatus.COMPLETED
+            else None
+        ),
         created_at=int(task.created_at.timestamp()),
         updated_at=int(task.updated_at.timestamp()) if task.updated_at else None,
     )

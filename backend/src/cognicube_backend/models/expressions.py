@@ -1,8 +1,5 @@
-from sqlalchemy import String, ForeignKey, Text
-from sqlalchemy.orm import (
-    Mapped,
-    mapped_column,
-)
+from sqlalchemy import String, Text
+from sqlalchemy.orm import Mapped, mapped_column
 
 from cognicube_backend.databases.database import Base
 
@@ -16,5 +13,5 @@ class Expression(Base):
     base64: Mapped[str] = mapped_column(Text)
     description: Mapped[str] = mapped_column(String(200))
     application_emotion_type: Mapped[str] = mapped_column(
-        String(20),  # ForeignKey("emotion_types.id")
+        String(20),
     )

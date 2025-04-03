@@ -1,11 +1,11 @@
 # logger.py
-import sys
 import logging
+import sys
 from time import time
 from typing import Callable
 
-from loguru import logger
 from fastapi import Request, Response
+from loguru import logger
 
 # 自定义日志格式
 LOG_FORMAT = "<level>{level: <8}</level> | <green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"

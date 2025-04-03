@@ -1,10 +1,11 @@
-from openai import AsyncOpenAI
 from typing import Optional
+
+from openai import AsyncOpenAI
+
+from cognicube_backend.config import CONFIG
 
 from .context_manager import ContextManager
 from .tool_chain_manager import ToolChainManager
-from cognicube_backend.config import CONFIG
-
 
 SESSION: Optional[AsyncOpenAI] = None
 

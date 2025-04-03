@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+
 from cognicube_backend.logger import logger
 
 

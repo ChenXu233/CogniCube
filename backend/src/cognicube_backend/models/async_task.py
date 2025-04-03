@@ -1,8 +1,10 @@
-from sqlalchemy.orm import declarative_base, Mapped, mapped_column
-from sqlalchemy import Column, String, Integer, ForeignKey, JSON, Text, DateTime
-from sqlalchemy import Enum as SAEnum
 from datetime import datetime
 from enum import Enum
+
+from sqlalchemy import JSON, Column, DateTime
+from sqlalchemy import Enum as SAEnum
+from sqlalchemy import ForeignKey, Integer, String, Text
+from sqlalchemy.orm import Mapped, declarative_base, mapped_column
 
 from cognicube_backend.schemas.conversation import ConversationResponse
 

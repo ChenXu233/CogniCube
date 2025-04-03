@@ -8,7 +8,6 @@ from sqlalchemy.orm import sessionmaker
 
 from cognicube_backend.config import CONFIG
 
-
 engine = create_engine(CONFIG.USER_DB_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

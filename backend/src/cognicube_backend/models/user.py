@@ -1,9 +1,10 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
-from sqlalchemy import Integer, String, Boolean, DateTime
-from sqlalchemy.orm import Session, mapped_column, Mapped
+from sqlalchemy import Boolean, DateTime, Integer, String
+from sqlalchemy.orm import Mapped, Session, mapped_column
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from cognicube_backend.databases.database import Base
-from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class User(Base):

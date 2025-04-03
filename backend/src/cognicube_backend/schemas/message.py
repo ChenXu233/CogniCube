@@ -1,7 +1,8 @@
-from pydantic import BaseModel
-from typing import List, Dict, Any
 from abc import ABC
 from enum import Enum
+from typing import Any, Dict, List
+
+from pydantic import BaseModel
 
 
 class MessageType(Enum):
