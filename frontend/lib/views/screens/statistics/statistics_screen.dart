@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../services/hitokoto.dart';
+import '../../../models/hitokoto_model.dart';
+
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
 
@@ -44,26 +47,40 @@ class _WeatherScreenState extends State<WeatherScreen>
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          const SafeArea(
-            child: Padding(
-              padding: EdgeInsets.only(top: 40),
-              child: Center(child: Text("wenzi")),
-            ),
-          ),
-          
+          const SafeArea(child: Padding(padding: EdgeInsets.only(top: 40))),
           // 修改后的卡片容器
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Align(
-              alignment: Alignment.center,
-              child: Container(
-                constraints: const BoxConstraints(
-                  maxWidth: double.infinity,
-                  maxHeight: 300,
-                  minHeight: 280,
+            padding: const EdgeInsets.only(top: 40),
+            child: Column(
+              children: [
+                FutureBuilder<OneSentence>(
+                  future: OneSentenceApiService.getDailySentence(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator(); // 显示加载指示器
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}'); // 显示错误信息
+                    } else {
+                      final sentence = snapshot.data!;
+                      return Text(sentence.content); // 显示每日一言
+                    }
+                  },
                 ),
-                child: _buildAIChatCard(primaryColor),
-              ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      constraints: const BoxConstraints(
+                        maxWidth: double.infinity,
+                        maxHeight: 300,
+                        minHeight: 280,
+                      ),
+                      child: _buildAIChatCard(primaryColor),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -84,7 +101,7 @@ class _WeatherScreenState extends State<WeatherScreen>
               color: Colors.black.withOpacity(0.1),
               blurRadius: 20,
               spreadRadius: 2,
-            )
+            ),
           ],
         ),
         padding: const EdgeInsets.all(24),
@@ -107,7 +124,7 @@ class _WeatherScreenState extends State<WeatherScreen>
                 ),
               ),
             ),
-            
+
             // 文字内容
             Column(
               children: [
@@ -138,7 +155,10 @@ class _WeatherScreenState extends State<WeatherScreen>
               onTap: () => context.push('/chat'),
               borderRadius: BorderRadius.circular(12),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -160,11 +180,11 @@ class _WeatherScreenState extends State<WeatherScreen>
                       Icons.arrow_forward_rounded,
                       color: primaryColor,
                       size: 18,
-                    )
+                    ),
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
