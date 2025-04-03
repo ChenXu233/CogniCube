@@ -36,17 +36,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     final authViewModel = Provider.of<AuthViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Color.fromARGB(255, 26, 25, 25),
-          ),
-          onPressed: () => context.pop(),
-        ),
-      ),
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [

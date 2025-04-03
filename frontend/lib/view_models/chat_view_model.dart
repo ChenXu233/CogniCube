@@ -12,7 +12,7 @@ class ChatViewModel extends ChangeNotifier {
   List<message_model.Message> messages = [];
 
   Future<void> fetchMoreMessages() async {
-    messages.clear();
+    messages = [...messages]; // 保持时序正确
     if (isLoadingMore) return;
 
     isLoadingMore = true;
