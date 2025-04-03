@@ -71,7 +71,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 onPageChanged: (index) => setState(() => _currentIndex = index),
                 children: [
                   Center(child: CBTScreen()),
-                  Center(child: ChatScreen()),
                   Center(child: WeatherScreen()),
                   Center(child: ProfileScreen()),
                 ]
