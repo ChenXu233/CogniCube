@@ -38,40 +38,135 @@ class _WeatherScreenState extends State<WeatherScreen>
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).primaryColor; // 获取主题主色
+
     return Scaffold(
-      backgroundColor: Colors.transparent, // 设置背景为透明
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          SafeArea(
+          const SafeArea(
             child: Padding(
-              padding: const EdgeInsets.only(
-                top: kToolbarHeight + 16,
-                bottom: kBottomNavigationBarHeight + 16,
-              ),
-              child: Text("wenzi"),
+              padding: EdgeInsets.only(top: 40),
+              child: Center(child: Text("wenzi")),
             ),
           ),
-        Align(
-            alignment: Alignment.center,
-            child: ElevatedButton(
-              onPressed: () => context.push('/chat'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+          
+          // 修改后的卡片容器
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Align(
+              alignment: Alignment.center,
+              child: Container(
+                constraints: const BoxConstraints(
+                  maxWidth: double.infinity,
+                  maxHeight: 300,
+                  minHeight: 280,
                 ),
-              ),
-              child: const Text(
-                '聊天',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
+                child: _buildAIChatCard(primaryColor),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAIChatCard(Color primaryColor) {
+    return Material(
+      elevation: 8,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
+              spreadRadius: 2,
+            )
+          ],
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch, // 横向填充
+          children: [
+            // 图标部分
+            Align(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.chat_bubble_rounded,
+                  color: primaryColor,
+                  size: 40,
+                ),
+              ),
+            ),
+            
+            // 文字内容
+            Column(
+              children: [
+                Text(
+                  "情绪助手",
+                  textAlign: TextAlign.center, // 文字居中
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "点击开始对话",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 15,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+
+            //按钮部分
+            InkWell(
+              onTap: () => context.push('/chat'),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "立即与我对话",
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      color: primaryColor,
+                      size: 18,
+                    )
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
