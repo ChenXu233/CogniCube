@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:go_router/go_router.dart';
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
 
@@ -49,6 +49,26 @@ class _WeatherScreenState extends State<WeatherScreen>
                 bottom: kBottomNavigationBarHeight + 16,
               ),
               child: Text("wenzi"),
+            ),
+          ),
+        Align(
+            alignment: Alignment.center,
+            child: ElevatedButton(
+              onPressed: () => context.push('/chat'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 32, vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Text(
+                '聊天',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
           ),
         ],
