@@ -1,5 +1,6 @@
 from sqlalchemy import Integer, PickleType
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy.orm import Mapped, mapped_column
+
 from cognicube_backend.databases.database import Base
 from cognicube_backend.services.ai.context_manager import ContextManager
 

@@ -1,11 +1,14 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from enum import Enum
-from sqlalchemy import Integer, String, DateTime, ForeignKey, JSON, Enum as SQLEnum
-from sqlalchemy.orm import mapped_column, Mapped
-from typing import Optional, Any, List
+from typing import Any, List, Optional
+
+from sqlalchemy import JSON, DateTime
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from cognicube_backend.databases.database import Base
-from cognicube_backend.schemas.message import Text, Expression
+from cognicube_backend.schemas.message import Expression, Text
 
 
 class Who(str, Enum):

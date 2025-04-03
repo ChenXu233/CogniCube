@@ -1,10 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from cognicube_backend.databases import init_db
 from cognicube_backend.apis import router_manager
+from cognicube_backend.databases import init_db
 from cognicube_backend.logger import logger as logger
-
 
 APP = FastAPI(debug=True)
 

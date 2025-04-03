@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field
 from typing import List
+
+from pydantic import BaseModel, Field
+
 from cognicube_backend.schemas.message import Message
 
 
@@ -9,6 +11,7 @@ class ConversationRequest(BaseModel):
 
 class ConversationResponse(BaseModel):
     message: Message = Field(..., description="AI生成的回复内容")
+
 
 class ConversationHistoryResponse(BaseModel):
     history: List[Message]

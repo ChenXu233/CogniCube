@@ -1,17 +1,18 @@
 import json
-from openai import AsyncOpenAI
-from typing import Optional
-from fastapi import HTTPException
-from sqlalchemy.orm import Session
 from inspect import cleandoc
+from typing import Optional
 
+from fastapi import HTTPException
+from openai import AsyncOpenAI
+from sqlalchemy.orm import Session
 
-from .ai.context_manager import ContextManager
-from cognicube_backend.models.conversation import Conversation
+from cognicube_backend.config import CONFIG
 from cognicube_backend.models.context import UserContext
+from cognicube_backend.models.conversation import Conversation
 from cognicube_backend.models.emotion_record import EmotionRecord
 from cognicube_backend.schemas.message import Message
-from cognicube_backend.config import CONFIG
+
+from .ai.context_manager import ContextManager
 
 SESSION: Optional[AsyncOpenAI] = None
 

@@ -1,16 +1,16 @@
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.orm import Session
 from datetime import timedelta
 
-from cognicube_backend.schemas.user import UserLogin
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
 from cognicube_backend.databases.database import get_db
+from cognicube_backend.logger import logger
 from cognicube_backend.models.user import User
-from cognicube_backend.schemas.user import TokenResponse
+from cognicube_backend.schemas.user import TokenResponse, UserLogin
 from cognicube_backend.utils.jwt_generator import (
     create_jwt_token,
     get_jwt_token_user_id,
 )
-from cognicube_backend.logger import logger
 
 auth = APIRouter(prefix="/apis/v1/auth")
 

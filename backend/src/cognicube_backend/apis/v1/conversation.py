@@ -1,21 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
 import datetime
 
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
+
 from cognicube_backend.databases.database import get_db
-from cognicube_backend.models.user import User
 from cognicube_backend.models.conversation import Conversation, Who
-from cognicube_backend.services.ai_service import (
-    AIChatService,
-)
-from cognicube_backend.schemas.message import Message, Text
-from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
+from cognicube_backend.models.user import User
 from cognicube_backend.schemas.conversation import (
+    ConversationHistoryResponse,
     ConversationRequest,
     ConversationResponse,
-    ConversationHistoryResponse,
 )
+from cognicube_backend.schemas.message import Message, Text
+from cognicube_backend.services.ai_service import AIChatService
 from cognicube_backend.utils.decorator import verify_email_verified
+from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 
 ai = APIRouter(prefix="/apis/v1/ai")
 
