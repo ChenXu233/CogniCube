@@ -4,8 +4,8 @@ from openai import AsyncOpenAI
 
 from cognicube_backend.config import CONFIG
 
-from .context_manager import ContextManager
-from .tool_chain_manager import ToolChainManager
+from cognicube_backend.services.ai.context_manager import ContextManager
+from cognicube_backend.services.ai.tool_chain_manager import ToolChainManager
 
 SESSION: Optional[AsyncOpenAI] = None
 

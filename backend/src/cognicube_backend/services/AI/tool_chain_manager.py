@@ -29,6 +29,7 @@ class ToolChainManager:
         param_descriptions: Dict[str, str] = {},
     ):
         def decorator(func: Callable) -> Callable:
+            nonlocal param_descriptions
             sig = get_typed_signature(func)
             params = list(sig.parameters.values())
             param_descriptions = param_descriptions or {}  # type: ignore # noqa: F823
