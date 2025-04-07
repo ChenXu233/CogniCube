@@ -26,15 +26,16 @@ final goRouter = GoRouter(
     final auth = Provider.of<AuthViewModel>(context, listen: false);
     final currentPath = state.uri.path;
     final isLoggingIn = currentPath.startsWith('/login');
+    final isRegistering = currentPath.startsWith('/register');
     final from = state.uri.queryParameters['from'];
 
-    if (!auth.isAuthenticated && !isLoggingIn) {
+    if (!auth.isAuthenticated && !isLoggingIn && !isRegistering) {
       final encodedFrom = Uri.encodeComponent(currentPath);
       return '/login?from=$encodedFrom&message=请先登录';
     }
 
     if (auth.isAuthenticated &&
-        isLoggingIn &&
+        (isLoggingIn || isRegistering) &&
         from != null &&
         from.isNotEmpty) {
       return from;
