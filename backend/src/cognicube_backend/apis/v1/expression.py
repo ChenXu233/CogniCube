@@ -4,7 +4,7 @@ from cognicube_backend.databases import get_db
 from cognicube_backend.models.expressions import Expression
 from cognicube_backend.schemas.expression import ExpressionRequest, ExpressionResponse
 
-expression = APIRouter(prefix="/expression", tags=["expression"])
+expression = APIRouter(prefix="/apis/v1/expression", tags=["expression"])
 
 
 @expression.post(

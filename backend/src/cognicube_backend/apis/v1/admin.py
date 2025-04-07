@@ -1,31 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from typing import List
 
-# 假设以下这些导入在你的项目中已经存在
 from cognicube_backend.databases.database import get_db
 from cognicube_backend.models.user import User
 from cognicube_backend.schemas.user import UserCreate
+from cognicube_backend.schemas.admin import UserResponse, PaginatedUsers
 from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 
 admin = APIRouter(prefix="/apis/v1/admin", tags=["admin"])
-
-
-class UserResponse(BaseModel):
-    id: int
-    username: str
-    is_admin: bool
-
-    class Config:
-        orm_mode = True
-
-
-class PaginatedUsers(BaseModel):
-    total: int
-    page: int
-    per_page: int
-    items: List[UserResponse]
 
 
 # --- Dependencies ---

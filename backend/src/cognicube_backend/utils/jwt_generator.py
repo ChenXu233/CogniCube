@@ -30,4 +30,9 @@ def decode_jwt_token(token: str) -> dict:
 
 def get_jwt_token_user_id(token: str = Header(..., description="JWT Token")) -> int:
     """获取JWT令牌中的用户信息"""
-    return decode_jwt_token(token).get("sub", None)
+    user_id = decode_jwt_token(token).get("sub", None)
+    if user_id is None:
+        raise HTTPException(
+            status_code=401, detail="Invalid authentication credentials"
+        )
+    return user_id
