@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'target_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class MoodTrackerScreen extends StatefulWidget {
   const MoodTrackerScreen({super.key});
@@ -90,11 +91,12 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
           // 自定义返回按钮
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pushReplacement(
-              // 替换当前路由更合适
-              context,
-              MaterialPageRoute(builder: (context) => TargetScreen()),
-            );
+            // Navigator.pushReplacement(
+            //   // 替换当前路由更合适
+            //   context,
+            //   MaterialPageRoute(builder: (context) => TargetScreen()),
+            // );
+            context.go('/cbt');
           },
         ),
         actions: [
