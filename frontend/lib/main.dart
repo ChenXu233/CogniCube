@@ -17,7 +17,6 @@ void main() async {
   // 初始化 SharedPreferences
   final prefs = await SharedPreferences.getInstance();
 
-  // 提前初始化 AuthViewModel（注意异步操作）
   final authViewModel = AuthViewModel(prefs: prefs);
   await authViewModel.initialize();
 
