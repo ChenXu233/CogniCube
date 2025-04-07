@@ -37,11 +37,3 @@ class EmotionRecord(Base):
 
     def __repr__(self) -> str:
         return f"<EmotionRecord {self.emotion_type} (user={self.user_id})>"
-
-
-"""
-以下是一个用户的对话，请你判断这个用户的情绪水平，越接近情绪化（如抑郁，狂躁）评分越接近100，注意超过60分以上需要慎重评估，越接近0说明这段对话越正常。
-请你先在<T></T>输出你的见解，需要结合已有信息慎重评估，给出清晰的理由，再在<score></score>和<emotion></emotion>输出类似以下格式的分数，不要携带其他的提醒：
-<score>20</score><emotion>兴奋</emotion>
-对话内容:"你死远点“
-"""
