@@ -12,12 +12,7 @@ from cognicube_backend.utils.jwt_generator import (
     get_jwt_token_user_id,
 )
 
-auth = APIRouter(prefix="/apis/v1/auth")
-
-
-@auth.get("/")
-async def read_root():
-    return "please don't use this endpoint"
+auth = APIRouter(prefix="/apis/v1/auth", tags=["auth"])
 
 
 @auth.post("/login", response_model=TokenResponse)

@@ -12,7 +12,7 @@ from cognicube_backend.models.conversation import Conversation
 from cognicube_backend.models.emotion_record import EmotionRecord
 from cognicube_backend.schemas.message import Message
 
-from .ai.context_manager import ContextManager
+from .ai_services.context_manager import ContextManager
 
 SESSION: Optional[AsyncOpenAI] = None
 
