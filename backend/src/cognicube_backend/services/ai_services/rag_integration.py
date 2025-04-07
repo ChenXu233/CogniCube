@@ -2,8 +2,14 @@ import uuid
 from datetime import datetime
 
 import qdrant_client
-from qdrant_client.models import (Distance, FieldCondition, Filter,
-                                  PointStruct, VectorParams)
+from qdrant_client.models import (
+    Distance,
+    FieldCondition,
+    Filter,
+    PointStruct,
+    VectorParams,
+    MatchValue,
+)
 from sentence_transformers import SentenceTransformer
 
 
@@ -57,7 +63,9 @@ class VectorDBMemorySystem:
         query_embedding = self.encoder.encode(query_text).tolist()
 
         # 构建过滤条件
-        user_filter = Filter(must=[FieldCondition(key="user_id", match=user_id)])
+        user_filter = Filter(
+            must=FieldCondition(key="user_id", match=MatchValue(value=user_id))
+        )
 
         # 执行搜索
         results = self.client.search(
@@ -71,8 +79,10 @@ class VectorDBMemorySystem:
         # 格式化结果并更新访问计数
         formatted = []
         for hit in results:
+            if not hit.payload:
+                continue
             payload = hit.payload
-            self._update_access_count(hit.id)
+            self._update_access_count(str(hit.id))
             formatted.append(
                 {
                     "text": payload["text"],
