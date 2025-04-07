@@ -8,13 +8,11 @@ import 'view_models/chat_view_model.dart';
 
 import 'utils/routes.dart';
 
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final prefs = await SharedPreferences.getInstance();
-  
+
   final authViewModel = AuthViewModel(prefs: prefs);
   await authViewModel.initialize();
 
