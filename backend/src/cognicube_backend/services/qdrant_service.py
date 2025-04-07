@@ -107,6 +107,7 @@ def start_qdrant():
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
+        cwd=config.install_path.parent,
         bufsize=1,
         **kwargs,
     )

@@ -8,7 +8,7 @@ from fastapi import Request, Response
 from loguru import logger
 
 # 自定义日志格式
-LOG_FORMAT = "<level>{level: <8}</level> | <green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+LOG_FORMAT = "<level>{level: <8}</level> | <green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <cyan>{function:.20}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
 
 
 class InterceptHandler(logging.Handler):
