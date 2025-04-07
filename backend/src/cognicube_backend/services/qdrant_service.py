@@ -150,6 +150,7 @@ async def lifespan(app: FastAPI):
     try:
         app.state.client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
         app.state.client.get_collections()
+        app.state.client.close()
         logger.info("🔗 Qdrant service connected")
     except Exception as e:
         logger.info(f"❌ Failed to connect Qdrant: {str(e)}")
