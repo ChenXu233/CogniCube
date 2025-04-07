@@ -7,10 +7,7 @@ from cognicube_backend.databases.database import get_db
 from cognicube_backend.models.conversation import Conversation, Who
 from cognicube_backend.models.user import User
 from cognicube_backend.schemas.conversation import (
-    ConversationHistoryResponse,
-    ConversationRequest,
-    ConversationResponse,
-)
+    ConversationHistoryResponse, ConversationRequest, ConversationResponse)
 from cognicube_backend.schemas.message import Message, Text
 from cognicube_backend.services.ai_service import AIChatService
 from cognicube_backend.utils.decorator import verify_email_verified
