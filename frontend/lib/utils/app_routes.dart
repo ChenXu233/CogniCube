@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../views/screens/CBT/moodtracker_screen.dart'; // 保持大小写一致性
 import '../../views/screens/CBT/target_screen.dart';
-import '../../views/screens/CBT/cbt_screen.dart'; // 示例路径
+// 示例路径
 
 final GoRouter appRoutes = GoRouter(
   initialLocation: '/',

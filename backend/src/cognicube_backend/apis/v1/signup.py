@@ -11,7 +11,7 @@ from cognicube_backend.schemas.user import UserCreate
 from cognicube_backend.services.email_service import send_verification_email
 from cognicube_backend.utils.create_html_page import generate_html_page
 
-signup = APIRouter(prefix="/apis/v1/auth")
+signup = APIRouter(prefix="/apis/v1/auth", tags=["signup"])
 
 
 @signup.post("/register")

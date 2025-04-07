@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../components/navigation_bar.dart';
-import '../../utils/gradient_helper.dart';
+import '../../view_models/home_view_model.dart';
 import '../../views/screens/CBT/CBT_screen.dart';
 import './statistics/statistics_screen.dart';
 import '../../views/screens/user/profile_screen.dart';
-import 'dart:ui' as ui;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,86 +13,64 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  late PageController _pageController;
-  int _currentIndex = 0;
-  late AnimationController _gradientController;
-
+class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: 1);
-    _gradientController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 15),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    _gradientController.dispose();
-    super.dispose();
+    // 确保在 HomeScreen 初始化时调用 HomeViewModel 中的 initController 方法
+    final viewModel = Provider.of<HomeViewModel>(context, listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          AnimatedBuilder(
-            animation: _gradientController,
-            builder: (context, _) {
-              return Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: createPrimaryGradient(),
+    return Consumer<HomeViewModel>(
+      builder: (context, viewModel, _) {
+        return Scaffold(
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFFFFF0F5), Color(0xFFFFF8E1)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
                   ),
-                ],
-              );
-            },
-          ),
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
-            ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                bottom: kBottomNavigationBarHeight + 16,
+                ),
               ),
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) => setState(() => _currentIndex = index),
-                children: [
-                  Center(child: CBTScreen()),
-                  Center(child: WeatherScreen()),
-                  Center(child: ProfileScreen()),
-                ]
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: kBottomNavigationBarHeight + 16,
+                  ),
+                  child: PageView(
+                    controller:
+                        viewModel
+                            .pageController, // 使用 ViewModel 中的 PageController
+                    onPageChanged: (index) => viewModel.navigateToPage(index),
+                    children: const [
+                      CBTScreen(key: PageStorageKey('cbt')),
+                      WeatherScreen(key: PageStorageKey('weather')),
+                      ProfileScreen(key: PageStorageKey('profile')),
+                    ],
+                  ),
+                ),
               ),
-            ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: buildStaticBlurNavigationBar(
+                  context,
+                  viewModel.currentIndex,
+                  (index) => viewModel.navigateToPage(index),
+                ),
+              ),
+            ],
           ),
-
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: buildStaticBlurNavigationBar(context, _currentIndex, (
-              index,
-            ) {
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            }),
-          ),
-         ],
-      ),
+        );
+      },
     );
   }
 }

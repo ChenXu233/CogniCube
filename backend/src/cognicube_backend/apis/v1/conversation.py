@@ -16,7 +16,7 @@ from cognicube_backend.services.ai_service import AIChatService
 from cognicube_backend.utils.decorator import verify_email_verified
 from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 
-ai = APIRouter(prefix="/apis/v1/ai")
+ai = APIRouter(prefix="/apis/v1/ai", tags=["ai"])
 
 
 @ai.post("/conversation", response_model=ConversationResponse)

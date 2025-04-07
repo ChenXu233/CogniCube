@@ -2,20 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 // View Models
 import 'view_models/auth_view_model.dart';
 import 'view_models/chat_view_model.dart';
+import 'view_models/home_view_model.dart'; // 新增 HomeViewModel 引入
 
+// Routes
 import 'utils/routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // 初始化 SharedPreferences
   final prefs = await SharedPreferences.getInstance();
 
   final authViewModel = AuthViewModel(prefs: prefs);
   await authViewModel.initialize();
 
+  // 系统 UI 配置
   SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.edgeToEdge,
     overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
@@ -32,10 +37,14 @@ void main() async {
     ),
   );
 
+  // 全局状态管理
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (ctx) => AuthViewModel(prefs: prefs)),
+        // 使用已初始化的 AuthViewModel 实例
+        ChangeNotifierProvider.value(value: authViewModel), // 关键改动
+        // 其他 ViewModel
+        ChangeNotifierProvider(create: (_) => HomeViewModel()), // 新增全局注册
         ChangeNotifierProvider(create: (_) => ChatViewModel()),
       ],
       child: const App(),
@@ -55,6 +64,7 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         return MediaQuery(
+          // 保持一致的媒体查询
           data: MediaQuery.of(context),
           child: Scaffold(
             resizeToAvoidBottomInset: true,
