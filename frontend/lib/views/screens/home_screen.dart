@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/navigation_bar.dart';
 import '../../utils/gradient_helper.dart';
 import '../../views/screens/CBT/CBT_screen.dart';
+import '../../view_models/home_view_model.dart';
 import './statistics/statistics_screen.dart';
 import '../../views/screens/user/profile_screen.dart';
 import 'dart:ui' as ui;
@@ -66,13 +67,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 bottom: kBottomNavigationBarHeight + 16,
               ),
               child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) => setState(() => _currentIndex = index),
-                children: [
-                  Center(child: CBTScreen()),
-                  Center(child: WeatherScreen()),
-                  Center(child: ProfileScreen()),
-                ]
+                children: const [
+                  WeatherScreen(key: PageStorageKey('weather')), // 🌟 首页
+                  CBTScreen(key: PageStorageKey('cbt')),
+                  ProfileScreen(key: PageStorageKey('profile')),
+                ],
               ),
             ),
           ),
@@ -91,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               );
             }),
           ),
-         ],
+        ],
       ),
     );
   }

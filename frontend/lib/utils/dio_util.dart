@@ -27,7 +27,7 @@ class DioUtil {
       BaseOptions(
         baseUrl: Constants.backendUrl,
         connectTimeout: const Duration(seconds: 30),
-        receiveTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 30),
         responseType: ResponseType.json,
       ),
     );
