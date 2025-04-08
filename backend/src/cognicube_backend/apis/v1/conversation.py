@@ -1,13 +1,16 @@
 import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from cognicube_backend.databases.database import get_db
 from cognicube_backend.models.conversation import Conversation, Who
 from cognicube_backend.models.user import User
 from cognicube_backend.schemas.conversation import (
-    ConversationHistoryResponse, ConversationRequest, ConversationResponse)
+    ConversationHistoryResponse,
+    ConversationRequest,
+    ConversationResponse,
+)
 from cognicube_backend.schemas.message import Message, Text
 from cognicube_backend.services.ai_service import AIChatService
 from cognicube_backend.utils.decorator import verify_email_verified
@@ -20,6 +23,7 @@ ai = APIRouter(prefix="/apis/v1/ai", tags=["ai"])
 @verify_email_verified(get_db)
 async def create_conversation(
     message: ConversationRequest,
+    background_tasks: BackgroundTasks,
     user_id: int = Depends(get_jwt_token_user_id),
     db: Session = Depends(get_db),
 ):
@@ -37,7 +41,6 @@ async def create_conversation(
         messages=[Text(text=ai_response_text)],
     )
     await ai_service.save_message_record(user_id, ai_message)
-    await ai_service.emotion_quantification(message.message.get_plain_text())
 
     _ai_message = (
         db.query(Conversation)
@@ -48,6 +51,12 @@ async def create_conversation(
     )
     if not _ai_message:
         raise HTTPException(status_code=404, detail="AI回复不存在")
+
+    # 将情感量化放入后台任务
+    background_tasks.add_task(
+        ai_service.emotion_quantification,
+        message.message.get_plain_text(),
+    )
 
     return ConversationResponse(message=ai_message)
 

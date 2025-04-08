@@ -12,10 +12,11 @@ from cognicube_backend.models.context import UserContext
 from cognicube_backend.models.conversation import Conversation
 from cognicube_backend.models.emotion_record import EmotionRecord
 from cognicube_backend.schemas.message import Message
-from cognicube_backend.services.ai_services.rag_integration import \
-    VectorDBMemorySystem
+from cognicube_backend.services.ai_services.rag_integration import VectorDBMemorySystem
+from cognicube_backend.databases.database import get_db
 
 SESSION: Optional[AsyncOpenAI] = None
+VECTOR_MEMORY_SYSTEM: Optional[VectorDBMemorySystem] = None
 
 
 async def get_ai_session() -> AsyncOpenAI:
@@ -24,6 +25,14 @@ async def get_ai_session() -> AsyncOpenAI:
     if SESSION is None:
         SESSION = AsyncOpenAI(api_key=CONFIG.AI_API_KEY, base_url=CONFIG.AI_API_URL)
     return SESSION
+
+
+def get_memory_system() -> VectorDBMemorySystem:
+    """返回一个全局的 VectorDBMemorySystem 实例"""
+    global VECTOR_MEMORY_SYSTEM
+    if VECTOR_MEMORY_SYSTEM is None:
+        VECTOR_MEMORY_SYSTEM = VectorDBMemorySystem()
+    return VECTOR_MEMORY_SYSTEM
 
 
 class AIChatService:
@@ -38,7 +47,7 @@ class AIChatService:
         self.context_manager: UserContext = self.get_context_manager()
         print(self.context_manager)
         self.context_manager.add_message("system", self.prompt)
-        self.memory_system = VectorDBMemorySystem()
+        self.memory_system = get_memory_system()
         self.memory_prompt = cleandoc(
             """
             <memory>以下是有关用户当前发来消息的记忆，请参考：<insert></insert><end_memory>
@@ -162,36 +171,49 @@ class AIChatService:
 
     async def emotion_quantification(self, user_message: str):
         """情感量化接口"""
-        self.client = await get_ai_session()
-
-        _user_message = self.emotion_prompt + "\n" + user_message
-        self.context_manager.add_message("user", _user_message)
-        response = await self.client.chat.completions.create(
-            model=self.model_name,
-            messages=self.get_context(),
-        )
-        text = response.choices[0].message.content
-        logger.debug("情感量化:" + str(text))
-
-        if not text:
-            return
-
+        # 创建新的 Session
+        db: Session = next(get_db())
         try:
-            text_dict = json.loads(text)
-        except json.JSONDecodeError:
-            return
+            # 重新加载 context_manager
+            self.context_manager = (
+                db.query(UserContext).filter_by(user_id=self.user_id).first()
+            )
+            if not self.context_manager:
+                raise Exception("Context manager not found")
 
-        emotion_record = EmotionRecord(
-            user_id=self.user_id,
-            emotion_type=text_dict["emotion_type"],
-            intensity_score=text_dict["intensity_score"],
-            valence=text_dict["valence"],
-            arousal=text_dict["arousal"],
-            dominance=text_dict.get("dominance", None),
-        )
-        self.db.add(emotion_record)
-        self.db.commit()
-        return emotion_record
+            # 执行情感量化逻辑
+            self.client = await get_ai_session()
+
+            _user_message = self.emotion_prompt + "\n" + user_message
+            self.context_manager.add_message("user", _user_message)
+            response = await self.client.chat.completions.create(
+                model=self.model_name,
+                messages=self.get_context(),
+            )
+            text = response.choices[0].message.content
+            logger.debug("情感量化:" + str(text))
+
+            if not text:
+                return
+
+            try:
+                text_dict = json.loads(text)
+            except json.JSONDecodeError:
+                return
+
+            emotion_record = EmotionRecord(
+                user_id=self.user_id,
+                emotion_type=text_dict["emotion_type"],
+                intensity_score=text_dict["intensity_score"],
+                valence=text_dict["valence"],
+                arousal=text_dict["arousal"],
+                dominance=text_dict.get("dominance", None),
+            )
+            self.db.add(emotion_record)
+            self.db.commit()
+            return emotion_record
+        finally:
+            db.close()
 
     async def save_message_record(self, user_id: int, message: Message):
         """保存对话记录"""
