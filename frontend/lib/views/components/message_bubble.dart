@@ -124,27 +124,51 @@ class MessageBubble extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(8),
+      constraints: const BoxConstraints(maxWidth: 300), // 限制最大宽度
       decoration: BoxDecoration(
         color: Colors.grey.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(4),
+        border: Border(
+          left: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 4,
+          ),
+        ),
       ),
-      child: Row(
-        children: [
-          Icon(Icons.reply, size: 16, color: Colors.grey.shade600),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8, top: 4, bottom: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.reply,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '回复',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Text(
               replyText ?? '',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Colors.grey.shade700,
-                fontStyle: FontStyle.italic,
+                fontSize: 12,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
