@@ -247,3 +247,4 @@ backend/.pdm-python
 
 .vscode/
 backend/tests/databases/
+backend/qdrant_storage/*
