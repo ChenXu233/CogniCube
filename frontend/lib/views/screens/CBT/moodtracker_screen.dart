@@ -95,7 +95,7 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
               context,
               listen: false,
             );
-            viewModel.resetToHome(); // 或者：viewModel.navigateToPage(0);
+            viewModel.navigateToPage(0);
 
             // ✅ 回到 HomeScreen（带 BottomNavigationBar）
             context.go('/home');
