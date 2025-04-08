@@ -18,6 +18,11 @@ class Setting(BaseSettings):
     AI_MODEL_NAME: str = "deepseek-ai/DeepSeek-V3"
     AI_API_KEY: str
     AI_PROMPT: str = ""
+    QDRANT_VERSION: str = "v1.13.6"
+    QDRANT_PORT: int = 6333
+    QDRANT_HOST: str = "127.0.0.1"
+    STORAGE_PATH: str = "qdrant_storage"
+    Model_PATH: str = "model_storage"
 
     class Config:
         """读取配置文件"""

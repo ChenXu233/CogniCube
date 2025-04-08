@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'target_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class MoodTrackerScreen extends StatefulWidget {
@@ -11,7 +10,6 @@ class MoodTrackerScreen extends StatefulWidget {
 }
 
 class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
-  // ========== 修改后的音乐播放部分 ========== //
   late AudioPlayer _audioPlayer;
   bool isPlaying = false;
 
@@ -19,19 +17,17 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
   void initState() {
     super.initState();
     _audioPlayer = AudioPlayer();
-    _setupAudio(); // 修改初始化方法
+    _setupAudio();
   }
 
   Future<void> _setupAudio() async {
-    // 添加状态监听
     _audioPlayer.onPlayerStateChanged.listen((state) {
       setState(() => isPlaying = state == PlayerState.playing);
     });
 
-    // 预加载音频源
     try {
       await _audioPlayer.setSource(AssetSource('music.mp3'));
-      await _audioPlayer.resume(); // 改为 resume()
+      await _audioPlayer.resume();
     } catch (e) {
       print("初始化音频失败: $e");
     }
@@ -41,21 +37,19 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
     if (isPlaying) {
       await _audioPlayer.pause();
     } else {
-      await _audioPlayer.resume(); // 恢复播放
+      await _audioPlayer.resume();
     }
   }
-  // ========== 修改结束 ========== //
 
-  // 原有情绪跟踪部分
   int? selectedMood;
   final TextEditingController _noteController = TextEditingController();
 
   final List<Map<String, dynamic>> moods = [
-    {'emoji': '😡', 'label': '愤怒', 'color': Color(0xFFFFCCCC)},
-    {'emoji': '😟', 'label': '低落', 'color': Color(0xFFFFD699)},
-    {'emoji': '😐', 'label': '一般', 'color': Color(0xFFFFF4C2)},
-    {'emoji': '🙂', 'label': '开心', 'color': Color(0xFFCCE6CC)},
-    {'emoji': '😄', 'label': '超棒', 'color': Color(0xFFCCE6FF)},
+    {'emoji': '😡', 'label': '愤怒'},
+    {'emoji': '😟', 'label': '低落'},
+    {'emoji': '😐', 'label': '一般'},
+    {'emoji': '🙂', 'label': '开心'},
+    {'emoji': '😄', 'label': '超棒'},
   ];
 
   void _submitMood() {
@@ -82,20 +76,18 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const Color softPurple = Color(0xFFE1D5E7);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('情绪追踪'),
-        backgroundColor: Color(0xFFFFB6C1),
+        backgroundColor: Color(0xFFB39DDB),
         foregroundColor: Colors.white,
         leading: IconButton(
-          // 自定义返回按钮
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            context.go('/home', extra: {'pageIndex': 0});
-          },
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/home', extra: {'pageIndex': 0}),
         ),
         actions: [
-          // 保留音乐按钮
           IconButton(
             icon: Icon(
               isPlaying ? Icons.music_note : Icons.music_off,
@@ -105,78 +97,90 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
           ),
         ],
       ),
-
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFFFF0F5), Color(0xFFFFF8E1)],
+            colors: [Color(0xFFF8F4FF), Color(0xFFEBE1FA)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: ListView(
             children: [
               const Text(
-                '今天的心情如何？',
+                '亲爱的，今天的你感觉如何呢？',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF6D4C41),
+                  color: Color(0xFF6A1B9A),
                 ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              const SizedBox(height: 22),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.spaceBetween,
                 children: List.generate(moods.length, (index) {
+                  final isSelected = selectedMood == index;
                   return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedMood = index;
-                      });
-                    },
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color:
-                                selectedMood == index
-                                    ? moods[index]['color']
-                                    : Colors.grey.shade200,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
+                    onTap: () => setState(() => selectedMood = index),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      width: 80,
+                      height: 100,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: LinearGradient(
+                          colors:
+                              isSelected
+                                  ? [Color(0xFFD1C4E9), Color(0xFFB39DDB)]
+                                  : [softPurple, softPurple],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow:
+                            isSelected
+                                ? [
+                                  BoxShadow(
+                                    color: Colors.deepPurple.withOpacity(0.2),
+                                    blurRadius: 8,
+                                    offset: const Offset(2, 4),
+                                  ),
+                                ]
+                                : [],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
                             moods[index]['emoji'],
-                            style: const TextStyle(fontSize: 28),
+                            style: const TextStyle(fontSize: 30),
                           ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          moods[index]['label'],
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color:
-                                selectedMood == index
-                                    ? Color(0xFF6D4C41)
-                                    : Colors.black54,
+                          const SizedBox(height: 8),
+                          Text(
+                            moods[index]['label'],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Color.fromARGB(150, 74, 20, 140),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   );
                 }),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 80),
               const Text(
-                '想说点什么？',
+                '想对自己说点什么吗？',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF6D4C41),
+                  color: Color(0xFF6A1B9A),
                 ),
               ),
               const SizedBox(height: 8),
@@ -184,24 +188,28 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
                 controller: _noteController,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  hintText: '写下您的感受...',
+                  hintText: '写下你的心情...',
                   filled: true,
-                  fillColor: Colors.white.withOpacity(0.8),
+                  fillColor: Colors.white.withOpacity(0.85),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFFFFB6C1), width: 2),
+                    borderSide: const BorderSide(
+                      color: Color(0xFFB39DDB),
+                      width: 2,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 80),
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFFFB6C1),
+                    backgroundColor: Color(0xFFB39DDB),
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 32,
                       vertical: 12,
@@ -211,10 +219,27 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
                     ),
                   ),
                   onPressed: _submitMood,
-                  child: const Text(
-                    '记录心情',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  child: const Text('记录心情', style: TextStyle(fontSize: 16)),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Center(
+                child: Image.asset(
+                  'assets/images/soft_flower.png',
+                  height: 100,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Center(
+                child: Text(
+                  '无论你现在的心情如何，都值得被温柔对待 💜',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF7B1FA2),
+                    fontStyle: FontStyle.italic,
                   ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ],
