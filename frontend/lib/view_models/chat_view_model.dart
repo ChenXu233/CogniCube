@@ -67,12 +67,13 @@ class ChatViewModel extends ChangeNotifier {
       final loadingMessage = _createMessage('正在加载...', 'loading', temp: true);
       _addMessage(loadingMessage);
       final response = await ChatApiService.getAIResponse(text);
-      print('收到回复: $response');
+      // print('收到回复: $response');
+      final validReplyTo = userMessage.messageId;
 
       final aiMessage = _createMessage(
         response,
         'assistant',
-        replyTo: userMessage.messageId,
+        replyTo: validReplyTo,
       );
       _addMessage(aiMessage);
     } catch (e) {
@@ -87,6 +88,11 @@ class ChatViewModel extends ChangeNotifier {
     int? replyTo,
     bool temp = false,
   }) {
+    // 添加回复消息校验
+    if (replyTo != null) {
+      final exists = messages.any((m) => m.messageId == replyTo);
+      if (!exists) replyTo = null; // 自动清除无效回复ID
+    }
     return message_model.Message(
       messages: [message_model.TextModel(text: text)],
       who: who,

@@ -11,10 +11,11 @@ class CBTViewModel extends ChangeNotifier {
     features = [
       CBTFeature(icon: Icons.mood, label: '情绪追踪', routePath: '/cbt/mood'),
       CBTFeature(
-        icon: Icons.assessment,
+        icon: Icons.fitness_center,
         label: '认知训练',
         routePath: '/cbt/tests',
       ),
+      CBTFeature(icon: Icons.timer, label: '倒计时', routePath: '/cbt/countdown'),
     ];
   }
 }

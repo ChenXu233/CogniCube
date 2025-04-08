@@ -16,6 +16,7 @@ import '../views/screens/user/profile_screen.dart';
 import '../views/screens/CBT/tests/tests_screen.dart';
 import '../views/screens/CBT/moodtracker_screen.dart';
 import '../views/screens/setting/setting_screen.dart';
+import '../views/screens/CBT/countdown_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final goRouter = GoRouter(
@@ -111,6 +112,11 @@ final goRouter = GoRouter(
               },
             ),
           ],
+        ),
+        GoRoute(
+          path: 'countdown',
+          pageBuilder:
+              (context, state) => const MaterialPage(child: CountdownScreen()),
         ),
       ],
     ),

@@ -55,22 +55,26 @@ abstract class Message with _$Message {
 }
 
 extension MessageExtensions on Message {
+  Message? getRepliedMessage(List<Message> allMessages) {
+    if (replyTo == null) return null;
+    try {
+      return allMessages.firstWhere((m) => m.messageId == replyTo);
+    } catch (_) {
+      return null;
+    }
+  }
+
   String getPlainText() {
     return messages.whereType<TextModel>().map((e) => e.text).join();
   }
 
   String? getReplyText(List<Message> allMessages) {
-    if (replyTo == null) return null;
-    final replied = allMessages.firstWhere(
-      (m) => m.messageId == replyTo,
-      orElse:
-          () => Message(
-            messages: [TextModel(text: '[已删除消息]')],
-            who: 'system',
-            messageId: -1,
-          ),
-    );
+    final replied = getRepliedMessage(allMessages);
+    if (replied == null) return null;
+
     final text = replied.getPlainText();
-    return text.length > 30 ? '${text.substring(0, 30)}...' : text;
+    return text.isEmpty
+        ? '[空消息]'
+        : (text.length > 30 ? '${text.substring(0, 30)}...' : text);
   }
 }
