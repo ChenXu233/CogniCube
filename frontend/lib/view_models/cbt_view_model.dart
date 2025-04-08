@@ -1,4 +1,3 @@
-// cbt_view_model.dart
 import 'package:flutter/material.dart';
 
 class CBTViewModel extends ChangeNotifier {
@@ -14,7 +13,7 @@ class CBTViewModel extends ChangeNotifier {
       CBTFeature(
         icon: Icons.assessment,
         label: '认知训练',
-        routePath: '/cbt/training',
+        routePath: '/cbt/tests',
       ),
     ];
   }

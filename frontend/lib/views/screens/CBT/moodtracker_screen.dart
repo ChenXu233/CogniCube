@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'target_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-
-import '../../../view_models/home_view_model.dart';
 
 class MoodTrackerScreen extends StatefulWidget {
   const MoodTrackerScreen({super.key});
@@ -13,7 +11,7 @@ class MoodTrackerScreen extends StatefulWidget {
 }
 
 class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
-  // ========== 音乐播放功能 ========== //
+  // ========== 修改后的音乐播放部分 ========== //
   late AudioPlayer _audioPlayer;
   bool isPlaying = false;
 
@@ -21,32 +19,34 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
   void initState() {
     super.initState();
     _audioPlayer = AudioPlayer();
-    _setupAudio();
-  }
-
-  @override
-  void dispose() {
-    _audioPlayer.dispose(); // 释放音频资源
-    super.dispose();
+    _setupAudio(); // 修改初始化方法
   }
 
   Future<void> _setupAudio() async {
+    // 添加状态监听
     _audioPlayer.onPlayerStateChanged.listen((state) {
       setState(() => isPlaying = state == PlayerState.playing);
     });
 
+    // 预加载音频源
     try {
       await _audioPlayer.setSource(AssetSource('music.mp3'));
+      await _audioPlayer.resume(); // 改为 resume()
     } catch (e) {
-      debugPrint("初始化音频失败: $e");
+      print("初始化音频失败: $e");
     }
   }
 
   void _toggleMusic() async {
-    isPlaying ? await _audioPlayer.pause() : await _audioPlayer.resume();
+    if (isPlaying) {
+      await _audioPlayer.pause();
+    } else {
+      await _audioPlayer.resume(); // 恢复播放
+    }
   }
+  // ========== 修改结束 ========== //
 
-  // ========== 情绪跟踪部分 ========== //
+  // 原有情绪跟踪部分
   int? selectedMood;
   final TextEditingController _noteController = TextEditingController();
 
@@ -66,10 +66,10 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
       return;
     }
 
-    final moodLabel = moods[selectedMood!]['label'];
-    final note = _noteController.text;
+    String moodLabel = moods[selectedMood!]['label'];
+    String note = _noteController.text;
 
-    debugPrint('已记录：情绪 - $moodLabel，日志 - $note');
+    print('已记录：情绪 - $moodLabel，日志 - $note');
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('已记录：$moodLabel')));
@@ -87,23 +87,15 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
         title: const Text('情绪追踪'),
         backgroundColor: Color(0xFFFFB6C1),
         foregroundColor: Colors.white,
-        // 修改返回逻辑
         leading: IconButton(
+          // 自定义返回按钮
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
-            // ✅ 触发回到 HomeScreen 的 CBT 页面（index 0）
-            final viewModel = Provider.of<HomeViewModel>(
-              context,
-              listen: false,
-            );
-            viewModel.navigateToPage(0);
-
-            // ✅ 回到 HomeScreen（带 BottomNavigationBar）
-            context.go('/home');
+            context.go('/home', extra: {'pageIndex': 0});
           },
-          icon: const Icon(Icons.arrow_back),
         ),
-
         actions: [
+          // 保留音乐按钮
           IconButton(
             icon: Icon(
               isPlaying ? Icons.music_note : Icons.music_off,
@@ -113,8 +105,9 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
           ),
         ],
       ),
+
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFFFFF0F5), Color(0xFFFFF8E1)],
             begin: Alignment.topLeft,
@@ -139,7 +132,11 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(moods.length, (index) {
                   return GestureDetector(
-                    onTap: () => setState(() => selectedMood = index),
+                    onTap: () {
+                      setState(() {
+                        selectedMood = index;
+                      });
+                    },
                     child: Column(
                       children: [
                         Container(
@@ -164,7 +161,7 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
                             fontWeight: FontWeight.w600,
                             color:
                                 selectedMood == index
-                                    ? const Color(0xFF6D4C41)
+                                    ? Color(0xFF6D4C41)
                                     : Colors.black54,
                           ),
                         ),
@@ -196,10 +193,7 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: Color(0xFFFFB6C1),
-                      width: 2,
-                    ),
+                    borderSide: BorderSide(color: Color(0xFFFFB6C1), width: 2),
                   ),
                 ),
               ),
@@ -207,7 +201,7 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFB6C1),
+                    backgroundColor: Color(0xFFFFB6C1),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 32,
                       vertical: 12,
