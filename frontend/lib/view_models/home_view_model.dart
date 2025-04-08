@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class HomeViewModel with ChangeNotifier {
   late final PageController _pageController;
-  int _currentIndex = 0;
+  int _currentIndex = 0; // CBT 为初始界面
 
   HomeViewModel() {
     _pageController = PageController(initialPage: _currentIndex)
@@ -21,18 +21,20 @@ class HomeViewModel with ChangeNotifier {
     );
   }
 
+  void navigateToCBT() => navigateToPage(1);
+
   void _handlePageScroll() {
     final newIndex = _pageController.page?.round() ?? _currentIndex;
     if (newIndex != _currentIndex) {
       _currentIndex = newIndex;
-      notifyListeners(); // 触发UI更新
+      notifyListeners();
     }
   }
 
   void resetToHome() {
-    if (_currentIndex == 0) return;
-    _currentIndex = 0;
-    _pageController.jumpToPage(0);
+    if (_currentIndex == 1) return;
+    _currentIndex = 1;
+    _pageController.jumpToPage(1);
     notifyListeners();
   }
 
@@ -40,7 +42,7 @@ class HomeViewModel with ChangeNotifier {
   void dispose() {
     _pageController
       ..removeListener(_handlePageScroll)
-      ..dispose(); // 关键内存管理
+      ..dispose();
     super.dispose();
   }
 }

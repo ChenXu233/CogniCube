@@ -13,7 +13,14 @@ class TestsScreen extends StatelessWidget {
         title: const Text('心理自测量表'),
         backgroundColor: const Color.fromARGB(198, 238, 167, 208),
         foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            context.go('/home', extra: {'pageIndex': 0});
+          },
+        ),
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView.separated(

@@ -5,6 +5,7 @@ import '../../views/screens/CBT/CBT_screen.dart';
 import '../../view_models/home_view_model.dart';
 import './statistics/statistics_screen.dart';
 import '../../views/screens/user/profile_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:ui' as ui;
 
 class HomeScreen extends StatefulWidget {
@@ -16,17 +17,31 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late PageController _pageController;
-  int _currentIndex = 0;
+  int _currentIndex = 1; // 默认是 Weather 页
   late AnimationController _gradientController;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: 1);
+
+    _pageController = PageController(initialPage: _currentIndex);
     _gradientController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 15),
     )..repeat(reverse: true);
+
+    // 👇 延迟读取 extra 参数（pageIndex）
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final extra =
+          GoRouter.of(context).routerDelegate.currentConfiguration.extra;
+      if (extra != null && extra is Map && extra.containsKey('pageIndex')) {
+        final index = extra['pageIndex'] as int;
+        setState(() {
+          _currentIndex = index;
+          _pageController.jumpToPage(index);
+        });
+      }
+    });
   }
 
   @override
@@ -44,14 +59,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           AnimatedBuilder(
             animation: _gradientController,
             builder: (context, _) {
-              return Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: createPrimaryGradient(),
-                    ),
-                  ),
-                ],
+              return Container(
+                decoration: BoxDecoration(gradient: createPrimaryGradient()),
               );
             },
           ),
@@ -67,15 +76,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 bottom: kBottomNavigationBarHeight + 16,
               ),
               child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() => _currentIndex = index);
+                },
                 children: const [
-                  WeatherScreen(key: PageStorageKey('weather')), // 🌟 首页
                   CBTScreen(key: PageStorageKey('cbt')),
+                  WeatherScreen(key: PageStorageKey('weather')),
                   ProfileScreen(key: PageStorageKey('profile')),
                 ],
               ),
             ),
           ),
-
           Positioned(
             bottom: 0,
             left: 0,
@@ -83,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: buildStaticBlurNavigationBar(context, _currentIndex, (
               index,
             ) {
+              setState(() => _currentIndex = index);
               _pageController.animateToPage(
                 index,
                 duration: const Duration(milliseconds: 300),
