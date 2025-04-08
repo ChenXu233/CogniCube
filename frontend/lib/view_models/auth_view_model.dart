@@ -50,6 +50,7 @@ class AuthViewModel with ChangeNotifier {
     } catch (e) {
       _errorMessage = e.toString();
       _isAuthenticated = false;
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();

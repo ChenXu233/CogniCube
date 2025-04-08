@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_view_model.dart';
 import '../../../utils/gradient_helper.dart';
+import 'package:dio/dio.dart';
 import 'dart:ui' as ui;
 
 class LoginScreen extends StatefulWidget {
@@ -285,18 +286,33 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       if (authVM.isAuthenticated && mounted) {
-        // 修改跳转逻辑：优先跳转来源页面
         final targetLocation = widget.fromLocation ?? '/';
         if (mounted) context.go(targetLocation);
-      }
-    } catch (e) {
-      if (mounted) {
+      } else if (mounted) {
+        // 显示未知错误
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
+            content: const Text('登录失败，请稍后重试'),
             backgroundColor: Colors.red[700],
           ),
         );
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                title: const Text('登录失败'),
+                content: Text(e.toString().replaceAll('Exception: ', '')),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('确定'),
+                  ),
+                ],
+              ),
+        ).then((_) => authVM.clearError());
       }
     }
   }

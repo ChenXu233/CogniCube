@@ -16,7 +16,21 @@ class AuthService {
       await _prefs.setString("auth_token", response.data['access_token']);
       return response.data['response'] ?? "登录成功";
     } on DioException catch (e) {
-      throw Exception('登录失败: ${e.response?.statusCode}');
+      final serverMessage = e.response?.data?['message'];
+      final statusCode = e.response?.statusCode;
+      String errorMessage = '登录失败';
+
+      if (statusCode == 401) {
+        errorMessage = serverMessage ?? '用户名或密码错误';
+      } else if (statusCode == 400) {
+        errorMessage = serverMessage ?? '请求参数错误';
+      } else if (statusCode == 500) {
+        errorMessage = '服务器内部错误，请稍后重试';
+      }
+
+      throw Exception(errorMessage);
+    } catch (e) {
+      throw Exception('登录失败: ${e.toString()}');
     }
   }
 
