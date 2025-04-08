@@ -2,22 +2,31 @@ import asyncio
 import os
 import platform
 import shutil
+import socket
 import subprocess
 import sys
+import threading
 import zipfile
-import threading  # 新增线程支持
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 import requests
+import yaml  # 新增yaml支持
 from fastapi import FastAPI
 from qdrant_client import QdrantClient
 
+from cognicube_backend.config import CONFIG
 from cognicube_backend.logger import logger
 
-QDRANT_VERSION = "v1.13.6"
-QDRANT_PORT = 6333
-QDRANT_HOST = "127.0.0.1"
+QDRANT_VERSION = CONFIG.QDRANT_VERSION
+QDRANT_PORT = CONFIG.QDRANT_PORT
+QDRANT_HOST = CONFIG.QDRANT_HOST
+STORAGE_PATH = CONFIG.STORAGE_PATH
+
+
+def check_port_available():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex((QDRANT_HOST, QDRANT_PORT)) != 0
 
 
 class QdrantConfig:
@@ -26,6 +35,7 @@ class QdrantConfig:
         self.arch = platform.machine().lower()
         self.bin_name = "qdrant.exe" if self.system == "windows" else "qdrant"
         self.install_path = self._get_install_path()
+        self.config_path = self.install_path.parent / "config.yaml"  # 配置文件路径
 
     def _get_install_path(self):
         if self.system == "windows":
@@ -42,13 +52,33 @@ class QdrantConfig:
         elif self.system == "linux":
             return f"{base_url}/qdrant-x86_64-unknown-linux-gnu.tar.gz"
         elif self.system == "darwin":
-            if "arm" in self.arch:
-                return f"{base_url}/qdrant-aarch64-apple-darwin.tar.gz"
-            return f"{base_url}/qdrant-x86_64-apple-darwin.tar.gz"
+            return (
+                f"{base_url}/qdrant-aarch64-apple-darwin.tar.gz"
+                if "arm" in self.arch
+                else f"{base_url}/qdrant-x86_64-apple-darwin.tar.gz"
+            )
         raise Exception(f"Unsupported platform: {self.system}")
 
 
 config = QdrantConfig()
+
+
+def create_config_file():
+    """创建配置文件（如果不存在）"""
+    if not config.config_path.exists():
+        logger.info(f"📄 Creating config file at {config.config_path}")
+        config_data = {
+            "storage": {"storage_path": str(Path.cwd() / STORAGE_PATH)},
+            "optimizer": {
+                "memmap_threshold_kb": 1024  # 优化内存使用
+            },
+        }
+        with open(config.config_path, "w") as f:
+            yaml.dump(config_data, f)
+
+        # 确保存储目录存在
+        storage_dir = Path(STORAGE_PATH)
+        storage_dir.mkdir(parents=True, exist_ok=True)
 
 
 def check_qdrant_installed():
@@ -57,6 +87,7 @@ def check_qdrant_installed():
 
 def install_qdrant():
     logger.info("🔧 Installing Qdrant...")
+    temp_path = None
     try:
         url = config.get_download_url()
         download_dir = config.install_path.parent
@@ -76,24 +107,23 @@ def install_qdrant():
 
         logger.info(f"✅ Qdrant installed to {config.install_path}")
     except Exception as e:
-        logger.info(f"❌ Installation failed: {str(e)}")
+        logger.error(f"❌ Installation failed: {str(e)}")
         sys.exit(1)
-
-
-def check_port_available():
-    if config.system == "windows":
-        command = f"netstat -ano | findstr :{QDRANT_PORT}"
-    else:
-        command = f"lsof -i :{QDRANT_PORT} || ss -ltn | grep :{QDRANT_PORT}"
-    return os.system(command) != 0
+    finally:
+        if temp_path and temp_path.exists():
+            temp_path.unlink()
 
 
 def start_qdrant():
     """启动Qdrant服务并重定向输出到日志系统"""
+    create_config_file()  # 确保配置文件存在
+
     command = [
         str(config.install_path),
         "--uri",
         f"http://{QDRANT_HOST}:{QDRANT_PORT}",
+        "--config-path",
+        str(config.config_path),
     ]
 
     kwargs = {}
@@ -118,7 +148,6 @@ def start_qdrant():
             if line:
                 logger_func(f"{prefix}{line.strip()}")
 
-    # 启动日志记录线程
     stdout_thread = threading.Thread(
         target=log_stream, args=(process.stdout, logger.info, "[Qdrant] "), daemon=True
     )
@@ -128,14 +157,13 @@ def start_qdrant():
     stdout_thread.start()
     stderr_thread.start()
 
-    return process  # 返回进程对象
+    return process
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # 服务启动逻辑
     if not check_port_available():
-        logger.info(f"🚨 Port {QDRANT_PORT} is occupied!")
+        logger.error(f"🚨 Port {QDRANT_PORT} is occupied!")
         sys.exit(1)
 
     if not check_qdrant_installed():
@@ -144,28 +172,45 @@ async def lifespan(app: FastAPI):
 
     logger.info("🚀 Starting Qdrant service...")
     qdrant_process = start_qdrant()
-    app.state.qdrant_process = qdrant_process  # 存储进程对象
+    app.state.qdrant_process = qdrant_process
     await asyncio.sleep(5)
 
     try:
         app.state.client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
         app.state.client.get_collections()
-        app.state.client.close()
         logger.info("🔗 Qdrant service connected")
     except Exception as e:
-        logger.info(f"❌ Failed to connect Qdrant: {str(e)}")
+        logger.error(f"❌ Failed to connect Qdrant: {str(e)}")
         sys.exit(1)
 
-    yield  # 应用运行期间
+    yield
 
-    # 服务停止逻辑
     logger.info("🛑 Stopping Qdrant service...")
     if hasattr(app.state, "qdrant_process"):
-        process = app.state.qdrant_process
+        process: subprocess.Popen = app.state.qdrant_process
         process.terminate()
+
         try:
-            process.wait(timeout=5)
+            # 首次等待正常退出
+            exit_code = process.wait(timeout=5)
+            if exit_code != 0:
+                logger.warning(f"Qdrant exited with non-zero code: {exit_code}")
         except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait()
-        logger.info("✅ Qdrant stopped")
+            logger.warning("Qdrant did not terminate gracefully, forcing kill...")
+            try:
+                # 强制终止并等待
+                process.kill()
+                process.wait()
+            except Exception as e:
+                logger.error(f"Failed to kill Qdrant: {str(e)}")
+
+        # 最终状态确认
+        if process.poll() is None:
+            logger.error("❌ Qdrant failed to stop")
+        else:
+            logger.info("✅ Qdrant stopped")
+
+        # 清理进程引用
+        del app.state.qdrant_process
+    else:
+        logger.info("Qdrant service was not running")
