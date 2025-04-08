@@ -14,7 +14,7 @@ class AuthService {
       );
 
       await _prefs.setString("auth_token", response.data['access_token']);
-      return response.data['response'] ?? "登录成功";
+      return response.data['access_token'];
     } on DioException catch (e) {
       final serverMessage = e.response?.data?['message'];
       final statusCode = e.response?.statusCode;

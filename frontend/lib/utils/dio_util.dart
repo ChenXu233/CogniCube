@@ -35,6 +35,9 @@ class DioUtil {
     _dio.interceptors.add(
       InterceptorsWrapper(onRequest: _handleRequest, onError: _handleError),
     );
+    _dio.interceptors.add(
+      LogInterceptor(requestBody: true, responseBody: true),
+    );
   }
 
   Future<void> _initSharedPreferences() async {
@@ -61,6 +64,7 @@ class DioUtil {
     } else {
       errorMessage = error.message ?? errorMessage;
     }
+    print('Dio Error: ${error.message}');
 
     final modifiedError = DioException(
       requestOptions: error.requestOptions,
@@ -73,7 +77,7 @@ class DioUtil {
       _performLogout();
     }
 
-    handler.next(modifiedError);
+    handler.next(modifiedError); //报错
   }
 
   // void _gotoPage(BuildContext context, String routeName) {

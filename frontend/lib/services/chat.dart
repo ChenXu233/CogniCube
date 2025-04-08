@@ -22,6 +22,7 @@ class ChatApiService {
           .map((e) => message_model.Message.fromJson(e))
           .toList();
     } on DioException catch (e) {
+      print('获取历史消息失败: ${e.message}');
       throw _handleDioError(e);
     }
   }
@@ -31,12 +32,15 @@ class ChatApiService {
       final body = {
         'message':
             message_model.Message(
-              messages: [message_model.TextModel(text: message).toJson()],
+              messages: [message_model.TextModel(text: message)],
               who: 'user',
             ).toJson(),
-      };
+      }; // 直接序列化整个消息对象
 
-      final response = await _dio.post('/ai/conversation', data: body);
+      final response = await _dio.post(
+        '/ai/conversation',
+        data: body, // 直接使用序列化后的对象
+      );
 
       return (response.data['message']['messages'] as List)
           .map((msg) => msg['content']?.toString() ?? "未收到有效响应")
