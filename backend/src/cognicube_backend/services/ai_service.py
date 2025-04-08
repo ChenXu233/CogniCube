@@ -1,6 +1,6 @@
 import json
 from inspect import cleandoc
-from typing import Optional, List
+from typing import Optional
 
 from fastapi import HTTPException
 from openai import AsyncOpenAI
@@ -13,7 +13,7 @@ from cognicube_backend.models.emotion_record import EmotionRecord
 from cognicube_backend.schemas.message import Message
 from cognicube_backend.services.ai_services.rag_integration import VectorDBMemorySystem
 
-from .ai_services.context_manager import ContextManager
+# from .ai_services.context_manager import ContextManager
 
 SESSION: Optional[AsyncOpenAI] = None
 
@@ -35,7 +35,7 @@ class AIChatService:
         self.api_base = CONFIG.AI_API_URL
         self.prompt = CONFIG.AI_PROMPT
         self.client: AsyncOpenAI | None = None
-        self.context_manager: ContextManager = self.get_context_manager()
+        self.context_manager: UserContext = self.get_context_manager()
         print(self.context_manager)
         self.context_manager.add_message("system", self.prompt)
         self.memory_system = VectorDBMemorySystem()
@@ -87,16 +87,20 @@ class AIChatService:
             """
         )
 
-    def get_context_manager(self) -> ContextManager:
+    def get_context_manager(self) -> UserContext:
         if (
             user_context := self.db.query(UserContext)
             .filter_by(user_id=self.user_id)
             .first()
         ):
-            user_context = user_context.context_manager
+            user_context = user_context
         else:
-            user_context = ContextManager()
-            self.db.add(UserContext(user_id=self.user_id, context_manager=user_context))
+            user_context = UserContext(
+                user_id=self.user_id,
+                model=self.model_name,
+                system_content=self.prompt,
+            )
+            self.db.add(user_context)
         return user_context
 
     def update_context_manager(self):
@@ -142,6 +146,7 @@ class AIChatService:
         context = self.context_manager.get_context()
         for msg in reversed(context):
             if msg["role"] == "user":
+                # 只取最后一条用户消息
                 query_text += str(msg["content"])
                 break
         if not query_text:
