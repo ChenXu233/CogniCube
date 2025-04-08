@@ -31,7 +31,7 @@ class ChatApiService {
       final body = {
         'message':
             message_model.Message(
-              messages: [message_model.TextModel(text: message)],
+              messages: [message_model.TextModel(text: message).toJson()],
               who: 'user',
             ).toJson(),
       };
@@ -43,6 +43,8 @@ class ChatApiService {
           .join('\n');
     } on DioException catch (e) {
       throw _handleDioError(e);
+    } catch (e) {
+      throw Exception('获取 AI 回复失败: $e');
     }
   }
 

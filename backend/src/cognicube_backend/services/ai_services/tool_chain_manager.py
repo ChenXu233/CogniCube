@@ -5,7 +5,8 @@ from fastapi.dependencies.utils import get_typed_signature
 from pydantic import BaseModel, ConfigDict, create_model
 from pydantic.fields import FieldInfo
 
-from cognicube_backend.schemas.toolcall import ToolCallRequest, ToolCallResponse
+from cognicube_backend.schemas.toolcall import (ToolCallRequest,
+                                                ToolCallResponse)
 
 
 class ToolMetadata(BaseModel):

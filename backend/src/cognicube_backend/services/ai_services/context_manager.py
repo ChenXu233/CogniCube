@@ -1,12 +1,10 @@
 import re
 from typing import Dict, List, Literal
 
-from openai.types.chat import (
-    ChatCompletionAssistantMessageParam,
-    ChatCompletionMessageParam,
-    ChatCompletionSystemMessageParam,
-    ChatCompletionUserMessageParam,
-)
+from openai.types.chat import (ChatCompletionAssistantMessageParam,
+                               ChatCompletionMessageParam,
+                               ChatCompletionSystemMessageParam,
+                               ChatCompletionUserMessageParam)
 
 MODEL_CONTEXT_CONFIG = {
     "DeepSeek-chat": 56 * 1000,

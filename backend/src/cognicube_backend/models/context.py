@@ -2,7 +2,8 @@ from sqlalchemy import Integer, PickleType
 from sqlalchemy.orm import Mapped, mapped_column
 
 from cognicube_backend.databases.database import Base
-from cognicube_backend.services.ai_services.context_manager import ContextManager
+from cognicube_backend.services.ai_services.context_manager import \
+    ContextManager
 
 
 class UserContext(Base):
