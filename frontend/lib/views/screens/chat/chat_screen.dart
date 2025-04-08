@@ -13,7 +13,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  late final ChatViewModel _vm;
+  late final ChatViewModel vm;
 
   @override
   void initState() {
@@ -52,13 +52,13 @@ class _ChatScreenState extends State<ChatScreen> {
       builder: (context, vm, _) {
         return NotificationListener<ScrollEndNotification>(
           onNotification: (notification) {
-            if (notification.metrics.pixels == 0) {
+            if (notification.metrics.extentAfter == 0) {
               vm.fetchMoreMessages();
             }
             return true;
           },
           child: ListView.builder(
-            reverse: true,
+            reverse: false,
             controller: vm.scrollController,
             padding: const EdgeInsets.all(8),
             itemCount: vm.messages.length + 1,
@@ -66,7 +66,8 @@ class _ChatScreenState extends State<ChatScreen> {
               if (index == vm.messages.length) {
                 return _buildLoadingIndicator(vm);
               }
-              return MessageBubble(message: vm.messages[index]);
+              final message = vm.messages[index];
+              return MessageBubble(message: message);
             },
           ),
         );

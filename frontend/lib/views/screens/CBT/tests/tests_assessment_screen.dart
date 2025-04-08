@@ -46,11 +46,8 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
       context,
       MaterialPageRoute(
         builder:
-            (context) => TestsResultScreen(
-              // 使用新类名
-              assessment: assessment,
-              score: score,
-            ),
+            (context) =>
+                TestsResultScreen(assessment: assessment, score: score),
       ),
     );
   }
@@ -62,7 +59,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(assessment.title),
-        backgroundColor: Colors.blue.shade800,
+        backgroundColor: Color.fromARGB(255, 176, 141, 237),
         foregroundColor: Colors.white,
       ),
       body: Padding(
@@ -72,8 +69,10 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
           children: [
             LinearProgressIndicator(
               value: (_currentIndex + 1) / assessment.questions.length,
-              backgroundColor: Colors.blue.shade100,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
+              backgroundColor: Color(0xFFEDE7F6),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Color.fromARGB(255, 115, 86, 165),
+              ),
             ),
             const SizedBox(height: 20),
             Text(
@@ -97,7 +96,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                           value: entry.key,
                           groupValue: _answers[_currentIndex],
                           onChanged: (value) => _selectAnswer(value),
-                          activeColor: Colors.blue.shade800,
+                          activeColor: Color.fromARGB(255, 176, 146, 228),
                         ),
                       )
                       .toList(),
@@ -106,7 +105,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
             ElevatedButton(
               onPressed: _answers[_currentIndex] != null ? _nextQuestion : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade800,
+                backgroundColor: Color.fromARGB(255, 175, 145, 226),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
