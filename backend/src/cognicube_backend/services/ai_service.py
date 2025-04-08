@@ -7,13 +7,13 @@ from openai import AsyncOpenAI
 from sqlalchemy.orm import Session
 
 from cognicube_backend.config import CONFIG
+from cognicube_backend.logger import logger
 from cognicube_backend.models.context import UserContext
 from cognicube_backend.models.conversation import Conversation
 from cognicube_backend.models.emotion_record import EmotionRecord
 from cognicube_backend.schemas.message import Message
-from cognicube_backend.services.ai_services.rag_integration import VectorDBMemorySystem
-
-# from .ai_services.context_manager import ContextManager
+from cognicube_backend.services.ai_services.rag_integration import \
+    VectorDBMemorySystem
 
 SESSION: Optional[AsyncOpenAI] = None
 
@@ -171,7 +171,7 @@ class AIChatService:
             messages=self.get_context(),
         )
         text = response.choices[0].message.content
-        print(text)
+        logger.debug("情感量化:" + str(text))
 
         if not text:
             return

@@ -69,9 +69,7 @@ def create_config_file():
         logger.info(f"📄 Creating config file at {config.config_path}")
         config_data = {
             "storage": {"storage_path": str(Path.cwd() / STORAGE_PATH)},
-            "optimizer": {
-                "memmap_threshold_kb": 1024  # 优化内存使用
-            },
+            "optimizer": {"memmap_threshold_kb": 1024},  # 优化内存使用
         }
         with open(config.config_path, "w") as f:
             yaml.dump(config_data, f)

@@ -4,21 +4,12 @@ import os
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Any
+from typing import Any, Callable, Dict, List, Optional
 
 import qdrant_client
-from qdrant_client.models import (
-    Distance,
-    FieldCondition,
-    Filter,
-    MatchValue,
-    PayloadSchemaType,
-    PointIdsList,
-    PointStruct,
-    Range,
-    ReadConsistencyType,
-    VectorParams,
-)
+from qdrant_client.models import (Distance, FieldCondition, Filter, MatchValue,
+                                  PayloadSchemaType, PointIdsList, PointStruct,
+                                  Range, ReadConsistencyType, VectorParams)
 from sentence_transformers import SentenceTransformer
 
 
