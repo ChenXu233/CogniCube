@@ -22,7 +22,7 @@ class ChatViewModel extends ChangeNotifier {
             ? _generateMockMessages()
             : await _fetchApiMessages();
 
-    messages = [...newMessages.reversed, ...messages];
+    messages = [...newMessages, ...messages];
     isLoadingMore = false;
     notifyListeners();
   }
@@ -52,11 +52,7 @@ class ChatViewModel extends ChangeNotifier {
   void scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
-        scrollController.animateTo(
-          scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
       }
     });
   }

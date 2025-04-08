@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/constants.dart';
 import '../view_models/auth_view_model.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
+// import 'package:go_router/go_router.dart';
 
 import 'routes.dart';
 
@@ -76,9 +76,9 @@ class DioUtil {
     handler.next(modifiedError);
   }
 
-  void _gotoPage(BuildContext context, String routeName) {
-    context.go(routeName);
-  }
+  // void _gotoPage(BuildContext context, String routeName) {
+  //   context.go(routeName);
+  // }
 
   void _performLogout() {
     _prefs.remove('auth_token');

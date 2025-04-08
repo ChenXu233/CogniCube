@@ -21,39 +21,52 @@ class MessageBubble extends StatelessWidget {
             isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           if (message.replyTo != null) _buildReplyPreview(context),
-          Row(
-            mainAxisAlignment:
-                isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (!isUser && !isLoading)
-                const CircleAvatar(
-                  radius: 16,
-                  child: Icon(Icons.smart_toy, size: 18),
-                ),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 280),
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: _getBubbleColor(context, isUser, isLoading),
-                    borderRadius: _getBorderRadius(isUser),
-                    boxShadow:
-                        isLoading
-                            ? null
-                            : [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 2,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
+          IntrinsicWidth(
+            child: Row(
+              mainAxisAlignment:
+                  isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+              children: [
+                if (!isUser && !isLoading)
+                  const Padding(
+                    padding: EdgeInsets.only(right: 8),
+                    child: CircleAvatar(
+                      radius: 16,
+                      child: Icon(Icons.smart_toy, size: 18),
+                    ),
                   ),
-                  child: _buildContent(context, isLoading),
+                Flexible(
+                  child: Container(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: _getBubbleColor(context, isUser, isLoading),
+                        borderRadius: _getBorderRadius(isUser),
+                        boxShadow:
+                            isLoading
+                                ? null
+                                : [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 2,
+                                    offset: const Offset(0, 1),
+                                  ),
+                                ],
+                      ),
+                      child: _buildContent(context, isLoading),
+                    ), //
+                  ),
                 ),
-              ),
-            ],
+                if (isUser && !isLoading)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: CircleAvatar(
+                      radius: 16,
+                      child: Icon(Icons.person, size: 18),
+                    ),
+                  ),
+              ],
+            ),
           ),
           _buildTimestamp(context),
         ],
