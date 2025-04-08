@@ -299,12 +299,17 @@ class _LoginScreenState extends State<LoginScreen>
       }
     } catch (e) {
       if (mounted) {
+        final errorMessage =
+            e is DioException
+                ? _parseDioError(e)
+                : e.toString().replaceAll('Exception: ', '');
+
         showDialog(
           context: context,
           builder:
               (context) => AlertDialog(
                 title: const Text('登录失败'),
-                content: Text(e.toString().replaceAll('Exception: ', '')),
+                content: Text(errorMessage),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -315,5 +320,17 @@ class _LoginScreenState extends State<LoginScreen>
         ).then((_) => authVM.clearError());
       }
     }
+  }
+
+  // 新增 Dio 错误解析方法
+  String _parseDioError(DioException e) {
+    if (e.type == DioExceptionType.connectionTimeout) {
+      return '连接超时，请检查网络';
+    } else if (e.type == DioExceptionType.receiveTimeout) {
+      return '服务器响应超时';
+    } else if (e.response == null) {
+      return '网络不可用，请检查连接';
+    }
+    return e.message ?? '用户名或密码错误';
   }
 }

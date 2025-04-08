@@ -23,12 +23,19 @@ class AuthService {
       if (statusCode == 401) {
         errorMessage = serverMessage ?? '用户名或密码错误';
       } else if (statusCode == 400) {
-        errorMessage = serverMessage ?? '请求参数错误';
+        errorMessage = serverMessage ?? '请求参数格式错误';
+      } else if (statusCode == 429) {
+        errorMessage = '尝试次数过多，请稍后再试';
       } else if (statusCode == 500) {
-        errorMessage = '服务器内部错误，请稍后重试';
+        errorMessage = '服务器内部错误，请联系管理员';
       }
 
-      throw Exception(errorMessage);
+      throw DioException(
+        requestOptions: e.requestOptions,
+        response: e.response,
+        error: errorMessage,
+        type: e.type,
+      );
     } catch (e) {
       throw Exception('登录失败: ${e.toString()}');
     }

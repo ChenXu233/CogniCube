@@ -6,7 +6,6 @@ import '../view_models/auth_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
-// import  'package:flutter/material.dart';
 import 'routes.dart';
 
 class DioUtil {
@@ -56,14 +55,25 @@ class DioUtil {
   }
 
   void _handleError(DioException error, ErrorInterceptorHandler handler) {
+    String errorMessage = '网络请求错误';
+    if (error.response != null) {
+      errorMessage = error.response?.data['message'] ?? errorMessage;
+    } else {
+      errorMessage = error.message ?? errorMessage;
+    }
+
+    final modifiedError = DioException(
+      requestOptions: error.requestOptions,
+      response: error.response,
+      error: errorMessage,
+      type: error.type,
+    );
+
     if (error.response?.statusCode == 401) {
       _performLogout();
-    } else if (error.response?.statusCode == 403) {
-      if (navigatorKey.currentContext != null) {
-        _gotoPage(navigatorKey.currentContext!, '/login');
-      }
     }
-    handler.next(error);
+
+    handler.next(modifiedError);
   }
 
   void _gotoPage(BuildContext context, String routeName) {

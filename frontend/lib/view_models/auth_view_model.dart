@@ -87,9 +87,12 @@ class AuthViewModel with ChangeNotifier {
 
       // 更新认证状态
       await _checkAuthStatus();
+
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
+      _isAuthenticated = false;
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
