@@ -81,6 +81,10 @@ class _FancyFeatureCard extends StatelessWidget {
       displayLabel = '心理测评';
       subtitleText = '点击开始测试';
       buttonText = '立即开始';
+    } else if (feature.label == '倒计时') {
+      displayLabel = '倒计时';
+      subtitleText = '点击开始倒计时';
+      buttonText = '立即开始';
     } else {
       subtitleText = '点击开始对话';
       buttonText = '立即与我对话';

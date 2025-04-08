@@ -112,6 +112,12 @@ final goRouter = GoRouter(
             ),
           ],
         ),
+        GoRoute(
+          path: 'countdown',
+          pageBuilder:
+              (context, state) =>
+                  const MaterialPage(child: MoodTrackerScreen()),
+        ),
       ],
     ),
   ],
