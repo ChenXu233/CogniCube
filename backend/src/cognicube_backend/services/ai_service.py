@@ -1,6 +1,6 @@
 import json
 from inspect import cleandoc
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import HTTPException
 from openai import AsyncOpenAI
@@ -11,6 +11,7 @@ from cognicube_backend.models.context import UserContext
 from cognicube_backend.models.conversation import Conversation
 from cognicube_backend.models.emotion_record import EmotionRecord
 from cognicube_backend.schemas.message import Message
+from cognicube_backend.services.ai_services.rag_integration import VectorDBMemorySystem
 
 from .ai_services.context_manager import ContextManager
 
@@ -37,57 +38,17 @@ class AIChatService:
         self.context_manager: ContextManager = self.get_context_manager()
         print(self.context_manager)
         self.context_manager.add_message("system", self.prompt)
-
-    def get_context_manager(self) -> ContextManager:
-        if (
-            user_context := self.db.query(UserContext)
-            .filter_by(user_id=self.user_id)
-            .first()
-        ):
-            user_context = user_context.context_manager
-        else:
-            user_context = ContextManager()
-            self.db.add(UserContext(user_id=self.user_id, context_manager=user_context))
-        return user_context
-
-    def update_context_manager(self):
-        user_context = (
-            self.db.query(UserContext).filter_by(user_id=self.user_id).first()
-        )
-        if not self.context_manager:
-            raise Exception("Context manager is not initialized")
-        if not user_context:
-            raise Exception("user context is not initialized")
-        user_context.context_manager = self.context_manager
-        self.db.commit()
-
-    def get_context(self):
-        """获取上下文"""
-
-        return self.context_manager.get_context()
-
-    async def chat(self, user_message: str):
-        return await self._chat(user_message)
-
-    async def _chat(self, user_message: str):
-        """AI 聊天接口"""
-        self.client = await get_ai_session()
-        user_message = user_message + ""  # TODO：构建聊天提示词
-        self.context_manager.add_message("user", user_message)
-        response = await self.client.chat.completions.create(
-            model=self.model_name,
-            messages=self.get_context(),
-        )
-        return response
-
-    async def emotion_quantification(self, user_message: str):
-        """情感量化接口"""
-        self.client = await get_ai_session()
-
-        _user_message = cleandoc(
+        self.memory_system = VectorDBMemorySystem()
+        self.memory_prompt = cleandoc(
             """
-            请根据以下用户输入，结合前面的具体聊天内容，量化其情感倾向，并给出情感倾向的量化结果。
-            请按以下格式输出内容:
+            <memory>以下是有关用户当前发来消息的记忆，请参考：<insert></insert><end_memory>
+            """
+        )
+
+        self.emotion_prompt = cleandoc(
+            """
+    请根据以下用户输入，结合前面的具体聊天内容，量化其情感倾向，并给出情感倾向的量化结果。
+    请按以下格式输出内容:
     "字段说明": {
         "emotion_type": {
             "description": "情绪类型名称",
@@ -125,7 +86,80 @@ class AIChatService:
     以下是用户当前的输入：
             """
         )
-        _user_message = _user_message + user_message
+
+    def get_context_manager(self) -> ContextManager:
+        if (
+            user_context := self.db.query(UserContext)
+            .filter_by(user_id=self.user_id)
+            .first()
+        ):
+            user_context = user_context.context_manager
+        else:
+            user_context = ContextManager()
+            self.db.add(UserContext(user_id=self.user_id, context_manager=user_context))
+        return user_context
+
+    def update_context_manager(self):
+        user_context = (
+            self.db.query(UserContext).filter_by(user_id=self.user_id).first()
+        )
+        if not self.context_manager:
+            raise Exception("Context manager is not initialized")
+        if not user_context:
+            raise Exception("user context is not initialized")
+        user_context.context_manager = self.context_manager
+        self.db.commit()
+
+    def get_context(self):
+        """获取上下文"""
+
+        return self.context_manager.get_context()
+
+    async def chat(self, user_message: str):
+        return await self._chat(user_message)
+
+    async def _chat(self, user_message: str):
+        """AI 聊天接口"""
+
+        memories = await self.get_memory()
+        self.client = await get_ai_session()
+        user_message = (
+            self.memory_prompt.replace("<insert></insert>", memories)
+            + "\n"
+            + user_message
+        )
+        self.context_manager.add_message("user", user_message)
+        response = await self.client.chat.completions.create(
+            model=self.model_name,
+            messages=self.get_context(),
+        )
+        return response
+
+    async def get_memory(self) -> str:
+        """获取记忆接口"""
+        # 获取最近的用户消息作为查询文本
+        query_text = ""
+        context = self.context_manager.get_context()
+        for msg in reversed(context):
+            if msg["role"] == "user":
+                query_text += str(msg["content"])
+                break
+        if not query_text:
+            return "无相关记忆"
+
+        memories = self.memory_system.retrieve_memories(str(self.user_id), query_text)
+        memories = "\n".join([f"• {m['metadata']['text']}" for m in memories[:20]])
+        return memories
+
+    async def add_memory(self, memory: str):
+        """添加记忆接口"""
+        self.memory_system.add_memory(str(self.user_id), memory)
+
+    async def emotion_quantification(self, user_message: str):
+        """情感量化接口"""
+        self.client = await get_ai_session()
+
+        _user_message = self.emotion_prompt + "\n" + user_message
         self.context_manager.add_message("user", _user_message)
         response = await self.client.chat.completions.create(
             model=self.model_name,

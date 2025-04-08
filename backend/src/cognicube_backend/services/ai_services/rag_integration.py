@@ -4,12 +4,21 @@ import os
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Any
 
 import qdrant_client
-from qdrant_client.models import (Distance, FieldCondition, Filter, MatchValue,
-                                  PayloadSchemaType, PointIdsList, PointStruct,
-                                  Range, ReadConsistencyType, VectorParams)
+from qdrant_client.models import (
+    Distance,
+    FieldCondition,
+    Filter,
+    MatchValue,
+    PayloadSchemaType,
+    PointIdsList,
+    PointStruct,
+    Range,
+    ReadConsistencyType,
+    VectorParams,
+)
 from sentence_transformers import SentenceTransformer
 
 
@@ -104,7 +113,7 @@ class VectorDBMemorySystem:
         importance_weight: float = 0.3,
         recency_weight: float = 0.2,
         max_age_days: int = 180,
-    ) -> List[Dict]:
+    ) -> List[Dict[str, Any]]:
         """增强版记忆检索，支持多维度加权排序"""
         # 参数校验
         if not user_id.strip() or top_k <= 0:
@@ -151,7 +160,6 @@ class VectorDBMemorySystem:
 
         # 多维度综合评分
         current_time = datetime.now().timestamp()
-        max_age_sec = max_age_days * 86400
         processed = []
         for point in results:
             if not point.payload:

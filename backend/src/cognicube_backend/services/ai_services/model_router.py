@@ -1,11 +1,12 @@
 from typing import Optional
 
+from openai import AsyncOpenAI
+
 from cognicube_backend.config import CONFIG
 from cognicube_backend.services.ai_services.context_manager import \
     ContextManager
 from cognicube_backend.services.ai_services.tool_chain_manager import \
     ToolChainManager
-from openai import AsyncOpenAI
 
 SESSION: Optional[AsyncOpenAI] = None
 

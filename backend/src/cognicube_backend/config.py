@@ -21,7 +21,7 @@ class Setting(BaseSettings):
     QDRANT_VERSION: str = "v1.13.6"
     QDRANT_PORT: int = 6333
     QDRANT_HOST: str = "127.0.0.1"
-    STORAGE_PATH: str = "qdrant_storage"  # 持久化目录名称
+    STORAGE_PATH: str = "qdrant_storage"
     Model_PATH: str = "model_storage"
 
     class Config:
