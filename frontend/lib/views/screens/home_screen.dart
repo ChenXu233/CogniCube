@@ -16,13 +16,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late PageController _pageController;
-  int _currentIndex = 0;
+  int _currentIndex = 1; // 默认显示中间的 CBT 屏幕
   late AnimationController _gradientController;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: 1);
+    _pageController = PageController(initialPage: _currentIndex);
     _gradientController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 15),
@@ -67,15 +67,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 bottom: kBottomNavigationBarHeight + 16,
               ),
               child: PageView(
+                controller: _pageController, // 绑定控制器
+                onPageChanged: (index) {
+                  setState(() => _currentIndex = index); // 同步滑动切换
+                },
                 children: const [
-                  WeatherScreen(key: PageStorageKey('weather')), // 🌟 首页
                   CBTScreen(key: PageStorageKey('cbt')),
+                  WeatherScreen(key: PageStorageKey('weather')),
                   ProfileScreen(key: PageStorageKey('profile')),
                 ],
               ),
             ),
           ),
-
           Positioned(
             bottom: 0,
             left: 0,
@@ -83,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: buildStaticBlurNavigationBar(context, _currentIndex, (
               index,
             ) {
+              setState(() => _currentIndex = index); // 更新按钮状态
               _pageController.animateToPage(
                 index,
                 duration: const Duration(milliseconds: 300),
