@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../components/navigation_bar.dart';
 import '../../utils/gradient_helper.dart';
 import '../../views/screens/CBT/CBT_screen.dart';
-import '../../view_models/home_view_model.dart';
 import './statistics/statistics_screen.dart';
 import '../../views/screens/user/profile_screen.dart';
 import 'package:go_router/go_router.dart';

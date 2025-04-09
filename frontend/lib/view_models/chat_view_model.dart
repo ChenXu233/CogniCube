@@ -5,12 +5,37 @@ import '../services/chat.dart';
 import '../utils/constants.dart';
 
 class ChatViewModel extends ChangeNotifier {
+  int? _replyingToMessageId;
+  String get replyingPreview => _getReplyingPreview();
   int _nextMessageId = 1001;
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
   bool isSendButtonEnabled = false;
   bool isLoadingMore = false;
   List<message_model.Message> messages = [];
+
+  void setReplyingTo(int? messageId) {
+    _replyingToMessageId = messageId;
+    notifyListeners();
+  }
+
+  void clearReply() {
+    setReplyingTo(null);
+  }
+
+  String _getReplyingPreview() {
+    if (_replyingToMessageId == null) return '';
+    final message = messages.firstWhere(
+      (m) => m.messageId == _replyingToMessageId,
+      orElse:
+          () => message_model.Message(
+            messages: [message_model.TextModel(text: '已删除的消息')],
+            who: 'user',
+            messageId: -1,
+          ),
+    );
+    return message.getPlainText();
+  }
 
   Future<void> fetchMoreMessages() async {
     if (isLoadingMore) return;
@@ -58,27 +83,36 @@ class ChatViewModel extends ChangeNotifier {
   }
 
   Future<void> sendMessage(String text) async {
-    if (text.trim().isEmpty) return;
-
-    final userMessage = _createMessage(text, 'user');
+    final userMessage = _createMessage(
+      text,
+      'user',
+      replyTo: _replyingToMessageId, // 添加回复关联
+    );
     _addMessage(userMessage);
+    clearReply();
 
     try {
       final loadingMessage = _createMessage('正在加载...', 'loading', temp: true);
       _addMessage(loadingMessage);
       final response = await ChatApiService.getAIResponse(text);
       // print('收到回复: $response');
-      final validReplyTo = userMessage.messageId;
 
       final aiMessage = _createMessage(
         response,
         'assistant',
-        replyTo: validReplyTo,
+        replyTo: userMessage.messageId,
       );
       _addMessage(aiMessage);
     } catch (e) {
       messages.removeLast();
-      _addMessage(_createMessage('发生错误，请稍后再试:$e', 'assistant'));
+
+      _addMessage(
+        _createMessage(
+          '发生错误，请稍后再试:$e',
+          'assistant',
+          replyTo: userMessage.messageId,
+        ),
+      );
     }
   }
 
@@ -89,16 +123,19 @@ class ChatViewModel extends ChangeNotifier {
     bool temp = false,
   }) {
     // 添加回复消息校验
-    if (replyTo != null) {
-      final exists = messages.any((m) => m.messageId == replyTo);
-      if (!exists) replyTo = null; // 自动清除无效回复ID
+    int? finalReplyTo = replyTo;
+    if (who == 'assistant' && replyTo != null) {
+      final userMessages = messages.where((m) => m.who == 'user');
+      if (userMessages.isNotEmpty) {
+        finalReplyTo = userMessages.last.messageId;
+      }
     }
     return message_model.Message(
       messages: [message_model.TextModel(text: text)],
       who: who,
       messageId: temp ? -1 : _nextMessageId++,
       timestamp: DateTime.now().millisecondsSinceEpoch.toDouble(),
-      replyTo: replyTo,
+      replyTo: finalReplyTo,
     );
   }
 

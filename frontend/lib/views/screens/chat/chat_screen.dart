@@ -87,37 +87,91 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Widget _buildReplyPreview(BuildContext context, ChatViewModel vm) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        border: Border(top: BorderSide(color: Colors.grey.shade300)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.reply, color: Colors.blue.shade800, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              vm.replyingPreview,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.blue.shade800),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.close, size: 20, color: Colors.blue.shade800),
+            onPressed: vm.clearReply,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInputArea() {
     return Consumer<ChatViewModel>(
       builder: (context, vm, _) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: vm.messageController,
-                  decoration: InputDecoration(
-                    hintText: '输入消息...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24),
+        return Column(
+          children: [
+            if (vm.replyingPreview.isNotEmpty)
+              _buildReplyPreview(context, vm), // 新增回复预览
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: vm.messageController,
+                      decoration: InputDecoration(
+                        hintText: '输入消息...',
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 14,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade200,
+                      ),
+                      onChanged: vm.updateSendButtonState,
+                      onSubmitted: (text) => _sendMessage(text),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
-                  onChanged: vm.updateSendButtonState,
-                  onSubmitted: (text) => _sendMessage(text),
-                ),
+                  const SizedBox(width: 8),
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor:
+                        vm.isSendButtonEnabled
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.send,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                      onPressed:
+                          vm.isSendButtonEnabled
+                              ? () => _sendMessage(vm.messageController.text)
+                              : null,
+                    ),
+                  ),
+                ],
               ),
-              IconButton(
-                icon: const Icon(Icons.send),
-                color: Colors.blue,
-                onPressed:
-                    vm.isSendButtonEnabled
-                        ? () => _sendMessage(vm.messageController.text)
-                        : null,
-              ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
