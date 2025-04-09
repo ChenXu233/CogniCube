@@ -3,21 +3,16 @@ import json
 from typing import Any, Callable, Dict, List, Type
 
 from openai import AsyncOpenAI
-from openai.types.chat import (
-    ChatCompletionMessageParam,
-    ChatCompletionToolMessageParam,
-    ChatCompletionToolParam,
-    ChatCompletionUserMessageParam,
-)
+from openai.types.chat import (ChatCompletionMessageParam,
+                               ChatCompletionToolMessageParam,
+                               ChatCompletionToolParam,
+                               ChatCompletionUserMessageParam)
 from openai.types.shared_params import FunctionDefinition
 from pydantic import BaseModel, ConfigDict, Field, create_model
 
 from cognicube_backend.logger import logger
-from cognicube_backend.schemas.toolcall import (
-    ToolCallResponse,
-    OpenAITool,
-    ToolMetadata,
-)
+from cognicube_backend.schemas.toolcall import (OpenAITool, ToolCallResponse,
+                                                ToolMetadata)
 
 
 class ToolExecutionError(Exception):

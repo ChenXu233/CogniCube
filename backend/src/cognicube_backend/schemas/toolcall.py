@@ -1,5 +1,6 @@
+from typing import Any, Callable, Dict, Type
+
 from pydantic import BaseModel
-from typing import Dict, Any, Callable, Type
 
 
 class OpenAITool(BaseModel):

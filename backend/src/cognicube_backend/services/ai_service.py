@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from openai import AsyncOpenAI
 from sqlalchemy.orm import Session
 
+from cognicube_backend.app import get_memory_system
 from cognicube_backend.config import CONFIG
 from cognicube_backend.databases.database import get_db
 from cognicube_backend.logger import logger
@@ -13,14 +14,10 @@ from cognicube_backend.models.context import UserContext
 from cognicube_backend.models.conversation import Conversation
 from cognicube_backend.models.emotion_record import EmotionRecord
 from cognicube_backend.schemas.message import Message
-from cognicube_backend.services.ai_services.rag_integration import VectorDBMemorySystem
 from cognicube_backend.services.ai_services.tool_chain import (
-    OpenAIToolExecutor,
-    ToolRegistry,
-)
+    OpenAIToolExecutor, ToolRegistry)
 
 SESSION: Optional[AsyncOpenAI] = None
-VECTOR_MEMORY_SYSTEM: Optional[VectorDBMemorySystem] = None
 
 
 async def get_ai_session() -> AsyncOpenAI:
@@ -29,14 +26,6 @@ async def get_ai_session() -> AsyncOpenAI:
     if SESSION is None:
         SESSION = AsyncOpenAI(api_key=CONFIG.AI_API_KEY, base_url=CONFIG.AI_API_URL)
     return SESSION
-
-
-def get_memory_system() -> VectorDBMemorySystem:
-    """返回一个全局的 VectorDBMemorySystem 实例"""
-    global VECTOR_MEMORY_SYSTEM
-    if VECTOR_MEMORY_SYSTEM is None:
-        VECTOR_MEMORY_SYSTEM = VectorDBMemorySystem()
-    return VECTOR_MEMORY_SYSTEM
 
 
 class AIChatService:

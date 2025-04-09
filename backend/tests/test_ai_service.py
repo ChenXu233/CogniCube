@@ -1,6 +1,8 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 from sqlalchemy.orm import Session
+
 from cognicube_backend.services.ai_service import AIChatService
 
 # filepath: tests/test_ai_service.py
