@@ -56,12 +56,17 @@ abstract class Message with _$Message {
 
 extension MessageExtensions on Message {
   Message? getRepliedMessage(List<Message> allMessages) {
-    if (replyTo == null) return null;
-    try {
-      return allMessages.firstWhere((m) => m.messageId == replyTo);
-    } catch (_) {
-      return null;
-    }
+    return replyTo != null
+        ? allMessages.firstWhere(
+          (m) => m.messageId == replyTo,
+          orElse:
+              () => Message(
+                messages: [TextModel(text: '已删除的消息')],
+                who: 'user',
+                messageId: -1,
+              ),
+        )
+        : null;
   }
 
   String getPlainText() {
@@ -77,4 +82,16 @@ extension MessageExtensions on Message {
         ? '[空消息]'
         : (text.length > 30 ? '${text.substring(0, 30)}...' : text);
   }
+
+  // static Message _findLatestUserMessage(List<Message> messages) {
+  //   return messages.lastWhere(
+  //     (m) => m.who == 'user',
+  //     orElse:
+  //         () => Message(
+  //           messages: [TextModel(text: '未知消息')],
+  //           who: 'user',
+  //           messageId: -1,
+  //         ),
+  //   );
+  // }
 }
