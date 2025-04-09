@@ -5,19 +5,23 @@ import '../../models/message_model.dart' as message_model;
 
 class MessageBubble extends StatelessWidget {
   final message_model.Message message;
-  // final _messageTypes = const {'user', 'assistant', 'loading'};
 
   const MessageBubble({super.key, required this.message});
-  // 新增方法：显示上下文菜单
-  void _showContextMenu(BuildContext context, Offset position) async {
+  void _showContextMenu(BuildContext context) async {
     final renderBox = context.findRenderObject() as RenderBox;
+    // 获取消息气泡在屏幕中的位置
+    final bubblePosition = renderBox.localToGlobal(Offset.zero);
+    final bubbleHeight = renderBox.size.height;
+    final menuLeft = bubblePosition.dx;
+    final menuTop = bubblePosition.dy + bubbleHeight + 8;
+    final menuRight = bubblePosition.dx + renderBox.size.width;
     final result = await showMenu(
       context: context,
       position: RelativeRect.fromLTRB(
-        position.dx,
-        position.dy,
-        position.dx + renderBox.size.width,
-        position.dy + renderBox.size.height,
+        menuLeft,
+        menuTop,
+        menuRight,
+        menuTop + 1, // 高度由菜单内容决定
       ),
       items: [
         const PopupMenuItem(
@@ -43,10 +47,8 @@ class MessageBubble extends StatelessWidget {
     final isLoading = message.who == 'loading';
 
     return GestureDetector(
-      onSecondaryTapDown:
-          (details) => _showContextMenu(context, details.globalPosition),
-      onLongPress:
-          () => _showContextMenu(context, context.size!.center(Offset.zero)),
+      onSecondaryTapDown: (details) => _showContextMenu(context),
+      onLongPress: () => _showContextMenu(context),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         child: Column(
