@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:vibration/vibration.dart';
 
 class CountdownScreen extends StatefulWidget {
-  const CountdownScreen({Key? key}) : super(key: key);
+  const CountdownScreen({super.key});
 
   @override
   _CountdownScreenState createState() => _CountdownScreenState();

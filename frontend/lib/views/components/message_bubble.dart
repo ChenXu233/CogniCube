@@ -5,71 +5,105 @@ import '../../models/message_model.dart' as message_model;
 
 class MessageBubble extends StatelessWidget {
   final message_model.Message message;
-  final _messageTypes = const {'user', 'assistant', 'loading'};
+  // final _messageTypes = const {'user', 'assistant', 'loading'};
 
   const MessageBubble({super.key, required this.message});
+  // 新增方法：显示上下文菜单
+  void _showContextMenu(BuildContext context, Offset position) async {
+    final renderBox = context.findRenderObject() as RenderBox;
+    final result = await showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        position.dx,
+        position.dy,
+        position.dx + renderBox.size.width,
+        position.dy + renderBox.size.height,
+      ),
+      items: [
+        const PopupMenuItem(
+          value: 'reply',
+          child: ListTile(
+            leading: Icon(Icons.reply, size: 20),
+            title: Text('回复'),
+            dense: true,
+          ),
+        ),
+      ],
+    );
+
+    if (result == 'reply') {
+      // 触发回复状态
+      context.read<ChatViewModel>().setReplyingTo(message.messageId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final isUser = message.who == 'user';
     final isLoading = message.who == 'loading';
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      child: Column(
-        crossAxisAlignment:
-            isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          if (message.replyTo != null) _buildReplyPreview(context),
-          IntrinsicWidth(
-            child: Row(
-              mainAxisAlignment:
-                  isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-              children: [
-                if (!isUser && !isLoading)
-                  const Padding(
-                    padding: EdgeInsets.only(right: 8),
-                    child: CircleAvatar(
-                      radius: 16,
-                      child: Icon(Icons.smart_toy, size: 18),
-                    ),
-                  ),
-                Flexible(
-                  child: Container(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: _getBubbleColor(context, isUser, isLoading),
-                        borderRadius: _getBorderRadius(isUser),
-                        boxShadow:
-                            isLoading
-                                ? null
-                                : [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 2,
-                                    offset: const Offset(0, 1),
-                                  ),
-                                ],
+    return GestureDetector(
+      onSecondaryTapDown:
+          (details) => _showContextMenu(context, details.globalPosition),
+      onLongPress:
+          () => _showContextMenu(context, context.size!.center(Offset.zero)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        child: Column(
+          crossAxisAlignment:
+              isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            if (message.who == 'assistant') _buildReplyPreview(context),
+            IntrinsicWidth(
+              child: Row(
+                mainAxisAlignment:
+                    isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+                children: [
+                  if (!isUser && !isLoading)
+                    const Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: CircleAvatar(
+                        radius: 16,
+                        child: Icon(Icons.smart_toy, size: 18),
                       ),
-                      child: _buildContent(context, isLoading),
-                    ), //
-                  ),
-                ),
-                if (isUser && !isLoading)
-                  const Padding(
-                    padding: EdgeInsets.only(left: 8),
-                    child: CircleAvatar(
-                      radius: 16,
-                      child: Icon(Icons.person, size: 18),
+                    ),
+                  Flexible(
+                    child: Container(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: _getBubbleColor(context, isUser, isLoading),
+                          borderRadius: _getBorderRadius(isUser),
+                          boxShadow:
+                              isLoading
+                                  ? null
+                                  : [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 2,
+                                      offset: const Offset(0, 1),
+                                    ),
+                                  ],
+                        ),
+                        child: _buildContent(context, isLoading),
+                      ), //
                     ),
                   ),
-              ],
+                  if (isUser && !isLoading)
+                    const Padding(
+                      padding: EdgeInsets.only(left: 8),
+                      child: CircleAvatar(
+                        radius: 16,
+                        child: Icon(Icons.person, size: 18),
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          _buildTimestamp(context),
-        ],
+            _buildTimestamp(context),
+          ],
+        ),
       ),
     );
   }
@@ -149,7 +183,7 @@ class MessageBubble extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '回复',
+                  replyText == null ? '最新消息' : '回复',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -159,7 +193,7 @@ class MessageBubble extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              replyText ?? '',
+              replyText ?? _getDefaultReplyText(chatVM.messages),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Colors.grey.shade700,
                 fontSize: 12,
@@ -171,6 +205,20 @@ class MessageBubble extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getDefaultReplyText(List<message_model.Message> messages) {
+    final lastUserMessage = messages.lastWhere(
+      (m) => m.who == 'user',
+      orElse:
+          () => message_model.Message(
+            messages: [message_model.TextModel(text: '未知消息')],
+            who: 'user',
+            messageId: -1,
+          ),
+    );
+    final text = lastUserMessage.getPlainText();
+    return text.length > 30 ? '${text.substring(0, 30)}...' : text;
   }
 
   Widget _buildTimestamp(BuildContext context) {
