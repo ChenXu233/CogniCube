@@ -7,13 +7,13 @@ from openai import AsyncOpenAI
 from sqlalchemy.orm import Session
 
 from cognicube_backend.config import CONFIG
+from cognicube_backend.databases.database import get_db
 from cognicube_backend.logger import logger
 from cognicube_backend.models.context import UserContext
 from cognicube_backend.models.conversation import Conversation
 from cognicube_backend.models.emotion_record import EmotionRecord
 from cognicube_backend.schemas.message import Message
 from cognicube_backend.services.ai_services.rag_integration import VectorDBMemorySystem
-from cognicube_backend.databases.database import get_db
 
 SESSION: Optional[AsyncOpenAI] = None
 VECTOR_MEMORY_SYSTEM: Optional[VectorDBMemorySystem] = None

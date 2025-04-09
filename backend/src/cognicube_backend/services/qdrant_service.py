@@ -1,4 +1,3 @@
-import asyncio
 import os
 import platform
 import shutil
@@ -7,14 +6,10 @@ import subprocess
 import sys
 import threading
 import zipfile
-from contextlib import asynccontextmanager
 from pathlib import Path
 
 import requests
 import yaml  # 新增yaml支持
-from fastapi import FastAPI
-from qdrant_client import QdrantClient
-
 from cognicube_backend.config import CONFIG
 from cognicube_backend.logger import logger
 
@@ -156,59 +151,3 @@ def start_qdrant():
     stderr_thread.start()
 
     return process
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    if not check_port_available():
-        logger.error(f"🚨 Port {QDRANT_PORT} is occupied!")
-        sys.exit(1)
-
-    if not check_qdrant_installed():
-        logger.info("🔄 Qdrant not found, starting installation...")
-        install_qdrant()
-
-    logger.info("🚀 Starting Qdrant service...")
-    qdrant_process = start_qdrant()
-    app.state.qdrant_process = qdrant_process
-    await asyncio.sleep(5)
-
-    try:
-        app.state.client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
-        app.state.client.get_collections()
-        logger.info("🔗 Qdrant service connected")
-    except Exception as e:
-        logger.error(f"❌ Failed to connect Qdrant: {str(e)}")
-        sys.exit(1)
-
-    yield
-
-    logger.info("🛑 Stopping Qdrant service...")
-    if hasattr(app.state, "qdrant_process"):
-        process: subprocess.Popen = app.state.qdrant_process
-        process.terminate()
-
-        try:
-            # 首次等待正常退出
-            exit_code = process.wait(timeout=5)
-            if exit_code != 0:
-                logger.warning(f"Qdrant exited with non-zero code: {exit_code}")
-        except subprocess.TimeoutExpired:
-            logger.warning("Qdrant did not terminate gracefully, forcing kill...")
-            try:
-                # 强制终止并等待
-                process.kill()
-                process.wait()
-            except Exception as e:
-                logger.error(f"Failed to kill Qdrant: {str(e)}")
-
-        # 最终状态确认
-        if process.poll() is None:
-            logger.error("❌ Qdrant failed to stop")
-        else:
-            logger.info("✅ Qdrant stopped")
-
-        # 清理进程引用
-        del app.state.qdrant_process
-    else:
-        logger.info("Qdrant service was not running")
