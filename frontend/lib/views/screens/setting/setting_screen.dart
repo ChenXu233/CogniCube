@@ -90,13 +90,6 @@ class _SettingsScreenState extends State<SettingsScreen>
                       // 导航到帮助与反馈页面
                     },
                   ),
-                  ListTile(
-                    leading: Icon(Icons.logout),
-                    title: Text('退出登录'),
-                    onTap: () {
-                      // 处理退出登录逻辑
-                    },
-                  ),
                 ],
               ),
             ),
