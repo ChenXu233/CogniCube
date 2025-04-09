@@ -3,16 +3,21 @@ import json
 from typing import Any, Callable, Dict, List, Type
 
 from openai import AsyncOpenAI
-from openai.types.chat import (ChatCompletionMessageParam,
-                               ChatCompletionToolMessageParam,
-                               ChatCompletionToolParam,
-                               ChatCompletionUserMessageParam)
+from openai.types.chat import (
+    ChatCompletionMessageParam,
+    ChatCompletionToolMessageParam,
+    ChatCompletionToolParam,
+    ChatCompletionUserMessageParam,
+)
 from openai.types.shared_params import FunctionDefinition
 from pydantic import BaseModel, ConfigDict, Field, create_model
 
 from cognicube_backend.logger import logger
-from cognicube_backend.schemas.toolcall import (OpenAITool, ToolCallResponse,
-                                                ToolMetadata)
+from cognicube_backend.schemas.toolcall import (
+    OpenAITool,
+    ToolCallResponse,
+    ToolMetadata,
+)
 
 
 class ToolExecutionError(Exception):
@@ -52,9 +57,11 @@ class ToolRegistry:
                     field_info.description = param_descriptions[param.name]
 
                 fields[param.name] = (
-                    param.annotation
-                    if param.annotation != inspect.Parameter.empty
-                    else Any,
+                    (
+                        param.annotation
+                        if param.annotation != inspect.Parameter.empty
+                        else Any
+                    ),
                     field_info,
                 )
 

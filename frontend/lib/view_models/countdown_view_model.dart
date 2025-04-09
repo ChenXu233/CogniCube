@@ -1,19 +1,113 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../view_models/countdown_view_model.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class CountdownScreen extends StatelessWidget {
-  const CountdownScreen({super.key});
+class CountdownItem {
+  final String id;
+  final int minutes;
+  final String goal;
+  bool isRunning = false;
+  Duration remaining;
 
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => CountdownViewModel(),
-      child: const CountdownPage(),
+  CountdownItem({required this.id, required this.minutes, required this.goal})
+    : remaining = Duration(minutes: minutes);
+
+  Map<String, dynamic> toJson() => {'id': id, 'minutes': minutes, 'goal': goal};
+
+  static CountdownItem fromJson(Map<String, dynamic> json) {
+    return CountdownItem(
+      id: json['id'],
+      minutes: json['minutes'],
+      goal: json['goal'],
     );
   }
 }
 
+class CountdownViewModel extends ChangeNotifier {
+  final List<CountdownItem> _items = [];
+  CountdownItem? _currentItem;
+  Timer? _timer;
+  bool _disposed = false;
+
+  List<CountdownItem> get items => _items;
+  CountdownItem? get currentItem => _currentItem;
+
+  Future<void> load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final taskList = prefs.getStringList('tasks') ?? [];
+
+    _items.clear();
+    for (String taskJson in taskList) {
+      final Map<String, dynamic> taskData = json.decode(taskJson);
+      _items.add(CountdownItem.fromJson(taskData));
+    }
+    notifyListeners();
+  }
+
+  Future<void> _saveTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final taskList = _items.map((e) => json.encode(e.toJson())).toList();
+    await prefs.setStringList('tasks', taskList);
+  }
+
+  void addItem(int minutes, String goal) {
+    final id = DateTime.now().millisecondsSinceEpoch.toString();
+    _items.add(CountdownItem(id: id, minutes: minutes, goal: goal));
+    _saveTasks();
+    notifyListeners();
+  }
+
+  void startCountdown(CountdownItem item) {
+    _currentItem = item;
+    item.isRunning = true;
+
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (item.remaining.inSeconds <= 0) {
+        stopCountdown();
+      } else {
+        item.remaining -= const Duration(seconds: 1);
+        notifyListeners();
+      }
+    });
+  }
+
+  void stopCountdown() {
+    _timer?.cancel();
+    _currentItem?.isRunning = false;
+    _currentItem = null;
+    _saveTasks();
+    notifyListeners();
+  }
+
+  void togglePause() {
+    if (_timer?.isActive ?? false) {
+      _timer?.cancel();
+      _currentItem?.isRunning = false;
+    } else if (_currentItem != null) {
+      startCountdown(_currentItem!);
+    }
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _timer?.cancel();
+    super.dispose(); // Don't forget to call super.dispose()!
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) {
+      super.notifyListeners();
+    }
+  }
+}
+
+// CountdownPage with MouseRegion for hover effect
 class CountdownPage extends StatefulWidget {
   const CountdownPage({super.key});
 
@@ -41,72 +135,34 @@ class _CountdownPageState extends State<CountdownPage> {
               ? Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('设置一个小目标 ✨', style: TextStyle(fontSize: 20)),
                     const SizedBox(height: 16),
                     Expanded(
-                      child:
-                          vm.items.isEmpty
-                              ? const Center(
-                                child: Text(
-                                  '暂无小目标，点右下角加号添加吧 💖',
-                                  style: TextStyle(fontSize: 16),
+                      child: ListView(
+                        children:
+                            vm.items.map((item) {
+                              return MouseRegion(
+                                onEnter: (_) => setState(() {}),
+                                onExit: (_) => setState(() {}),
+                                child: Card(
+                                  elevation: 4,
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(item.goal),
+                                    subtitle: Text('${item.minutes} 分钟'),
+                                    trailing: const Icon(Icons.play_arrow),
+                                    onTap: () => vm.startCountdown(item),
+                                  ),
                                 ),
-                              )
-                              : GridView.count(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: 1.1,
-                                children:
-                                    vm.items.map((item) {
-                                      return GestureDetector(
-                                        onTap: () => vm.startCountdown(item),
-                                        child: Card(
-                                          elevation: 5,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                          ),
-                                          color: Colors.purple[50],
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(16.0),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.bubble_chart,
-                                                  color: Colors.purple,
-                                                  size: 32,
-                                                ),
-                                                const SizedBox(height: 8),
-                                                Text(
-                                                  item.goal,
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.deepPurple,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                const SizedBox(height: 8),
-                                                Text(
-                                                  '${item.minutes} 分钟',
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black54,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                              ),
+                              );
+                            }).toList(),
+                      ),
                     ),
                   ],
                 ),
@@ -176,6 +232,7 @@ class _CountdownPageState extends State<CountdownPage> {
   }
 }
 
+// CountdownRunningView widget
 class CountdownRunningView extends StatelessWidget {
   final CountdownItem item;
 

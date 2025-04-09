@@ -1,10 +1,12 @@
 import re
 from typing import Any, Dict, List, Literal, Optional
 
-from openai.types.chat import (ChatCompletionAssistantMessageParam,
-                               ChatCompletionMessageParam,
-                               ChatCompletionSystemMessageParam,
-                               ChatCompletionUserMessageParam)
+from openai.types.chat import (
+    ChatCompletionAssistantMessageParam,
+    ChatCompletionMessageParam,
+    ChatCompletionSystemMessageParam,
+    ChatCompletionUserMessageParam,
+)
 from sqlalchemy import JSON, Integer, String, Text
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.orm import Mapped, mapped_column
