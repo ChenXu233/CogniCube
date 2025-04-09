@@ -25,7 +25,7 @@ def get_memory_system() -> VectorDBMemorySystem:
     """返回一个全局的 VectorDBMemorySystem 实例"""
     global VECTOR_MEMORY_SYSTEM
     if VECTOR_MEMORY_SYSTEM is None:
-        raise RuntimeError("VECTOR_MEMORY_SYSTEM is not initialized")
+        VECTOR_MEMORY_SYSTEM = VectorDBMemorySystem()
     return VECTOR_MEMORY_SYSTEM
 
 
