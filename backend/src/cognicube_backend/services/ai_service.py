@@ -14,6 +14,10 @@ from cognicube_backend.models.conversation import Conversation
 from cognicube_backend.models.emotion_record import EmotionRecord
 from cognicube_backend.schemas.message import Message
 from cognicube_backend.services.ai_services.rag_integration import VectorDBMemorySystem
+from cognicube_backend.services.ai_services.tool_chain import (
+    OpenAIToolExecutor,
+    ToolRegistry,
+)
 
 SESSION: Optional[AsyncOpenAI] = None
 VECTOR_MEMORY_SYSTEM: Optional[VectorDBMemorySystem] = None
@@ -36,7 +40,11 @@ def get_memory_system() -> VectorDBMemorySystem:
 
 
 class AIChatService:
-    def __init__(self, user_id: int, db: Session):
+    def __init__(
+        self,
+        user_id: int,
+        db: Session,
+    ):
         self.user_id = user_id
         self.db = db
         self.model_name = CONFIG.AI_MODEL_NAME
@@ -44,6 +52,7 @@ class AIChatService:
         self.api_base = CONFIG.AI_API_URL
         self.prompt = CONFIG.AI_PROMPT
         self.client: AsyncOpenAI | None = None
+        self.tool_executor: OpenAIToolExecutor | None = None
         self.context_manager: UserContext = self.get_context_manager()
         print(self.context_manager)
         self.context_manager.add_message("system", self.prompt)
@@ -96,6 +105,10 @@ class AIChatService:
             """
         )
 
+    async def await_init(self, tool_registry: ToolRegistry):
+        self.client = await get_ai_session()
+        self.tool_executor = OpenAIToolExecutor(tool_registry, self.client)
+
     def get_context_manager(self) -> UserContext:
         if (
             user_context := self.db.query(UserContext)
@@ -141,11 +154,21 @@ class AIChatService:
             + "\n"
             + user_message
         )
+
+        for message in self.context_manager.get_context():
+            self.tool_executor.message_history.append(message)  # type: ignore
+
+        self.tool_executor.message_history.append(user_message)  # type: ignore
         self.context_manager.add_message("user", user_message)
-        response = await self.client.chat.completions.create(
-            model=self.model_name,
-            messages=self.get_context(),
-        )
+        try:
+            response = await self.tool_executor.chat_completion()  # type: ignore
+        except ExceptionGroup as e:
+            return {"error": str(e)}
+
+        # response = await self.client.chat.completions.create(
+        #     model=self.model_name,
+        #     messages=self.get_context(),
+        # )
         return response
 
     async def get_memory(self) -> str:

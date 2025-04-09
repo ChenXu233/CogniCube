@@ -1,6 +1,6 @@
 import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from cognicube_backend.databases.database import get_db
@@ -15,6 +15,7 @@ from cognicube_backend.schemas.message import Message, Text
 from cognicube_backend.services.ai_service import AIChatService
 from cognicube_backend.utils.decorator import verify_email_verified
 from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
+from cognicube_backend.services.ai_services.tool_chain import tool_registry
 
 ai = APIRouter(prefix="/apis/v1/ai", tags=["ai"])
 
@@ -32,6 +33,7 @@ async def create_conversation(
         raise HTTPException(status_code=404, detail="用户不存在")
 
     ai_service = AIChatService(user_id, db)
+    await ai_service.await_init(tool_registry)
 
     await ai_service.save_message_record(user_id, message.message)
     ai_response = await ai_service.chat(message.message.get_plain_text())
