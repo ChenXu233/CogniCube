@@ -15,7 +15,9 @@ from cognicube_backend.models.conversation import Conversation
 from cognicube_backend.models.emotion_record import EmotionRecord
 from cognicube_backend.schemas.message import Message
 from cognicube_backend.services.ai_services.tool_chain import (
-    OpenAIToolExecutor, ToolRegistry)
+    OpenAIToolExecutor,
+    ToolRegistry,
+)
 
 SESSION: Optional[AsyncOpenAI] = None
 
@@ -144,20 +146,20 @@ class AIChatService:
             + user_message
         )
 
-        for message in self.context_manager.get_context():
-            self.tool_executor.message_history.append(message)  # type: ignore
+        # for message in self.context_manager.get_context():
+        #     self.tool_executor.message_history.append(message)  # type: ignore
 
-        self.tool_executor.message_history.append(user_message)  # type: ignore
-        self.context_manager.add_message("user", user_message)
-        try:
-            response = await self.tool_executor.chat_completion()  # type: ignore
-        except ExceptionGroup as e:
-            return {"error": str(e)}
+        # self.tool_executor.message_history.append(user_message)  # type: ignore
+        # self.context_manager.add_message("user", user_message)
+        # try:
+        #     response = await self.tool_executor.chat_completion()  # type: ignore
+        # except ExceptionGroup as e:
+        #     return {"error": str(e)}
 
-        # response = await self.client.chat.completions.create(
-        #     model=self.model_name,
-        #     messages=self.get_context(),
-        # )
+        response = await self.client.chat.completions.create(
+            model=self.model_name,
+            messages=self.get_context(),
+        )
         return response
 
     async def get_memory(self) -> str:

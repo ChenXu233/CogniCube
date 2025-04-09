@@ -8,9 +8,15 @@ from cognicube_backend.models.async_task import AsyncTask, TaskStatus
 from cognicube_backend.models.conversation import Who
 from cognicube_backend.models.user import User
 from cognicube_backend.schemas.async_task import (  # 需要创建的新Schema
-    AsyncTaskCreate, AsyncTaskResponse, TaskStatusResponse)
+    AsyncTaskCreate,
+    AsyncTaskResponse,
+    TaskStatusResponse,
+)
 from cognicube_backend.schemas.conversation import (
-    ConversationHistoryResponse, ConversationRequest, ConversationResponse)
+    ConversationHistoryResponse,
+    ConversationRequest,
+    ConversationResponse,
+)
 from cognicube_backend.schemas.message import Message, Text
 from cognicube_backend.services.ai_service import AIChatService
 from cognicube_backend.utils.decorator import verify_email_verified

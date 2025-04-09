@@ -8,14 +8,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from qdrant_client import QdrantClient
 
 from cognicube_backend.logger import logger
-from cognicube_backend.services.ai_services.rag_integration import \
-    VectorDBMemorySystem
-from cognicube_backend.services.qdrant_service import (QDRANT_HOST,
-                                                       QDRANT_PORT,
-                                                       check_port_available,
-                                                       check_qdrant_installed,
-                                                       install_qdrant,
-                                                       start_qdrant)
+from cognicube_backend.services.ai_services.rag_integration import VectorDBMemorySystem
+from cognicube_backend.services.qdrant_service import (
+    QDRANT_HOST,
+    QDRANT_PORT,
+    check_port_available,
+    check_qdrant_installed,
+    install_qdrant,
+    start_qdrant,
+)
 
 VECTOR_MEMORY_SYSTEM: VectorDBMemorySystem | None = None
 
