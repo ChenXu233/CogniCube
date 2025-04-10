@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 import '../../../utils/gradient_helper.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -29,8 +30,18 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   Future<void> _loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
+    String birthdayStr = prefs.getString('birthday') ?? '未填写';
+    if (birthdayStr != '未填写') {
+      try {
+        final date = DateTime.parse(birthdayStr);
+        birthdayStr = DateFormat('yyyy年MM月dd日').format(date);
+      } catch (e) {
+        birthdayStr = '格式错误';
+      }
+    }
+
     setState(() {
-      _birthday = prefs.getString('birthday') ?? '未填写';
+      _birthday = birthdayStr;
       _gender = prefs.getString('gender') ?? '未填写';
     });
   }
@@ -95,16 +106,12 @@ class _SettingsScreenState extends State<SettingsScreen>
                   ListTile(
                     leading: const Icon(Icons.notifications),
                     title: const Text('通知设置'),
-                    onTap: () {
-                      // TODO
-                    },
+                    onTap: () {},
                   ),
                   ListTile(
                     leading: const Icon(Icons.lock),
                     title: const Text('隐私设置'),
-                    onTap: () {
-                      // TODO
-                    },
+                    onTap: () {},
                   ),
                   ListTile(
                     leading: const Icon(Icons.help),
