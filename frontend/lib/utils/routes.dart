@@ -16,6 +16,7 @@ import '../views/screens/CBT/tests/tests_screen.dart';
 import '../views/screens/CBT/moodtracker_screen.dart';
 import '../views/screens/setting/setting_screen.dart';
 import '../views/screens/CBT/countdown_screen.dart';
+import '../views/screens/setting/editprofile_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final goRouter = GoRouter(
@@ -50,23 +51,26 @@ final goRouter = GoRouter(
       pageBuilder: (context, state) => const MaterialPage(child: HomeScreen()),
       routes: [
         GoRoute(
-          path: '/profile',
+          path: 'profile',
           pageBuilder:
               (context, state) => const MaterialPage(child: ProfileScreen()),
         ),
         GoRoute(
-          path: '/setting',
+          path: 'setting',
           pageBuilder:
               (context, state) => const MaterialPage(child: SettingsScreen()),
         ),
       ],
     ),
-
     GoRoute(
       path: '/home',
       pageBuilder: (context, state) => const MaterialPage(child: HomeScreen()),
     ),
-    // 认证模块
+    GoRoute(
+      path: '/edit-profile',
+      pageBuilder:
+          (context, state) => const MaterialPage(child: EditProfileScreen()),
+    ),
     GoRoute(
       path: '/login',
       pageBuilder: (context, state) => const MaterialPage(child: LoginScreen()),
@@ -76,33 +80,26 @@ final goRouter = GoRouter(
       pageBuilder:
           (context, state) => const MaterialPage(child: RegistrationScreen()),
     ),
-    // 功能模块
     GoRoute(
       path: '/chat',
       pageBuilder: (context, state) => const MaterialPage(child: ChatScreen()),
     ),
-    // CBT功能模块（嵌套路由）
     GoRoute(
       path: '/cbt',
       pageBuilder: (context, state) => MaterialPage(child: CBTScreen()),
       routes: [
-        // 测试列表页面
         GoRoute(
           path: 'mood',
           pageBuilder:
               (context, state) =>
                   const MaterialPage(child: MoodTrackerScreen()),
         ),
-
         GoRoute(
           path: 'tests',
-          pageBuilder:
-              (context, state) =>
-                  MaterialPage(child: TestsScreen()), // ✅ 进入测试列表
+          pageBuilder: (context, state) => MaterialPage(child: TestsScreen()),
           routes: [
-            // 具体测试页面（动态参数）
             GoRoute(
-              path: ':assessmentId', // ✅ 通过参数匹配具体测试
+              path: ':assessmentId',
               pageBuilder: (context, state) {
                 final assessmentId = state.pathParameters['assessmentId']!;
                 return MaterialPage(

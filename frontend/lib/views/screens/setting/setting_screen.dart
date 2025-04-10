@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../utils/gradient_helper.dart';
-import 'package:go_router/go_router.dart';
 import 'dart:ui' as ui;
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../utils/gradient_helper.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -13,6 +14,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen>
     with TickerProviderStateMixin {
   late AnimationController _gradientController;
+  String _birthday = '';
+  String _gender = '';
 
   @override
   void initState() {
@@ -21,12 +24,39 @@ class _SettingsScreenState extends State<SettingsScreen>
       vsync: this,
       duration: const Duration(seconds: 15),
     )..repeat(reverse: true);
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _birthday = prefs.getString('birthday') ?? '未填写';
+      _gender = prefs.getString('gender') ?? '未填写';
+    });
   }
 
   @override
   void dispose() {
     _gradientController.dispose();
     super.dispose();
+  }
+
+  Widget buildUserInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          leading: const Icon(Icons.cake),
+          title: const Text('生日'),
+          subtitle: Text(_birthday),
+        ),
+        ListTile(
+          leading: const Icon(Icons.wc),
+          title: const Text('性别'),
+          subtitle: Text(_gender),
+        ),
+      ],
+    );
   }
 
   @override
@@ -37,14 +67,8 @@ class _SettingsScreenState extends State<SettingsScreen>
           AnimatedBuilder(
             animation: _gradientController,
             builder: (context, _) {
-              return Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: createPrimaryGradient(),
-                    ),
-                  ),
-                ],
+              return Container(
+                decoration: BoxDecoration(gradient: createPrimaryGradient()),
               );
             },
           ),
@@ -62,32 +86,31 @@ class _SettingsScreenState extends State<SettingsScreen>
               ),
               child: ListView(
                 children: [
+                  buildUserInfo(),
                   ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text('编辑个人信息'),
+                    leading: const Icon(Icons.person),
+                    title: const Text('编辑个人信息'),
+                    onTap: () => context.push('/edit-profile'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.notifications),
+                    title: const Text('通知设置'),
                     onTap: () {
-                      // 导航到编辑个人信息页面
+                      // TODO
                     },
                   ),
                   ListTile(
-                    leading: Icon(Icons.notifications),
-                    title: Text('通知设置'),
+                    leading: const Icon(Icons.lock),
+                    title: const Text('隐私设置'),
                     onTap: () {
-                      // 导航到通知设置页面
+                      // TODO
                     },
                   ),
                   ListTile(
-                    leading: Icon(Icons.lock),
-                    title: Text('隐私设置'),
+                    leading: const Icon(Icons.help),
+                    title: const Text('帮助与反馈'),
                     onTap: () {
-                      // 导航到隐私设置页面
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.help),
-                    title: Text('帮助与反馈'),
-                    onTap: () {
-                      // 导航到帮助与反馈页面
+                      // TODO
                     },
                   ),
                 ],
