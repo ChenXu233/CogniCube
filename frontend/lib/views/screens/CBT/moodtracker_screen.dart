@@ -223,13 +223,6 @@ class _MoodTrackerScreenState extends State<MoodTrackerScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              Center(
-                child: Image.asset(
-                  'assets/images/soft_flower.png',
-                  height: 100,
-                  fit: BoxFit.contain,
-                ),
-              ),
               const SizedBox(height: 12),
               const Center(
                 child: Text(
