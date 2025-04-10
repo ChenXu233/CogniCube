@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -24,8 +25,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             center: Alignment(0.5, -0.5),
             radius: 1.2,
             colors: [
-              Color.fromARGB(80, 255, 209, 216), // 淡粉
-              Color.fromARGB(80, 200, 230, 255), // 淡蓝
+              Color.fromARGB(80, 255, 209, 216),
+              Color.fromARGB(80, 200, 230, 255),
             ],
             stops: [0.2, 1.0],
           ),
@@ -36,13 +37,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 返回按钮
                 IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.black87),
                   onPressed: () => context.pop(),
                 ),
                 const SizedBox(height: 16),
-
                 Text(
                   '编辑个人信息',
                   style: theme.textTheme.headlineSmall?.copyWith(
@@ -52,7 +51,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // 姓名输入框
+                // 昵称
                 _buildLabeledInput(
                   label: '昵称',
                   child: TextField(
@@ -62,7 +61,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // 性别选择
+                // 性别
                 _buildLabeledInput(
                   label: '性别',
                   child: DropdownButtonFormField<String>(
@@ -82,7 +81,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // 生日选择
+                // 生日
                 _buildLabeledInput(
                   label: '生日',
                   child: GestureDetector(
@@ -116,14 +115,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 30),
                     ),
-                    onPressed: () {
-                      // ✅ 这里保存数据到后端
+                    onPressed: () async {
                       final name = _nameController.text.trim();
                       final gender = _selectedGender;
                       final birth = _selectedDate?.toIso8601String();
 
-                      // 👇 你可以在这里调用后端 API 进行保存（见下文）
+                      // ✅ 保存到 SharedPreferences
+                      final prefs = await SharedPreferences.getInstance();
+                      if (gender != null) {
+                        await prefs.setString('gender', gender);
+                      }
+                      if (birth != null) {
+                        await prefs.setString('birthday', birth);
+                      }
+
                       print('保存: $name / $gender / $birth');
+                      context.pop();
                     },
                     child: const Text('保存'),
                   ),
