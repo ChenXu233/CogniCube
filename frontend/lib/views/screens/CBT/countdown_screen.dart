@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../../view_models/countdown_view_model.dart';
 
 class CountdownScreen extends StatelessWidget {
@@ -32,6 +33,10 @@ class _CountdownPageState extends State<CountdownPage> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/home', extra: {'pageIndex': 0}),
+        ),
         title: const Text('治愈系倒计时'),
         backgroundColor: Colors.purple[100],
       ),

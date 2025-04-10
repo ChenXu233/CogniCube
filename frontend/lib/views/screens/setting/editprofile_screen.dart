@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -10,52 +10,187 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final TextEditingController _birthdayController = TextEditingController();
-  final TextEditingController _genderController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProfileData(); // 初始化时加载数据
-  }
-
-  Future<void> _loadProfileData() async {
-    final prefs = await SharedPreferences.getInstance();
-    _birthdayController.text = prefs.getString('birthday') ?? '';
-    _genderController.text = prefs.getString('gender') ?? '';
-  }
-
-  Future<void> _saveProfileData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('birthday', _birthdayController.text);
-    await prefs.setString('gender', _genderController.text);
-    context.pop();
-  }
+  final TextEditingController _nameController = TextEditingController();
+  DateTime? _selectedDate;
+  String? _selectedGender;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('编辑个人信息')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _birthdayController,
-              decoration: const InputDecoration(labelText: '生日（例如：2001-08-09）'),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(0.5, -0.5),
+            radius: 1.2,
+            colors: [
+              Color.fromARGB(80, 255, 209, 216), // 淡粉
+              Color.fromARGB(80, 200, 230, 255), // 淡蓝
+            ],
+            stops: [0.2, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 返回按钮
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.black87),
+                  onPressed: () => context.pop(),
+                ),
+                const SizedBox(height: 16),
+
+                Text(
+                  '编辑个人信息',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // 姓名输入框
+                _buildLabeledInput(
+                  label: '昵称',
+                  child: TextField(
+                    controller: _nameController,
+                    decoration: _inputDecoration('请输入昵称'),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // 性别选择
+                _buildLabeledInput(
+                  label: '性别',
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedGender,
+                    decoration: _inputDecoration('请选择性别'),
+                    items: const [
+                      DropdownMenuItem(value: '男', child: Text('男')),
+                      DropdownMenuItem(value: '女', child: Text('女')),
+                      DropdownMenuItem(value: '其他', child: Text('其他')),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedGender = value;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // 生日选择
+                _buildLabeledInput(
+                  label: '生日',
+                  child: GestureDetector(
+                    onTap: () => _selectDate(context),
+                    child: AbsorbPointer(
+                      child: TextFormField(
+                        decoration: _inputDecoration('请选择生日'),
+                        controller: TextEditingController(
+                          text:
+                              _selectedDate == null
+                                  ? ''
+                                  : DateFormat(
+                                    'yyyy-MM-dd',
+                                  ).format(_selectedDate!),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const Spacer(),
+
+                // 保存按钮
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(192, 250, 182, 197),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 30),
+                    ),
+                    onPressed: () {
+                      // ✅ 这里保存数据到后端
+                      final name = _nameController.text.trim();
+                      final gender = _selectedGender;
+                      final birth = _selectedDate?.toIso8601String();
+
+                      // 👇 你可以在这里调用后端 API 进行保存（见下文）
+                      print('保存: $name / $gender / $birth');
+                    },
+                    child: const Text('保存'),
+                  ),
+                ),
+              ],
             ),
-            TextField(
-              controller: _genderController,
-              decoration: const InputDecoration(labelText: '性别（例如：女）'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _saveProfileData,
-              child: const Text('保存'),
-            ),
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  InputDecoration _inputDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: Colors.black54),
+      filled: true,
+      fillColor: Colors.white.withOpacity(0.85),
+      contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.transparent),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.transparent),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(
+          color: Color.fromARGB(160, 249, 141, 157),
+          width: 2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabeledInput({required String label, required Widget child}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        child,
+      ],
+    );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: DateTime(1900),
+      lastDate: now,
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
   }
 }
