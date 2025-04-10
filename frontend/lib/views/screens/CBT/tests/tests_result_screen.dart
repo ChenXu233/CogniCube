@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
 import '../../../../models/assessment_model.dart';
 
+const Color primaryColor = Color.fromARGB(136, 244, 128, 146);
+const Color primaryGradientColor = Color.fromARGB(168, 102, 178, 241);
+
+RadialGradient createPrimaryGradient() {
+  return RadialGradient(
+    center: Alignment(0.5, 0.5), // 静态的中心点
+    radius: 1.2,
+    colors: const [
+      Color.fromARGB(136, 244, 128, 146),
+      Color.fromARGB(168, 102, 178, 241),
+    ],
+    stops: const [0.2, 1.0],
+  );
+}
+
 class TestsResultScreen extends StatelessWidget {
   final Assessment assessment;
   final int score;
@@ -18,7 +33,7 @@ class TestsResultScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('${assessment.title}结果'),
-        backgroundColor: Colors.blue.shade800,
+        backgroundColor: primaryColor, // 使用 primaryColor 作为背景色
         foregroundColor: Colors.white,
       ),
       body: Padding(
@@ -57,10 +72,10 @@ class TestsResultScreen extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               '$score',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue,
+                color: primaryColor, // 使用 primaryColor
               ),
             ),
             const SizedBox(height: 10),
@@ -118,7 +133,7 @@ class TestsResultScreen extends StatelessWidget {
           onPressed:
               () => Navigator.popUntil(context, (route) => route.isFirst),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue.shade800,
+            backgroundColor: primaryColor, // 使用 primaryColor
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
             shape: RoundedRectangleBorder(

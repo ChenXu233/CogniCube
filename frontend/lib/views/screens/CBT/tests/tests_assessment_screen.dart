@@ -23,16 +23,31 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
     assessment = assessments.firstWhere((a) => a.id == widget.assessmentId);
   }
 
-  void _selectAnswer(int? value) {
+  void _selectAnswer(int? value) async {
     setState(() {
       _answers[_currentIndex] = value;
     });
-  }
 
-  void _nextQuestion() {
-    if (_currentIndex < assessment.questions.length - 1) {
-      setState(() => _currentIndex++);
+    final isLast = _currentIndex == assessment.questions.length - 1;
+
+    if (!isLast) {
+      // 显示过渡动画页面（非最后一题）
+      await Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => const TransitionScreen(),
+          transitionDuration: const Duration(milliseconds: 300),
+          transitionsBuilder: (_, animation, __, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      );
+
+      setState(() {
+        _currentIndex++;
+      });
     } else {
+      // 最后一题，直接跳转到结果页
       _showResult();
     }
   }
@@ -59,7 +74,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(assessment.title),
-        backgroundColor: Color.fromARGB(255, 176, 141, 237),
+        backgroundColor: const Color.fromARGB(255, 176, 141, 237),
         foregroundColor: Colors.white,
       ),
       body: Padding(
@@ -69,8 +84,8 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
           children: [
             LinearProgressIndicator(
               value: (_currentIndex + 1) / assessment.questions.length,
-              backgroundColor: Color(0xFFEDE7F6),
-              valueColor: AlwaysStoppedAnimation<Color>(
+              backgroundColor: const Color(0xFFEDE7F6),
+              valueColor: const AlwaysStoppedAnimation<Color>(
                 Color.fromARGB(255, 115, 86, 165),
               ),
             ),
@@ -96,31 +111,42 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                           value: entry.key,
                           groupValue: _answers[_currentIndex],
                           onChanged: (value) => _selectAnswer(value),
-                          activeColor: Color.fromARGB(255, 176, 146, 228),
+                          activeColor: const Color.fromARGB(255, 176, 146, 228),
                         ),
                       )
                       .toList(),
             ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: _answers[_currentIndex] != null ? _nextQuestion : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 175, 145, 226),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                _currentIndex < assessment.questions.length - 1
-                    ? '下一题'
-                    : '查看结果',
-                style: const TextStyle(fontSize: 16),
-              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// 过渡页面
+class TransitionScreen extends StatelessWidget {
+  const TransitionScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      Navigator.pop(context);
+    });
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            CircularProgressIndicator(
+              color: Color.fromARGB(255, 176, 146, 228),
+              strokeWidth: 4,
+            ),
+            SizedBox(height: 16),
+            Text(
+              '正在加载下一题...',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
           ],
         ),

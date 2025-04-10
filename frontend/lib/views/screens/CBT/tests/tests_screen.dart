@@ -9,7 +9,6 @@ class TestsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 💜 顶部渐变背景色更柔和
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('心理自测量表'),
@@ -27,19 +26,18 @@ class TestsScreen extends StatelessWidget {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFFF0E6F6), // 淡淡的粉紫
-              Color(0xFFF9EEF3), // 淡粉白
+              Color(0xFFF0E6F6), // 淡粉紫
+              Color(0xFFF9EEF3), // 粉白
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 100, 16, 24), // 🪄 全体下移美化
+          padding: const EdgeInsets.fromLTRB(16, 100, 16, 24),
           child: ListView.separated(
             itemCount: assessments.length,
-            separatorBuilder:
-                (_, __) => const SizedBox(height: 24), // ✨ 卡片之间拉开距离
+            separatorBuilder: (_, __) => const SizedBox(height: 24),
             itemBuilder: (context, index) {
               final assessment = assessments[index];
               return AssessmentCard(assessment: assessment);
@@ -59,7 +57,7 @@ class AssessmentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xFFF5F2F5), // ✨ 灰紫色卡片背景（提升高级感）
+      color: const Color(0xFFF5F2F5), // 灰紫卡片背景
       elevation: 6,
       shadowColor: Colors.black12,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -71,11 +69,7 @@ class AssessmentCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                Icons.bar_chart,
-                color: const Color(0xFF9C6B9D), // 温柔紫图标
-                size: 36,
-              ),
+              Icon(Icons.bar_chart, color: const Color(0xFF9C6B9D), size: 36),
               const SizedBox(height: 14),
               Text(
                 assessment.title,
@@ -92,22 +86,20 @@ class AssessmentCard extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: () => context.go('/cbt/tests/${assessment.id}'),
-                icon: const Icon(Icons.arrow_forward_ios, size: 14),
-                label: const Text('立即开始', style: TextStyle(fontSize: 14)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE2D7E9),
-                  foregroundColor: const Color(0xFF774C8F),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.touch_app, color: Color(0xFFCAA5D6), size: 18),
+                  SizedBox(width: 6),
+                  Text(
+                    '点击卡片开始测试',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFFB288BA),
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 0,
-                ),
+                ],
               ),
             ],
           ),
