@@ -17,6 +17,7 @@ import '../views/screens/CBT/moodtracker_screen.dart';
 import '../views/screens/setting/setting_screen.dart';
 import '../views/screens/CBT/countdown_screen.dart';
 import '../views/screens/setting/editprofile_screen.dart';
+import '../views/screens/setting/helpfeedback_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final goRouter = GoRouter(
@@ -70,6 +71,11 @@ final goRouter = GoRouter(
       path: '/edit-profile',
       pageBuilder:
           (context, state) => const MaterialPage(child: EditProfileScreen()),
+    ),
+    GoRoute(
+      path: '/help-feedback',
+      pageBuilder:
+          (context, state) => const MaterialPage(child: HelpFeedbackScreen()),
     ),
     GoRoute(
       path: '/login',
