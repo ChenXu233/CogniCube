@@ -29,8 +29,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('birthday', _birthdayController.text);
     await prefs.setString('gender', _genderController.text);
-    // Navigator.pop(context); // 返回设置页
-    context.push('/setting');
+    context.pop();
   }
 
   @override

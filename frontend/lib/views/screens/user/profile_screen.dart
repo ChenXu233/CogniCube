@@ -15,6 +15,26 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>
     with TickerProviderStateMixin {
   late AnimationController _gradientController;
+  Future<bool?> _showLogoutConfirmationDialog() async {
+    return showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('确认退出'),
+            content: const Text('确定要退出登录吗？'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('取消'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('确定'),
+              ),
+            ],
+          ),
+    );
+  }
 
   @override
   void initState() {
@@ -103,29 +123,23 @@ class _ProfileScreenState extends State<ProfileScreen>
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(
-                          255,
-                          236,
-                          171,
-                          171,
-                        ).withOpacity(0.8),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () {
+                      // ✅ 修改后的按钮点击逻辑
+                      onPressed: () async {
                         if (authViewModel.isAuthenticated) {
-                          authViewModel.logout();
+                          final confirm = await _showLogoutConfirmationDialog();
+                          if (confirm == true) {
+                            authViewModel.logout();
+                            context.go('/login');
+                          }
+                        } else {
+                          context.go('/login');
                         }
-                        context.go('/login');
                       },
                       child: Text(
                         authViewModel.isAuthenticated ? '退出登录' : '立即登录',
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Colors.white,
+                          color: Color.fromARGB(255, 131, 92, 92),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
