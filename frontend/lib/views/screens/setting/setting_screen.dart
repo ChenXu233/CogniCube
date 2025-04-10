@@ -116,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   ListTile(
                     leading: const Icon(Icons.help),
                     title: const Text('帮助与反馈'),
-                    onTap: () {},
+                    onTap: () => context.push('/help-feedback'),
                   ),
                 ],
               ),
