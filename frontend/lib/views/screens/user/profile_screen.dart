@@ -124,6 +124,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                     width: double.infinity,
                     child: ElevatedButton(
                       // ✅ 修改后的按钮点击逻辑
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(
+                          255,
+                          236,
+                          171,
+                          171,
+                        ).withOpacity(0.8),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       onPressed: () async {
                         if (authViewModel.isAuthenticated) {
                           final confirm = await _showLogoutConfirmationDialog();
@@ -139,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         authViewModel.isAuthenticated ? '退出登录' : '立即登录',
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Color.fromARGB(255, 131, 92, 92),
+                          color: Color.fromARGB(255, 255, 255, 255),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
