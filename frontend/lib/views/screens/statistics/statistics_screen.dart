@@ -47,10 +47,31 @@ class _WeatherScreenState extends State<WeatherScreen>
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Stack(
+      body: Column(
         children: [
           const SafeArea(child: Padding(padding: EdgeInsets.only(top: 40))),
           // 修改后的卡片容器
+          Padding(
+            padding: const EdgeInsets.only(top: 0),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      constraints: const BoxConstraints(
+                        maxWidth: double.infinity,
+                        maxHeight: 300,
+                        minHeight: 280,
+                      ),
+                      child: _buildAIChatCard(primaryColor),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 40),
             child: Column(
@@ -67,20 +88,6 @@ class _WeatherScreenState extends State<WeatherScreen>
                       return Text(sentence.content); // 显示每日一言
                     }
                   },
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Container(
-                      constraints: const BoxConstraints(
-                        maxWidth: double.infinity,
-                        maxHeight: 300,
-                        minHeight: 280,
-                      ),
-                      child: _buildAIChatCard(primaryColor),
-                    ),
-                  ),
                 ),
               ],
             ),

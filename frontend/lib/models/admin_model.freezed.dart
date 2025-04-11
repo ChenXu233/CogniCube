@@ -1,0 +1,311 @@
+// dart format width=80
+// coverage:ignore-file
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+
+part of 'admin_model.dart';
+
+// **************************************************************************
+// FreezedGenerator
+// **************************************************************************
+
+// dart format off
+T _$identity<T>(T value) => value;
+
+/// @nodoc
+mixin _$UserInfo {
+
+ String get id; String get name; String get email; String get role; String get createdAt; String get updatedAt;
+/// Create a copy of UserInfo
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UserInfoCopyWith<UserInfo> get copyWith => _$UserInfoCopyWithImpl<UserInfo>(this as UserInfo, _$identity);
+
+  /// Serializes this UserInfo to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.role, role) || other.role == role)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,name,email,role,createdAt,updatedAt);
+
+@override
+String toString() {
+  return 'UserInfo(id: $id, name: $name, email: $email, role: $role, createdAt: $createdAt, updatedAt: $updatedAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $UserInfoCopyWith<$Res>  {
+  factory $UserInfoCopyWith(UserInfo value, $Res Function(UserInfo) _then) = _$UserInfoCopyWithImpl;
+@useResult
+$Res call({
+ String id, String name, String email, String role, String createdAt, String updatedAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$UserInfoCopyWithImpl<$Res>
+    implements $UserInfoCopyWith<$Res> {
+  _$UserInfoCopyWithImpl(this._self, this._then);
+
+  final UserInfo _self;
+  final $Res Function(UserInfo) _then;
+
+/// Create a copy of UserInfo
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? email = null,Object? role = null,Object? createdAt = null,Object? updatedAt = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as String,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _UserInfo implements UserInfo {
+  const _UserInfo({required this.id, required this.name, required this.email, required this.role, required this.createdAt, required this.updatedAt});
+  factory _UserInfo.fromJson(Map<String, dynamic> json) => _$UserInfoFromJson(json);
+
+@override final  String id;
+@override final  String name;
+@override final  String email;
+@override final  String role;
+@override final  String createdAt;
+@override final  String updatedAt;
+
+/// Create a copy of UserInfo
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UserInfoCopyWith<_UserInfo> get copyWith => __$UserInfoCopyWithImpl<_UserInfo>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$UserInfoToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.role, role) || other.role == role)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,name,email,role,createdAt,updatedAt);
+
+@override
+String toString() {
+  return 'UserInfo(id: $id, name: $name, email: $email, role: $role, createdAt: $createdAt, updatedAt: $updatedAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UserInfoCopyWith<$Res> implements $UserInfoCopyWith<$Res> {
+  factory _$UserInfoCopyWith(_UserInfo value, $Res Function(_UserInfo) _then) = __$UserInfoCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String name, String email, String role, String createdAt, String updatedAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$UserInfoCopyWithImpl<$Res>
+    implements _$UserInfoCopyWith<$Res> {
+  __$UserInfoCopyWithImpl(this._self, this._then);
+
+  final _UserInfo _self;
+  final $Res Function(_UserInfo) _then;
+
+/// Create a copy of UserInfo
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? email = null,Object? role = null,Object? createdAt = null,Object? updatedAt = null,}) {
+  return _then(_UserInfo(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as String,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$PaginatedUsers {
+
+ int get total; int get page; int get perPage; List<UserInfo> get data;
+/// Create a copy of PaginatedUsers
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PaginatedUsersCopyWith<PaginatedUsers> get copyWith => _$PaginatedUsersCopyWithImpl<PaginatedUsers>(this as PaginatedUsers, _$identity);
+
+  /// Serializes this PaginatedUsers to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaginatedUsers&&(identical(other.total, total) || other.total == total)&&(identical(other.page, page) || other.page == page)&&(identical(other.perPage, perPage) || other.perPage == perPage)&&const DeepCollectionEquality().equals(other.data, data));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,total,page,perPage,const DeepCollectionEquality().hash(data));
+
+@override
+String toString() {
+  return 'PaginatedUsers(total: $total, page: $page, perPage: $perPage, data: $data)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PaginatedUsersCopyWith<$Res>  {
+  factory $PaginatedUsersCopyWith(PaginatedUsers value, $Res Function(PaginatedUsers) _then) = _$PaginatedUsersCopyWithImpl;
+@useResult
+$Res call({
+ int total, int page, int perPage, List<UserInfo> data
+});
+
+
+
+
+}
+/// @nodoc
+class _$PaginatedUsersCopyWithImpl<$Res>
+    implements $PaginatedUsersCopyWith<$Res> {
+  _$PaginatedUsersCopyWithImpl(this._self, this._then);
+
+  final PaginatedUsers _self;
+  final $Res Function(PaginatedUsers) _then;
+
+/// Create a copy of PaginatedUsers
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? total = null,Object? page = null,Object? perPage = null,Object? data = null,}) {
+  return _then(_self.copyWith(
+total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as int,perPage: null == perPage ? _self.perPage : perPage // ignore: cast_nullable_to_non_nullable
+as int,data: null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as List<UserInfo>,
+  ));
+}
+
+}
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _PaginatedUsers implements PaginatedUsers {
+  const _PaginatedUsers({required this.total, required this.page, required this.perPage, required final  List<UserInfo> data}): _data = data;
+  factory _PaginatedUsers.fromJson(Map<String, dynamic> json) => _$PaginatedUsersFromJson(json);
+
+@override final  int total;
+@override final  int page;
+@override final  int perPage;
+ final  List<UserInfo> _data;
+@override List<UserInfo> get data {
+  if (_data is EqualUnmodifiableListView) return _data;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_data);
+}
+
+
+/// Create a copy of PaginatedUsers
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PaginatedUsersCopyWith<_PaginatedUsers> get copyWith => __$PaginatedUsersCopyWithImpl<_PaginatedUsers>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PaginatedUsersToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaginatedUsers&&(identical(other.total, total) || other.total == total)&&(identical(other.page, page) || other.page == page)&&(identical(other.perPage, perPage) || other.perPage == perPage)&&const DeepCollectionEquality().equals(other._data, _data));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,total,page,perPage,const DeepCollectionEquality().hash(_data));
+
+@override
+String toString() {
+  return 'PaginatedUsers(total: $total, page: $page, perPage: $perPage, data: $data)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PaginatedUsersCopyWith<$Res> implements $PaginatedUsersCopyWith<$Res> {
+  factory _$PaginatedUsersCopyWith(_PaginatedUsers value, $Res Function(_PaginatedUsers) _then) = __$PaginatedUsersCopyWithImpl;
+@override @useResult
+$Res call({
+ int total, int page, int perPage, List<UserInfo> data
+});
+
+
+
+
+}
+/// @nodoc
+class __$PaginatedUsersCopyWithImpl<$Res>
+    implements _$PaginatedUsersCopyWith<$Res> {
+  __$PaginatedUsersCopyWithImpl(this._self, this._then);
+
+  final _PaginatedUsers _self;
+  final $Res Function(_PaginatedUsers) _then;
+
+/// Create a copy of PaginatedUsers
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? total = null,Object? page = null,Object? perPage = null,Object? data = null,}) {
+  return _then(_PaginatedUsers(
+total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+as int,perPage: null == perPage ? _self.perPage : perPage // ignore: cast_nullable_to_non_nullable
+as int,data: null == data ? _self._data : data // ignore: cast_nullable_to_non_nullable
+as List<UserInfo>,
+  ));
+}
+
+
+}
+
+// dart format on
