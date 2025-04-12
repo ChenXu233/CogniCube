@@ -142,7 +142,7 @@ class MessageBubble extends StatelessWidget {
     }
 
     return Text(
-      message.getPlainText() ?? '', // 确保返回空字符串而不是 null
+      message.getPlainText(), // 确保返回空字符串而不是 null
       style: TextStyle(
         color:
             message.who == 'user'
@@ -156,9 +156,9 @@ class MessageBubble extends StatelessWidget {
     final timestamp =
         message.timestamp != null
             ? DateTime.fromMillisecondsSinceEpoch(
-              message.timestamp!.toInt() * 1000 +
-                  8 * 60 * 60 * 1000, // TODO: 时区问题需修正
-            )
+              message.timestamp!.toInt() * 1000 + 8 * 60 * 60 * 1000,
+              // isUtc: true, // 明确时间戳为 UTC
+            ) // UTC+8 即北京时间
             : null;
 
     return Padding(
