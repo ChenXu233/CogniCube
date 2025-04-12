@@ -82,16 +82,4 @@ extension MessageExtensions on Message {
         ? '[空消息]'
         : (text.length > 30 ? '${text.substring(0, 30)}...' : text);
   }
-
-  // static Message _findLatestUserMessage(List<Message> messages) {
-  //   return messages.lastWhere(
-  //     (m) => m.who == 'user',
-  //     orElse:
-  //         () => Message(
-  //           messages: [TextModel(text: '未知消息')],
-  //           who: 'user',
-  //           messageId: -1,
-  //         ),
-  //   );
-  // }
 }

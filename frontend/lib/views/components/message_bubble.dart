@@ -55,7 +55,6 @@ class MessageBubble extends StatelessWidget {
           crossAxisAlignment:
               isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            if (message.who == 'assistant') _buildReplyPreview(context),
             IntrinsicWidth(
               child: Row(
                 mainAxisAlignment:
@@ -152,75 +151,6 @@ class MessageBubble extends StatelessWidget {
                 : Theme.of(context).colorScheme.onSurface,
       ),
     );
-  }
-
-  Widget _buildReplyPreview(BuildContext context) {
-    final chatVM = Provider.of<ChatViewModel>(context, listen: false);
-    final replyText = message.getReplyText(chatVM.messages);
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      constraints: const BoxConstraints(maxWidth: 300), // 限制最大宽度
-      decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border(
-          left: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 4,
-          ),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 8, top: 4, bottom: 4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.reply,
-                  size: 16,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  replyText == null ? '最新消息' : '回复',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 2),
-            Text(
-              replyText ?? _getDefaultReplyText(chatVM.messages),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey.shade700,
-                fontSize: 12,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _getDefaultReplyText(List<message_model.Message> messages) {
-    final lastUserMessage = messages.lastWhere(
-      (m) => m.who == 'user',
-      orElse:
-          () => message_model.Message(
-            messages: [message_model.TextModel(text: '未知消息')],
-            who: 'user',
-            messageId: -1,
-          ),
-    );
-    final text = lastUserMessage.getPlainText();
-    return text.length > 30 ? '${text.substring(0, 30)}...' : text;
   }
 
   Widget _buildTimestamp(BuildContext context) {
