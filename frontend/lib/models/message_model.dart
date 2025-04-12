@@ -70,7 +70,16 @@ extension MessageExtensions on Message {
   }
 
   String getPlainText() {
-    return messages.whereType<TextModel>().map((e) => e.text).join();
+    return messages
+        .map((message) {
+          if (message is TextModel) {
+            return message.text;
+          } else if (message is ExpressionModel) {
+            return message.text; // 这里可以根据需要返回表情的文本描述
+          }
+          return message['text'];
+        })
+        .join('\n');
   }
 
   String? getReplyText(List<Message> allMessages) {

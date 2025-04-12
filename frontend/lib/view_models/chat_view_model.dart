@@ -7,6 +7,7 @@ import '../utils/constants.dart';
 class ChatViewModel extends ChangeNotifier {
   int? _replyingToMessageId;
   String get replyingPreview => _getReplyingPreview();
+
   int _nextMessageId = 1001;
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
@@ -41,12 +42,10 @@ class ChatViewModel extends ChangeNotifier {
     if (isLoadingMore) return;
     isLoadingMore = true;
     notifyListeners();
-
     final newMessages =
         Constants.useMockResponses
             ? _generateMockMessages()
             : await _fetchApiMessages();
-
     messages = [...newMessages, ...messages];
     isLoadingMore = false;
     notifyListeners();
@@ -64,8 +63,13 @@ class ChatViewModel extends ChangeNotifier {
   }
 
   Future<List<message_model.Message>> _fetchApiMessages() async {
-    final timeEnd = DateTime.now().millisecondsSinceEpoch / 1000;
-    final timeStart = timeEnd - 3600 * 24;
+    final int timeEnd;
+    if (messages.isEmpty) {
+      timeEnd = (DateTime.now().millisecondsSinceEpoch / 1000).toInt(); // 改为秒
+    } else {
+      timeEnd = (messages.first.timestamp?.toInt() ?? 0) ~/ 1000; // 改为秒
+    }
+    final int timeStart = timeEnd - 60 * 60 * 24; // 计算一天前的时间戳（秒）
     return await ChatApiService.getChatHistory(timeStart, timeEnd);
   }
 
@@ -90,16 +94,23 @@ class ChatViewModel extends ChangeNotifier {
     final userMessage = _createMessage(
       text,
       'user',
-      replyTo: _replyingToMessageId, // 添加回复关联
+      replyTo: _replyingToMessageId,
     );
     _addMessage(userMessage);
     clearReply();
 
+    message_model.Message? loadingMessage; // 声明加载消息变量
+
     try {
-      final loadingMessage = _createMessage('正在加载...', 'loading', temp: true);
+      // 创建并添加加载消息
+      loadingMessage = _createMessage('正在加载...', 'loading', temp: true);
       _addMessage(loadingMessage);
+
       final response = await ChatApiService.getAIResponse(text);
-      // print('收到回复: $response');
+
+      // 移除加载消息
+      messages.remove(loadingMessage);
+      notifyListeners();
 
       final aiMessage = _createMessage(
         response,
@@ -108,8 +119,13 @@ class ChatViewModel extends ChangeNotifier {
       );
       _addMessage(aiMessage);
     } catch (e) {
-      messages.removeLast();
+      // 确保移除加载消息
+      if (loadingMessage != null) {
+        messages.remove(loadingMessage);
+        notifyListeners();
+      }
 
+      // 添加错误消息
       _addMessage(
         _createMessage(
           '发生错误，请稍后再试:$e',
@@ -146,7 +162,6 @@ class ChatViewModel extends ChangeNotifier {
   void _addMessage(message_model.Message message) {
     messages.add(message);
     notifyListeners();
-    scrollToBottom();
   }
 
   @override
