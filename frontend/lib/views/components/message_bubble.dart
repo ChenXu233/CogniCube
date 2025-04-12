@@ -157,8 +157,8 @@ class MessageBubble extends StatelessWidget {
         message.timestamp != null
             ? DateTime.fromMillisecondsSinceEpoch(
               message.timestamp!.toInt() * 1000 + 8 * 60 * 60 * 1000,
-              // isUtc: true, // 明确时间戳为 UTC
-            ) // UTC+8 即北京时间
+              isUtc: false,
+            )
             : null;
 
     return Padding(

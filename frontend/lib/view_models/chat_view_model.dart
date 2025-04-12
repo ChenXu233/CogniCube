@@ -57,19 +57,33 @@ class ChatViewModel extends ChangeNotifier {
         messages: [message_model.TextModel(text: '历史消息1：你好，有什么可以帮助你的？')],
         who: 'assistant',
         messageId: _nextMessageId++,
-        timestamp: DateTime.now().millisecondsSinceEpoch.toDouble(),
+        timestamp: DateTime.now().millisecondsSinceEpoch / 1000, // 秒级时间戳
       ),
     ];
   }
 
   Future<List<message_model.Message>> _fetchApiMessages() async {
+    // 获取当前北京时间
+    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
+
+    // 计算当天北京时间零点
+    final todayStart = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).toUtc().add(const Duration(hours: 8));
+
     final int timeEnd;
     if (messages.isEmpty) {
-      timeEnd = (DateTime.now().millisecondsSinceEpoch / 1000).toInt(); // 改为秒
+      timeEnd = (now.millisecondsSinceEpoch / 1000).round(); // 当前北京时间秒级
     } else {
-      timeEnd = (messages.first.timestamp?.toInt() ?? 0) ~/ 1000; // 改为秒
+      timeEnd = messages.first.timestamp?.round() ?? 0;
     }
-    final int timeStart = timeEnd - 60 * 60 * 24; // 计算一天前的时间戳（秒）
+
+    // 计算24小时前的时间戳
+    final int timeStart =
+        (todayStart.millisecondsSinceEpoch / 1000).round() - 60 * 60 * 24;
+
     return await ChatApiService.getChatHistory(timeStart, timeEnd);
   }
 
@@ -150,11 +164,12 @@ class ChatViewModel extends ChangeNotifier {
         finalReplyTo = userMessages.last.messageId;
       }
     }
+    final beijingTime = DateTime.now().toUtc().add(const Duration(hours: 8));
     return message_model.Message(
       messages: [message_model.TextModel(text: text)],
       who: who,
       messageId: temp ? -1 : _nextMessageId++,
-      timestamp: DateTime.now().millisecondsSinceEpoch.toDouble(),
+      timestamp: beijingTime.millisecondsSinceEpoch / 1000 + 8 * 60 * 60,
       replyTo: finalReplyTo,
     );
   }
