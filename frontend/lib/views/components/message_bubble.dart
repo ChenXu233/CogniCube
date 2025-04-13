@@ -51,61 +51,71 @@ class MessageBubble extends StatelessWidget {
       onLongPress: () => _showContextMenu(context),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        child: Row(
+          mainAxisAlignment:
+              isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: _buildMessageRow(isUser, isLoading, context),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildMessageRow(
+    bool isUser,
+    bool isLoading,
+    BuildContext context,
+  ) {
+    final content = [
+      if (!isUser && !isLoading) _buildAvatar(Icons.smart_toy, rightMargin: 8),
+
+      Flexible(
         child: Column(
           crossAxisAlignment:
               isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            IntrinsicWidth(
-              child: Row(
-                mainAxisAlignment:
-                    isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-                children: [
-                  if (!isUser && !isLoading)
-                    const Padding(
-                      padding: EdgeInsets.only(right: 8),
-                      child: CircleAvatar(
-                        radius: 16,
-                        child: Icon(Icons.smart_toy, size: 18),
-                      ),
-                    ),
-                  Flexible(
-                    child: Container(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 8),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: _getBubbleColor(context, isUser, isLoading),
-                          borderRadius: _getBorderRadius(isUser),
-                          boxShadow:
-                              isLoading
-                                  ? null
-                                  : [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 2,
-                                      offset: const Offset(0, 1),
-                                    ),
-                                  ],
-                        ),
-                        child: _buildContent(context, isLoading),
-                      ), //
-                    ),
-                  ),
-                  if (isUser && !isLoading)
-                    const Padding(
-                      padding: EdgeInsets.only(left: 8),
-                      child: CircleAvatar(
-                        radius: 16,
-                        child: Icon(Icons.person, size: 18),
-                      ),
-                    ),
-                ],
+            Container(
+              margin: EdgeInsets.only(
+                left: isUser ? 40 : 0, // 保持对称间距
+                right: isUser ? 0 : 40,
               ),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _getBubbleColor(context, isUser, isLoading),
+                borderRadius: _getBorderRadius(isUser),
+                boxShadow:
+                    isLoading
+                        ? null
+                        : [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 2,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+              ),
+              child: _buildContent(context, isLoading),
             ),
             _buildTimestamp(context),
           ],
         ),
       ),
+
+      if (isUser && !isLoading) _buildAvatar(Icons.person, leftMargin: 8),
+    ];
+
+    // 调整用户消息的组件顺序
+    return isUser ? content.reversed.toList() : content;
+  }
+
+  Widget _buildAvatar(
+    IconData icon, {
+    double leftMargin = 0,
+    double rightMargin = 0,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(top: 4, left: leftMargin, right: rightMargin),
+      child: CircleAvatar(radius: 16, child: Icon(icon, size: 18)),
     );
   }
 
@@ -164,7 +174,7 @@ class MessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Text(
-        timestamp?.toString().substring(11, 16) ?? '',
+        timestamp?.toString().substring(5, 16) ?? '',
         style: Theme.of(
           context,
         ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
