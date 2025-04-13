@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../view_models/chat_view_model.dart';
 import '../../../views/components/message_bubble.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:ui'; // 导入ImageFilter
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -27,23 +28,61 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          _buildAppBar(),
-          Expanded(child: _buildMessageList()),
-          _buildInputArea(),
+          // 主内容区域（消息列表 + 输入框）
+          Positioned.fill(
+            child: Column(
+              children: [
+                Expanded(child: _buildMessageList()),
+                _buildInputArea(),
+              ],
+            ),
+          ),
+
+          // 模糊透明导航栏
+          _buildBlurAppBar(context),
         ],
       ),
     );
   }
 
-  Widget _buildAppBar() {
-    return AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => context.push('/home'),
+  Widget _buildBlurAppBar(BuildContext context) {
+    final statusBarHeight = MediaQuery.of(context).padding.top;
+
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // 模糊参数
+          child: Container(
+            padding: EdgeInsets.only(top: statusBarHeight),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.5), // 半透明白色
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.withOpacity(0.1)),
+              ),
+            ),
+            child: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => context.push('/home'),
+              ),
+              title: const Text(
+                'Chat',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
-      title: const Text('Chat'),
     );
   }
 
@@ -57,18 +96,26 @@ class _ChatScreenState extends State<ChatScreen> {
             }
             return true;
           },
-          child: ListView.builder(
-            reverse: true,
-            controller: vm.scrollController,
-            padding: const EdgeInsets.all(8),
-            itemCount: vm.messages.length + 1,
-            itemBuilder: (context, index) {
-              if (index == vm.messages.length) {
-                return _buildLoadingIndicator(vm);
-              }
-              final message = vm.messages[vm.messages.length - index - 1];
-              return MessageBubble(message: message);
-            },
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8), // 移除顶部padding
+            child: ListView.builder(
+              reverse: true,
+              controller: vm.scrollController,
+              padding: const EdgeInsets.fromLTRB(
+                8,
+                kToolbarHeight + 40,
+                8,
+                8,
+              ), // 调整顶部留白
+              itemCount: vm.messages.length + 1,
+              itemBuilder: (context, index) {
+                if (index == vm.messages.length) {
+                  return _buildLoadingIndicator(vm);
+                }
+                final message = vm.messages[vm.messages.length - index - 1];
+                return MessageBubble(message: message);
+              },
+            ),
           ),
         );
       },
