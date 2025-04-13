@@ -45,7 +45,7 @@ class AIChatService:
         self.client: AsyncOpenAI | None = None
         self.tool_executor: OpenAIToolExecutor | None = None
         self.context_manager: UserContext = self.get_context_manager()
-        print(self.context_manager)
+        logger.debug(f"Context manager: {self.context_manager}")
         self.context_manager.add_message("system", self.prompt)
         self.memory_system = get_memory_system()
         self.memory_prompt = cleandoc(
@@ -99,6 +99,7 @@ class AIChatService:
     async def await_init(self, tool_registry: ToolRegistry):
         self.client = await get_ai_session()
         self.tool_executor = OpenAIToolExecutor(tool_registry, self.client)
+        self.tool_executor.message_history = self.context_manager.get_context()
 
     def get_context_manager(self) -> UserContext:
         if (
@@ -146,21 +147,20 @@ class AIChatService:
             + user_message
         )
 
-        # for message in self.context_manager.get_context():
-        #     self.tool_executor.message_history.append(message)  # type: ignore
+        if not self.tool_executor:
+            raise Exception("Tool executor is not initialized")
 
-        # self.tool_executor.message_history.append(user_message)  # type: ignore
-        # self.context_manager.add_message("user", user_message)
-        # try:
-        #     response = await self.tool_executor.chat_completion()  # type: ignore
-        # except ExceptionGroup as e:
-        #     return {"error": str(e)}
-
-        response = await self.client.chat.completions.create(
-            model=self.model_name,
-            messages=self.get_context(),
+        self.tool_executor.message_history.append(
+            {"role": "user", "content": user_message}
         )
-        return response
+        self.context_manager.add_message("user", user_message)
+        try:
+            response = await self.tool_executor.chat_completion(model=self.model_name)
+            logger.debug(f"Chat response: {response}")
+            return response
+        except ExceptionGroup as e:
+            logger.error(f"Chat error: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"AI聊天失败: {str(e)}")
 
     async def get_memory(self) -> str:
         """获取记忆接口"""
@@ -177,11 +177,13 @@ class AIChatService:
 
         memories = self.memory_system.retrieve_memories(str(self.user_id), query_text)
         memories = "\n".join([f"• {m['metadata']['text']}" for m in memories[:20]])
+        logger.debug(f"Retrieved memories: {memories}")
         return memories
 
     async def add_memory(self, memory: str):
         """添加记忆接口"""
         self.memory_system.add_memory(str(self.user_id), memory)
+        logger.debug(f"Added memory: {memory}")
 
     async def emotion_quantification(self, user_message: str):
         """情感量化接口"""
@@ -205,7 +207,7 @@ class AIChatService:
                 messages=self.get_context(),
             )
             text = response.choices[0].message.content
-            logger.debug("情感量化:" + str(text))
+            logger.debug(f"Emotion quantification response: {text}")
 
             if not text:
                 return
@@ -213,6 +215,7 @@ class AIChatService:
             try:
                 text_dict = json.loads(text)
             except json.JSONDecodeError:
+                logger.error(f"Failed to parse JSON: {text}")
                 return
 
             emotion_record = EmotionRecord(
@@ -225,6 +228,7 @@ class AIChatService:
             )
             self.db.add(emotion_record)
             self.db.commit()
+            logger.debug(f"Emotion record saved: {emotion_record}")
             return emotion_record
         finally:
             db.close()
@@ -241,7 +245,9 @@ class AIChatService:
         try:
             self.db.add(message_record)
             self.db.commit()
+            logger.debug(f"Message record saved: {message_record}")
             return message_record
         except Exception as e:
             self.db.rollback()
+            logger.error(f"Failed to save message record: {str(e)}")
             raise HTTPException(status_code=500, detail=f"消息保存失败: {str(e)}")
