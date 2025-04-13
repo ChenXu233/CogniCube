@@ -36,9 +36,13 @@ logger = logging.getLogger(__name__)
 class VectorDBMemorySystem:
     def __init__(self, host=CONFIG.QDRANT_HOST, port=CONFIG.QDRANT_PORT):
         self.client = qdrant_client.QdrantClient(host=host, port=port)
+        os.environ["HTTP_PROXY"] = "http://loclalhost:7890"  # TODO: 代理设置
+        os.environ["HTTPS_PROXY"] = "http://loclalhost:7890"
         self.encoder = SentenceTransformer(
             "paraphrase-multilingual-MiniLM-L12-v2", device="cpu"
         )
+        os.environ["HTTP_PROXY"] = ""
+        os.environ["HTTPS_PROXY"] = ""
         self.collection_name = "user_memories"
         self._init_collection()
 

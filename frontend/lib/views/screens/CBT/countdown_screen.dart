@@ -119,8 +119,8 @@ class _CountdownPageState extends State<CountdownPage> {
               : CountdownRunningView(item: current),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddGoalDialog(context, vm),
-        child: const Icon(Icons.add),
         backgroundColor: Colors.purple,
+        child: const Icon(Icons.add),
       ),
     );
   }
