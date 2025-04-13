@@ -7,6 +7,7 @@ import '../utils/constants.dart';
 class ChatViewModel extends ChangeNotifier {
   int? _replyingToMessageId;
   String get replyingPreview => _getReplyingPreview();
+
   int _nextMessageId = 1001;
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
@@ -41,12 +42,10 @@ class ChatViewModel extends ChangeNotifier {
     if (isLoadingMore) return;
     isLoadingMore = true;
     notifyListeners();
-
     final newMessages =
         Constants.useMockResponses
             ? _generateMockMessages()
             : await _fetchApiMessages();
-
     messages = [...newMessages, ...messages];
     isLoadingMore = false;
     notifyListeners();
@@ -58,14 +57,33 @@ class ChatViewModel extends ChangeNotifier {
         messages: [message_model.TextModel(text: '历史消息1：你好，有什么可以帮助你的？')],
         who: 'assistant',
         messageId: _nextMessageId++,
-        timestamp: DateTime.now().millisecondsSinceEpoch.toDouble(),
+        timestamp: DateTime.now().millisecondsSinceEpoch / 1000, // 秒级时间戳
       ),
     ];
   }
 
   Future<List<message_model.Message>> _fetchApiMessages() async {
-    final timeEnd = DateTime.now().millisecondsSinceEpoch / 1000;
-    final timeStart = timeEnd - 3600 * 24;
+    // 获取当前北京时间
+    final now = DateTime.now().toUtc().add(const Duration(hours: 8));
+
+    // 计算当天北京时间零点
+    final todayStart = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).toUtc().add(const Duration(hours: 8));
+
+    final int timeEnd;
+    if (messages.isEmpty) {
+      timeEnd = (now.millisecondsSinceEpoch / 1000).round(); // 当前北京时间秒级
+    } else {
+      timeEnd = messages.first.timestamp?.round() ?? 0;
+    }
+
+    // 计算24小时前的时间戳
+    final int timeStart =
+        (todayStart.millisecondsSinceEpoch / 1000).round() - 60 * 60 * 24;
+
     return await ChatApiService.getChatHistory(timeStart, timeEnd);
   }
 
@@ -77,7 +95,11 @@ class ChatViewModel extends ChangeNotifier {
   void scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
-        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
       }
     });
   }
@@ -86,16 +108,23 @@ class ChatViewModel extends ChangeNotifier {
     final userMessage = _createMessage(
       text,
       'user',
-      replyTo: _replyingToMessageId, // 添加回复关联
+      replyTo: _replyingToMessageId,
     );
     _addMessage(userMessage);
     clearReply();
 
+    message_model.Message? loadingMessage; // 声明加载消息变量
+
     try {
-      final loadingMessage = _createMessage('正在加载...', 'loading', temp: true);
+      // 创建并添加加载消息
+      loadingMessage = _createMessage('正在加载...', 'loading', temp: true);
       _addMessage(loadingMessage);
+
       final response = await ChatApiService.getAIResponse(text);
-      // print('收到回复: $response');
+
+      // 移除加载消息
+      messages.remove(loadingMessage);
+      notifyListeners();
 
       final aiMessage = _createMessage(
         response,
@@ -104,8 +133,13 @@ class ChatViewModel extends ChangeNotifier {
       );
       _addMessage(aiMessage);
     } catch (e) {
-      messages.removeLast();
+      // 确保移除加载消息
+      if (loadingMessage != null) {
+        messages.remove(loadingMessage);
+        notifyListeners();
+      }
 
+      // 添加错误消息
       _addMessage(
         _createMessage(
           '发生错误，请稍后再试:$e',
@@ -130,11 +164,12 @@ class ChatViewModel extends ChangeNotifier {
         finalReplyTo = userMessages.last.messageId;
       }
     }
+    final beijingTime = DateTime.now().toUtc().add(const Duration(hours: 8));
     return message_model.Message(
       messages: [message_model.TextModel(text: text)],
       who: who,
       messageId: temp ? -1 : _nextMessageId++,
-      timestamp: DateTime.now().millisecondsSinceEpoch.toDouble(),
+      timestamp: beijingTime.millisecondsSinceEpoch / 1000 + 8 * 60 * 60,
       replyTo: finalReplyTo,
     );
   }
@@ -142,7 +177,6 @@ class ChatViewModel extends ChangeNotifier {
   void _addMessage(message_model.Message message) {
     messages.add(message);
     notifyListeners();
-    scrollToBottom();
   }
 
   @override

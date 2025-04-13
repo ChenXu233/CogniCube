@@ -6,8 +6,8 @@ class ChatApiService {
   static final Dio _dio = DioUtil().dio;
 
   static Future<List<message_model.Message>> getChatHistory(
-    double timeStart,
-    double timeEnd,
+    int timeStart,
+    int timeEnd,
   ) async {
     final timeStart0 = timeStart.toInt();
     final timeEnd0 = timeEnd.toInt();
@@ -22,7 +22,6 @@ class ChatApiService {
           .map((e) => message_model.Message.fromJson(e))
           .toList();
     } on DioException catch (e) {
-      print('获取历史消息失败: ${e.message}');
       throw _handleDioError(e);
     }
   }
@@ -43,7 +42,7 @@ class ChatApiService {
       );
 
       return (response.data['message']['messages'] as List)
-          .map((msg) => msg['content']?.toString() ?? "未收到有效响应")
+          .map((msg) => msg['text']?.toString() ?? "未收到有效响应")
           .join('\n');
     } on DioException catch (e) {
       throw _handleDioError(e);

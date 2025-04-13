@@ -52,13 +52,13 @@ class _ChatScreenState extends State<ChatScreen> {
       builder: (context, vm, _) {
         return NotificationListener<ScrollEndNotification>(
           onNotification: (notification) {
-            if (notification.metrics.extentAfter == 0) {
+            if (notification.metrics.extentBefore == 0) {
               vm.fetchMoreMessages();
             }
             return true;
           },
           child: ListView.builder(
-            reverse: false,
+            reverse: true,
             controller: vm.scrollController,
             padding: const EdgeInsets.all(8),
             itemCount: vm.messages.length + 1,
@@ -66,7 +66,7 @@ class _ChatScreenState extends State<ChatScreen> {
               if (index == vm.messages.length) {
                 return _buildLoadingIndicator(vm);
               }
-              final message = vm.messages[index];
+              final message = vm.messages[vm.messages.length - index - 1];
               return MessageBubble(message: message);
             },
           ),
