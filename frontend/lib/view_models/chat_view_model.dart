@@ -169,7 +169,7 @@ class ChatViewModel extends ChangeNotifier {
       messages: [message_model.TextModel(text: text)],
       who: who,
       messageId: temp ? -1 : _nextMessageId++,
-      timestamp: beijingTime.millisecondsSinceEpoch / 1000 + 8 * 60 * 60,
+      timestamp: beijingTime.millisecondsSinceEpoch / 1000 - 16 * 60 * 60,
       replyTo: finalReplyTo,
     );
   }
