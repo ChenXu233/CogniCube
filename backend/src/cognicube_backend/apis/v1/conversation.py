@@ -37,7 +37,7 @@ async def create_conversation(
 
     await ai_service.save_message_record(user_id, message.message)
     ai_response = await ai_service.chat(message.message.get_plain_text())
-    ai_response_text: str = ai_response.choices[0].message.content  # type: ignore
+    ai_response_text: str = ai_response
     ai_message = Message(
         who=Who.AI.value,
         messages=[Text(text=ai_response_text)],

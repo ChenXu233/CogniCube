@@ -46,10 +46,10 @@ class QdrantConfig:
         if self.system == "windows":
             return f"{base_url}/qdrant-x86_64-pc-windows-msvc.zip"
         elif self.system == "linux":
-            return f"{base_url}/qdrant-x86_64-unknown-linux-gnu.tar.gz"
+            return f"{base_url}/qdrant-aarch64-unknown-linux-musl.tar.gz"
         elif self.system == "darwin":
             return (
-                f"{base_url}/qdrant-aarch64-apple-darwin.tar.gz"
+                f"{base_url}/qdrant-x86_64-apple-darwin.tar.gz"
                 if "arm" in self.arch
                 else f"{base_url}/qdrant-x86_64-apple-darwin.tar.gz"
             )

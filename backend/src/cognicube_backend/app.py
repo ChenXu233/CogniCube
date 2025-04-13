@@ -1,6 +1,7 @@
 import asyncio
 import subprocess
 import sys
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -45,6 +46,8 @@ async def lifespan(app: FastAPI):
     await asyncio.sleep(5)
 
     try:
+        os.environ["HTTP_PROXY"] = ""
+        os.environ["HTTPS_PROXY"] = ""
         app.state.client = QdrantClient(host=str(QDRANT_HOST), port=QDRANT_PORT)
         app.state.client.get_collections()
         logger.info("🔗 Qdrant service connected")
