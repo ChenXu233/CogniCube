@@ -21,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _currentIndex = 1;
   late AnimationController _gradientController;
   late final HomeViewModel vm;
+  Offset _adminButtonOffset = const Offset(300, 500); // 初始位置
 
   @override
   void initState() {
@@ -32,10 +33,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       duration: const Duration(seconds: 15),
     )..repeat(reverse: true);
 
-    // 初始化 vm
     vm = context.read<HomeViewModel>();
 
-    // 👇 延迟读取 extra 参数（pageIndex）
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final extra =
           GoRouter.of(context).routerDelegate.currentConfiguration.extra;
@@ -63,11 +62,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    print(vm.prefs.getBool("is_admin"));
+    final isAdmin = vm.prefs.getBool("is_admin") == true;
+
     return Scaffold(
       body: Stack(
         children: [
-          // 渐变背景动画
+          // 🌈 背景渐变 + 毛玻璃
           AnimatedBuilder(
             animation: _gradientController,
             builder: (context, _) {
@@ -76,8 +76,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               );
             },
           ),
-
-          // 毛玻璃模糊效果
           Positioned.fill(
             child: BackdropFilter(
               filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -85,54 +83,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
 
-          // 主内容区域
+          // 📄 页面主内容
           SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  // 🟢 用 Expanded 包裹 PageView，避免内容溢出
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() => _currentIndex = index);
-                    },
-                    children: const [
-                      CBTScreen(key: PageStorageKey('cbt')),
-                      WeatherScreen(key: PageStorageKey('weather')),
-                      ProfileScreen(key: PageStorageKey('profile')),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // 🟣 悬浮的 Admin 按钮（只对管理员显示）
-          if (vm.prefs.getBool("is_admin") == true)
-            Positioned(
-              bottom: kBottomNavigationBarHeight + 80,
-              right: 20,
-              child: ElevatedButton(
-                onPressed: () {
-                  context.go('/admin');
+            child: Padding(
+              padding: const EdgeInsets.only(
+                bottom: kBottomNavigationBarHeight + 16,
+              ),
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() => _currentIndex = index);
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purpleAccent,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: const Text(
-                  "Admin",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                children: const [
+                  CBTScreen(key: PageStorageKey('cbt')),
+                  WeatherScreen(key: PageStorageKey('weather')),
+                  ProfileScreen(key: PageStorageKey('profile')),
+                ],
               ),
             ),
+          ),
 
-          // 底部导航栏
+          // ⬇️ 底部导航栏
           Positioned(
             bottom: 0,
             left: 0,
@@ -148,7 +119,50 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               );
             }),
           ),
+
+          // 👑 Admin 按钮（仅管理员）
+          if (isAdmin)
+            Positioned(
+              left: _adminButtonOffset.dx,
+              top: _adminButtonOffset.dy,
+              child: Draggable(
+                feedback: _buildAdminButton(),
+                childWhenDragging: const SizedBox.shrink(),
+                onDragEnd: (details) {
+                  setState(() {
+                    _adminButtonOffset = details.offset;
+                  });
+                },
+                child: _buildAdminButton(),
+              ),
+            ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAdminButton() {
+    return GestureDetector(
+      onTap: () {
+        context.go('/admin');
+      },
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: [Colors.purpleAccent, Colors.deepPurple],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 6,
+              offset: Offset(2, 3),
+            ),
+          ],
+        ),
+        child: const Icon(Icons.admin_panel_settings, color: Colors.white),
       ),
     );
   }
