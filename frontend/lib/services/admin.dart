@@ -41,7 +41,7 @@ class AdminService {
 }
 
 class AdminPage extends StatefulWidget {
-  const AdminPage({Key? key}) : super(key: key);
+  const AdminPage({super.key});
 
   @override
   State<AdminPage> createState() => _AdminPageState();

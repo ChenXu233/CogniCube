@@ -21,7 +21,6 @@ class User(Base):
         DateTime(timezone=True)
     )
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
-    recent_emotion_level: Mapped[int] = mapped_column(Integer, default=0)
     created_on: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )

@@ -49,6 +49,7 @@ dependencies:
   intl: ^0.17.0
   fl_chart: ^0.68.0
   collection: ^1.17.0
+  window_size: ^0.1.0
 
 dev_dependencies:
   json_serializable: ^6.5.1
