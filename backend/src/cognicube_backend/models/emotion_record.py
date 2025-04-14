@@ -1,5 +1,4 @@
 from datetime import UTC, datetime
-from typing import Optional
 
 from sqlalchemy import CheckConstraint, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, validates

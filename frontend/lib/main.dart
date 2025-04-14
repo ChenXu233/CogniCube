@@ -3,16 +3,26 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// 添加以下导入
+import 'dart:io';
+import 'package:window_size/window_size.dart';
+
 // View Models
 import 'view_models/auth_view_model.dart';
 import 'view_models/chat_view_model.dart';
-import 'view_models/home_view_model.dart'; // 新增 HomeViewModel 引入
+import 'view_models/home_view_model.dart';
 
 // Routes
 import 'utils/routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 设置窗口大小（仅限桌面平台）
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    setWindowTitle('CogniCube');
+    setWindowFrame(const Rect.fromLTWH(100, 100, 1280, 720)); // 默认窗口大小和位置
+  }
 
   // 初始化 SharedPreferences
   final prefs = await SharedPreferences.getInstance();
@@ -41,12 +51,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        // 使用已初始化的 AuthViewModel 实例
-        ChangeNotifierProvider.value(value: authViewModel), // 关键改动
-        // 其他 ViewModel
-        ChangeNotifierProvider(
-          create: (_) => HomeViewModel(prefs: prefs),
-        ), // 新增全局注册
+        ChangeNotifierProvider.value(value: authViewModel),
+        ChangeNotifierProvider(create: (_) => HomeViewModel(prefs: prefs)),
         ChangeNotifierProvider(create: (_) => ChatViewModel()),
       ],
       child: const App(),

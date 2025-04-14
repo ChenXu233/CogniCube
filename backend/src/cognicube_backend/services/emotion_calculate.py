@@ -5,7 +5,7 @@ from cognicube_backend.models.emotion_record import EmotionRecord
 
 def calculate_emotion_level(records: list[EmotionRecord]):
     if not records:
-        return "中性", 50
+        return "中性", 50.0
 
     emotion_categories = {
         "高兴": (80, 100),
@@ -50,9 +50,6 @@ def calculate_emotion_level(records: list[EmotionRecord]):
             emotion_type = category
             break
 
-    # 计算情感水平（0-100，越负面越高）
-    # 这里假设得分越低，情绪越负面，所以需要调整
-    # 例如，将得分范围0-100映射到100-0
-    emotion_level = 100 - (avg_score / 100) * 100
+    emotion_level = avg_score
 
     return emotion_type, emotion_level

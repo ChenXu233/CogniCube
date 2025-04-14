@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from cognicube_backend.databases.database import get_db
-from cognicube_backend.logger import logger
 from cognicube_backend.models.emotion_record import EmotionRecord
 from cognicube_backend.schemas.statistics import (
     EmotionLevelResponse,

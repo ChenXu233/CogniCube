@@ -16,5 +16,5 @@ class EmotionRecordResponse(BaseModel):
 class EmotionLevelResponse(BaseModel):
     """情感等级响应"""
 
-    emotion_level: int
+    emotion_level: float
     emotion_type: str
