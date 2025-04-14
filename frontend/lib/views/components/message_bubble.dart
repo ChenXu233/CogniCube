@@ -68,7 +68,6 @@ class MessageBubble extends StatelessWidget {
   ) {
     final content = [
       if (!isUser && !isLoading) _buildAvatar(Icons.smart_toy, rightMargin: 8),
-
       Flexible(
         child: Column(
           crossAxisAlignment:
@@ -76,7 +75,7 @@ class MessageBubble extends StatelessWidget {
           children: [
             Container(
               margin: EdgeInsets.only(
-                left: isUser ? 40 : 0, // 保持对称间距
+                left: isUser ? 40 : 0,
                 right: isUser ? 0 : 40,
               ),
               padding: const EdgeInsets.all(12),
@@ -100,12 +99,10 @@ class MessageBubble extends StatelessWidget {
           ],
         ),
       ),
-
       if (isUser && !isLoading) _buildAvatar(Icons.person, leftMargin: 8),
     ];
 
-    // 调整用户消息的组件顺序
-    return isUser ? content.reversed.toList() : content;
+    return content; // 直接返回原数组，不再反转
   }
 
   Widget _buildAvatar(
