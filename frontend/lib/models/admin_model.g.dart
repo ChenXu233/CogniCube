@@ -7,30 +7,30 @@ part of 'admin_model.dart';
 // **************************************************************************
 
 _UserInfo _$UserInfoFromJson(Map<String, dynamic> json) => _UserInfo(
-  id: json['id'] as String,
-  name: json['name'] as String,
+  id: (json['id'] as num).toInt(),
+  username: json['username'] as String,
   email: json['email'] as String,
-  role: json['role'] as String,
-  createdAt: json['createdAt'] as String,
-  updatedAt: json['updatedAt'] as String,
+  is_admin: json['is_admin'] as bool,
+  recent_emotion_level: (json['recent_emotion_level'] as num).toInt(),
+  is_verified: json['is_verified'] as bool,
 );
 
 Map<String, dynamic> _$UserInfoToJson(_UserInfo instance) => <String, dynamic>{
   'id': instance.id,
-  'name': instance.name,
+  'username': instance.username,
   'email': instance.email,
-  'role': instance.role,
-  'createdAt': instance.createdAt,
-  'updatedAt': instance.updatedAt,
+  'is_admin': instance.is_admin,
+  'recent_emotion_level': instance.recent_emotion_level,
+  'is_verified': instance.is_verified,
 };
 
 _PaginatedUsers _$PaginatedUsersFromJson(Map<String, dynamic> json) =>
     _PaginatedUsers(
       total: (json['total'] as num).toInt(),
       page: (json['page'] as num).toInt(),
-      perPage: (json['perPage'] as num).toInt(),
-      data:
-          (json['data'] as List<dynamic>)
+      per_page: (json['per_page'] as num).toInt(),
+      items:
+          (json['items'] as List<dynamic>)
               .map((e) => UserInfo.fromJson(e as Map<String, dynamic>))
               .toList(),
     );
@@ -39,6 +39,6 @@ Map<String, dynamic> _$PaginatedUsersToJson(_PaginatedUsers instance) =>
     <String, dynamic>{
       'total': instance.total,
       'page': instance.page,
-      'perPage': instance.perPage,
-      'data': instance.data,
+      'per_page': instance.per_page,
+      'items': instance.items,
     };

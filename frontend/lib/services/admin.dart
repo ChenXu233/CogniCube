@@ -61,12 +61,12 @@ class _AdminPageState extends State<AdminPage> {
   void _createUser() async {
     // 示例用户数据，可改成弹窗表单
     final newUser = UserInfo(
-      id: '0',
-      name: '新用户',
+      id: 0,
+      username: '新用户',
       email: 'newuser@example.com',
-      role: 'user',
-      createdAt: DateTime.now().toIso8601String(),
-      updatedAt: DateTime.now().toIso8601String(),
+      is_admin: true,
+      recent_emotion_level: 0,
+      is_verified: true,
     );
 
     try {
@@ -90,9 +90,8 @@ class _AdminPageState extends State<AdminPage> {
       itemBuilder: (context, index) {
         final user = users[index];
         return ListTile(
-          title: Text(user.name),
-          subtitle: Text('${user.email} • ${user.role}'),
-          trailing: Text(user.createdAt.split('T').first),
+          title: Text(user.username),
+          subtitle: Text('${user.email} • ${user.is_admin}'),
         );
       },
     );
@@ -115,7 +114,7 @@ class _AdminPageState extends State<AdminPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('出错了：${snapshot.error}'));
           } else if (snapshot.hasData) {
-            final users = snapshot.data!.data;
+            final users = snapshot.data!.items;
             return _buildUserList(users);
           } else {
             return const Center(child: Text('没有用户数据'));
@@ -126,9 +125,9 @@ class _AdminPageState extends State<AdminPage> {
   }
 }
 
-// ---- 扩展函数：UserInfo.toJson() ----
+// 扩展函数：UserInfo.toJson()
 extension UserInfoToJson on UserInfo {
   Map<String, dynamic> toJson() {
-    return {"name": name, "email": email, "role": role};
+    return {"name": username, "email": email, "is_admin": is_admin};
   }
 }

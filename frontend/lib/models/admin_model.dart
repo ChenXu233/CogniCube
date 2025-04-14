@@ -6,12 +6,12 @@ part 'admin_model.g.dart';
 @freezed
 abstract class UserInfo with _$UserInfo {
   const factory UserInfo({
-    required String id,
-    required String name,
+    required int id,
+    required String username,
     required String email,
-    required String role,
-    required String createdAt,
-    required String updatedAt,
+    required bool is_admin,
+    required int recent_emotion_level,
+    required bool is_verified,
   }) = _UserInfo;
 
   factory UserInfo.fromJson(Map<String, dynamic> json) =>
@@ -23,8 +23,8 @@ abstract class PaginatedUsers with _$PaginatedUsers {
   const factory PaginatedUsers({
     required int total,
     required int page,
-    required int perPage,
-    required List<UserInfo> data,
+    required int per_page,
+    required List<UserInfo> items,
   }) = _PaginatedUsers;
 
   factory PaginatedUsers.fromJson(Map<String, dynamic> json) =>
@@ -33,6 +33,13 @@ abstract class PaginatedUsers with _$PaginatedUsers {
 
 extension UserInfoToJson on UserInfo {
   Map<String, dynamic> toJson() {
-    return {"name": name, "email": email, "role": role};
+    return {
+      "id": id,
+      "username": username,
+      "email": email,
+      "is_admin": is_admin,
+      "recent_emotion_level": recent_emotion_level,
+      "is_verified": is_verified,
+    };
   }
 }
