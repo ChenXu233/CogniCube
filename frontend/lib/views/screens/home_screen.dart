@@ -22,6 +22,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _gradientController;
   late final HomeViewModel vm;
 
+  // 初始按钮位置（右下角）
+  double _buttonX = 300;
+  double _buttonY = 600;
+
   @override
   void initState() {
     super.initState();
@@ -32,14 +36,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       duration: const Duration(seconds: 15),
     )..repeat(reverse: true);
 
-    // 初始化 vm
     vm = context.read<HomeViewModel>();
 
-    // 👇 延迟读取 extra 参数（pageIndex）
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final extra =
           GoRouter.of(context).routerDelegate.currentConfiguration.extra;
-
       if (extra != null &&
           extra is Map &&
           extra.containsKey('pageIndex') &&
@@ -63,11 +64,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    print(vm.prefs.getBool("is_admin"));
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       body: Stack(
         children: [
-          // 渐变背景动画
           AnimatedBuilder(
             animation: _gradientController,
             builder: (context, _) {
@@ -76,63 +77,73 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               );
             },
           ),
-
-          // 毛玻璃模糊效果
           Positioned.fill(
             child: BackdropFilter(
               filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
             ),
           ),
-
-          // 主内容区域
           SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  // 🟢 用 Expanded 包裹 PageView，避免内容溢出
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() => _currentIndex = index);
-                    },
-                    children: const [
-                      CBTScreen(key: PageStorageKey('cbt')),
-                      WeatherScreen(key: PageStorageKey('weather')),
-                      ProfileScreen(key: PageStorageKey('profile')),
-                    ],
-                  ),
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.only(
+                bottom: kBottomNavigationBarHeight + 16,
+              ),
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() => _currentIndex = index);
+                },
+                children: const [
+                  CBTScreen(key: PageStorageKey('cbt')),
+                  WeatherScreen(key: PageStorageKey('weather')),
+                  ProfileScreen(key: PageStorageKey('profile')),
+                ],
+              ),
             ),
           ),
-          // 🟣 悬浮的 Admin 按钮（只对管理员显示）
+
+          // 👇 可拖动的 Admin 按钮（仅管理员显示）
           if (vm.prefs.getBool("is_admin") == true)
             Positioned(
-              bottom: kBottomNavigationBarHeight + 80,
-              right: 20,
-              child: ElevatedButton(
-                onPressed: () {
-                  context.go('/admin');
+              left: _buttonX,
+              top: _buttonY,
+              child: GestureDetector(
+                onPanUpdate: (details) {
+                  setState(() {
+                    _buttonX = (_buttonX + details.delta.dx).clamp(
+                      0,
+                      screenSize.width - 110,
+                    ); // 限制按钮宽度
+                    _buttonY = (_buttonY + details.delta.dy).clamp(
+                      0,
+                      screenSize.height - 100,
+                    ); // 限制按钮高度
+                  });
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purpleAccent,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    context.go('/admin');
+                  },
+                  icon: const Icon(Icons.admin_panel_settings_rounded),
+                  label: const Text(
+                    "管理员",
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(124, 186, 92, 241),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 16,
+                    ),
+                    elevation: 6,
                   ),
-                ),
-                child: const Text(
-                  "Admin",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
 
-          // 底部导航栏
           Positioned(
             bottom: 0,
             left: 0,
