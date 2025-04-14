@@ -1,5 +1,4 @@
 from datetime import UTC, datetime
-from typing import Optional
 
 from sqlalchemy import CheckConstraint, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, validates
@@ -23,7 +22,7 @@ class EmotionRecord(Base):
     )
     valence: Mapped[float] = mapped_column(CheckConstraint("valence BETWEEN -1 AND 1"))
     arousal: Mapped[float] = mapped_column(CheckConstraint("arousal BETWEEN 0 AND 1"))
-    dominance: Mapped[Optional[float]] = mapped_column(
+    dominance: Mapped[float] = mapped_column(
         CheckConstraint("dominance BETWEEN 0 AND 1")
     )
 
