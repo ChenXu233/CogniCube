@@ -1,7 +1,7 @@
 import asyncio
+import os
 import subprocess
 import sys
-import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
