@@ -44,7 +44,9 @@ void main() async {
         // 使用已初始化的 AuthViewModel 实例
         ChangeNotifierProvider.value(value: authViewModel), // 关键改动
         // 其他 ViewModel
-        ChangeNotifierProvider(create: (_) => HomeViewModel()), // 新增全局注册
+        ChangeNotifierProvider(
+          create: (_) => HomeViewModel(prefs: prefs),
+        ), // 新增全局注册
         ChangeNotifierProvider(create: (_) => ChatViewModel()),
       ],
       child: const App(),

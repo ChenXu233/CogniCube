@@ -13,6 +13,8 @@ class AuthService {
         data: {'username': username, 'password': password},
       );
 
+      await _prefs.setBool("is_admin", response.data['is_admin']);
+
       await _prefs.setString("auth_token", response.data['access_token']);
       return response.data['access_token'];
     } on DioException catch (e) {

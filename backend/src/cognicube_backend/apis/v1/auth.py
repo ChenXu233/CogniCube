@@ -31,6 +31,7 @@ async def login(user: UserLogin, db: Session = Depends(get_db)):
 
     return {
         "user_id": int(user_db.id),
+        "is_admin" : user_db.is_admin,
         "access_token": access_token,
     }
 

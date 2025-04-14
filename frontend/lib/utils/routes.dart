@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
 // View Models
 import '../view_models/auth_view_model.dart';
 
@@ -19,7 +20,10 @@ import '../views/screens/CBT/countdown_screen.dart';
 import '../views/screens/setting/editprofile_screen.dart';
 import '../views/screens/setting/helpfeedback_screen.dart';
 
+import '../services/admin.dart';
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 final goRouter = GoRouter(
   navigatorKey: navigatorKey,
   initialLocation: '/',
@@ -46,6 +50,7 @@ final goRouter = GoRouter(
 
     return null;
   },
+
   routes: [
     GoRoute(
       path: '/',
@@ -121,6 +126,12 @@ final goRouter = GoRouter(
               (context, state) => const MaterialPage(child: CountdownScreen()),
         ),
       ],
+    ),
+
+    // 🌟 Admin 路由加在这里
+    GoRoute(
+      path: '/admin',
+      pageBuilder: (context, state) => const MaterialPage(child: AdminPage()),
     ),
   ],
 );

@@ -30,3 +30,9 @@ abstract class PaginatedUsers with _$PaginatedUsers {
   factory PaginatedUsers.fromJson(Map<String, dynamic> json) =>
       _$PaginatedUsersFromJson(json);
 }
+
+extension UserInfoToJson on UserInfo {
+  Map<String, dynamic> toJson() {
+    return {"name": name, "email": email, "role": role};
+  }
+}

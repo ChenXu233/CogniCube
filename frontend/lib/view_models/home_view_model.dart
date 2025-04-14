@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeViewModel with ChangeNotifier {
   late final PageController _pageController;
   int _currentIndex = 0; // CBT 为初始界面
+  final SharedPreferences prefs;
 
-  HomeViewModel() {
+  HomeViewModel({required this.prefs}) {
     _pageController = PageController(initialPage: _currentIndex)
       ..addListener(_handlePageScroll);
   }
@@ -19,6 +21,11 @@ class HomeViewModel with ChangeNotifier {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  void updateIsAdmin(bool b) {
+    prefs.setBool('isAdmin', b);
+    notifyListeners();
   }
 
   void navigateToCBT() => navigateToPage(1);

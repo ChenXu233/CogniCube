@@ -72,4 +72,5 @@ class TokenResponse(BaseModel):
     """Token响应模型"""
 
     access_token: str
+    is_admin: bool
     user_id: int
