@@ -4,6 +4,7 @@
 
 import re
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel, field_validator
 
@@ -61,15 +62,23 @@ class UserResponse(BaseModel):
     id: int
     username: str
     email: str
-    created_on: datetime
+    is_admin: bool
+    recent_emotion_level: int
     is_verified: bool
 
     class Config:
         from_attributes = True
 
 
-class TokenResponse(BaseModel):
-    """Token响应模型"""
+class PaginatedUsers(BaseModel):
+    total: int
+    page: int
+    per_page: int
+    items: List[UserResponse]
+
+
+class LoginResponse(BaseModel):
+    """登录后响应的模型"""
 
     access_token: str
     is_admin: bool

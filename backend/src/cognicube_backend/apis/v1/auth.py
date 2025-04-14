@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from cognicube_backend.databases.database import get_db
 from cognicube_backend.logger import logger
 from cognicube_backend.models.user import User
-from cognicube_backend.schemas.user import TokenResponse, UserLogin
+from cognicube_backend.schemas.user import LoginResponse, UserLogin
 from cognicube_backend.utils.jwt_generator import (
     create_jwt_token,
     get_jwt_token_user_id,
@@ -15,7 +15,7 @@ from cognicube_backend.utils.jwt_generator import (
 auth = APIRouter(prefix="/apis/v1/auth", tags=["auth"])
 
 
-@auth.post("/login", response_model=TokenResponse)
+@auth.post("/login", response_model=LoginResponse)
 async def login(user: UserLogin, db: Session = Depends(get_db)):
     logger.debug(f"User login: {user.username}")
     user_db = db.query(User).filter(User.username == user.username).first()
@@ -31,7 +31,7 @@ async def login(user: UserLogin, db: Session = Depends(get_db)):
 
     return {
         "user_id": int(user_db.id),
-        "is_admin" : user_db.is_admin,
+        "is_admin": user_db.is_admin,
         "access_token": access_token,
     }
 

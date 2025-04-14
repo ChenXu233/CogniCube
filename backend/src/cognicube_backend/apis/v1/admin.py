@@ -3,8 +3,7 @@ from sqlalchemy.orm import Session
 
 from cognicube_backend.databases.database import get_db
 from cognicube_backend.models.user import User
-from cognicube_backend.schemas.admin import PaginatedUsers, UserResponse
-from cognicube_backend.schemas.user import UserCreate
+from cognicube_backend.schemas.user import UserCreate, UserResponse, PaginatedUsers
 from cognicube_backend.utils.jwt_generator import get_jwt_token_user_id
 
 admin = APIRouter(prefix="/apis/v1/admin", tags=["admin"])
