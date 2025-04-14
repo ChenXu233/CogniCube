@@ -21,7 +21,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _currentIndex = 1;
   late AnimationController _gradientController;
   late final HomeViewModel vm;
-  Offset _adminButtonOffset = const Offset(300, 500); // 初始位置
+
+  // 初始按钮位置（右下角）
+  double _buttonX = 300;
+  double _buttonY = 600;
 
   @override
   void initState() {
@@ -38,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final extra =
           GoRouter.of(context).routerDelegate.currentConfiguration.extra;
-
       if (extra != null &&
           extra is Map &&
           extra.containsKey('pageIndex') &&
@@ -62,12 +64,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final isAdmin = vm.prefs.getBool("is_admin") == true;
+    final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Stack(
         children: [
-          // 🌈 背景渐变 + 毛玻璃
           AnimatedBuilder(
             animation: _gradientController,
             builder: (context, _) {
@@ -82,8 +83,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
             ),
           ),
-
-          // 📄 页面主内容
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(
@@ -103,7 +102,48 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
 
-          // ⬇️ 底部导航栏
+          // 👇 可拖动的 Admin 按钮（仅管理员显示）
+          if (vm.prefs.getBool("is_admin") == true)
+            Positioned(
+              left: _buttonX,
+              top: _buttonY,
+              child: GestureDetector(
+                onPanUpdate: (details) {
+                  setState(() {
+                    _buttonX = (_buttonX + details.delta.dx).clamp(
+                      0,
+                      screenSize.width - 110,
+                    ); // 限制按钮宽度
+                    _buttonY = (_buttonY + details.delta.dy).clamp(
+                      0,
+                      screenSize.height - 100,
+                    ); // 限制按钮高度
+                  });
+                },
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    context.go('/admin');
+                  },
+                  icon: const Icon(Icons.admin_panel_settings_rounded),
+                  label: const Text(
+                    "管理员",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(124, 186, 92, 241),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 16,
+                    ),
+                    elevation: 6,
+                  ),
+                ),
+              ),
+            ),
+
           Positioned(
             bottom: 0,
             left: 0,
@@ -119,50 +159,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               );
             }),
           ),
-
-          // 👑 Admin 按钮（仅管理员）
-          if (isAdmin)
-            Positioned(
-              left: _adminButtonOffset.dx,
-              top: _adminButtonOffset.dy,
-              child: Draggable(
-                feedback: _buildAdminButton(),
-                childWhenDragging: const SizedBox.shrink(),
-                onDragEnd: (details) {
-                  setState(() {
-                    _adminButtonOffset = details.offset;
-                  });
-                },
-                child: _buildAdminButton(),
-              ),
-            ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildAdminButton() {
-    return GestureDetector(
-      onTap: () {
-        context.go('/admin');
-      },
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-            colors: [Colors.purpleAccent, Colors.deepPurple],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 6,
-              offset: Offset(2, 3),
-            ),
-          ],
-        ),
-        child: const Icon(Icons.admin_panel_settings, color: Colors.white),
       ),
     );
   }
