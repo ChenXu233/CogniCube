@@ -22,7 +22,7 @@ class AdminService {
     }
   }
 
-  static Future<String> creatUser(UserInfo user) async {
+  static Future<String> createUser(UserInfo user) async {
     try {
       Response response = await _dio.post('/admin/users', data: user.toJson());
       return "创建成功";
@@ -55,45 +55,110 @@ class _AdminPageState extends State<AdminPage> {
   @override
   void initState() {
     super.initState();
+    _loadUsers();
+  }
+
+  void _loadUsers() {
     _userFuture = AdminService.getUsers(_page, _perPage);
   }
 
-  void _createUser() async {
-    // 示例用户数据，可改成弹窗表单
-    final newUser = UserInfo(
-      id: 0,
-      username: '新用户',
-      email: 'newuser@example.com',
-      is_admin: true,
-      recent_emotion_level: 0,
-      is_verified: true,
+  Future<void> _createUserDialog() async {
+    final _usernameController = TextEditingController();
+    final _emailController = TextEditingController();
+    final _passwordController = TextEditingController();
+    bool _isAdmin = false;
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("创建新用户"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _usernameController,
+                decoration: const InputDecoration(labelText: "用户名"),
+              ),
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: "邮箱"),
+              ),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: "密码"),
+              ),
+              Row(
+                children: [
+                  const Text("管理员权限"),
+                  const Spacer(),
+                  Switch(
+                    value: _isAdmin,
+                    onChanged: (val) {
+                      setState(() {
+                        _isAdmin = val;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("取消"),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text("创建"),
+            ),
+          ],
+        );
+      },
     );
 
-    try {
-      final msg = await AdminService.creatUser(newUser);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    if (result == true) {
+      final newUser = UserInfo(
+        id: 0,
+        username: _usernameController.text,
+        email: _emailController.text,
+        is_admin: _isAdmin,
+        is_verified: true,
+        recent_emotion_level: 0,
+      );
 
-      // 刷新列表
-      setState(() {
-        _userFuture = AdminService.getUsers(_page, _perPage);
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      try {
+        final msg = await AdminService.createUser(newUser);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(msg)));
+        setState(() => _loadUsers());
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
     }
   }
 
   Widget _buildUserList(List<UserInfo> users) {
-    return ListView.builder(
-      itemCount: users.length,
-      itemBuilder: (context, index) {
-        final user = users[index];
-        return ListTile(
-          title: Text(user.username),
-          subtitle: Text('${user.email} • ${user.is_admin}'),
-        );
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() => _loadUsers());
       },
+      child: ListView.builder(
+        itemCount: users.length,
+        itemBuilder: (context, index) {
+          final user = users[index];
+          return ListTile(
+            leading: CircleAvatar(child: Text(user.username[0])),
+            title: Text(user.username),
+            subtitle: Text('${user.email} • ${user.is_admin ? "管理员" : "普通用户"}'),
+          );
+        },
+      ),
     );
   }
 
@@ -103,7 +168,11 @@ class _AdminPageState extends State<AdminPage> {
       appBar: AppBar(
         title: const Text('用户管理'),
         actions: [
-          IconButton(icon: const Icon(Icons.add), onPressed: _createUser),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _createUserDialog,
+            tooltip: "创建用户",
+          ),
         ],
       ),
       body: FutureBuilder<PaginatedUsers>(
@@ -125,9 +194,14 @@ class _AdminPageState extends State<AdminPage> {
   }
 }
 
-// 扩展函数：UserInfo.toJson()
+// 🔁 修正字段映射，和后端一致
 extension UserInfoToJson on UserInfo {
   Map<String, dynamic> toJson() {
-    return {"name": username, "email": email, "is_admin": is_admin};
+    return {
+      "username": username,
+      "email": email,
+      "password": "123456", // 示例密码或后续改为输入字段
+      "is_admin": is_admin,
+    };
   }
 }
