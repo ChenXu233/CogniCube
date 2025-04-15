@@ -63,7 +63,6 @@ class UserResponse(BaseModel):
     username: str
     email: str
     is_admin: bool
-    recent_emotion_level: int
     is_verified: bool
 
     class Config:

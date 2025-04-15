@@ -24,7 +24,6 @@ class User(Base):
     created_on: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
-    recent_emotion_level: Mapped[int] = mapped_column(Integer, nullable=True)
 
 
     @property

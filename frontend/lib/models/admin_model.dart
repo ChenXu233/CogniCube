@@ -10,7 +10,6 @@ abstract class UserInfo with _$UserInfo {
     required String username,
     required String email,
     required bool is_admin,
-    required int recent_emotion_level,
     required bool is_verified,
   }) = _UserInfo;
 
@@ -38,7 +37,6 @@ extension UserInfoToJson on UserInfo {
       "username": username,
       "email": email,
       "is_admin": is_admin,
-      "recent_emotion_level": recent_emotion_level,
       "is_verified": is_verified,
     };
   }

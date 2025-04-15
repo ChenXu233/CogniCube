@@ -126,7 +126,6 @@ class _AdminPageState extends State<AdminPage> {
         email: _emailController.text,
         is_admin: _isAdmin,
         is_verified: true,
-        recent_emotion_level: 0,
       );
 
       try {

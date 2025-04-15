@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserInfo {
 
- int get id; String get username; String get email; bool get is_admin; int get recent_emotion_level; bool get is_verified;
+ int get id; String get username; String get email; bool get is_admin; bool get is_verified;
 /// Create a copy of UserInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $UserInfoCopyWith<UserInfo> get copyWith => _$UserInfoCopyWithImpl<UserInfo>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.is_admin, is_admin) || other.is_admin == is_admin)&&(identical(other.recent_emotion_level, recent_emotion_level) || other.recent_emotion_level == recent_emotion_level)&&(identical(other.is_verified, is_verified) || other.is_verified == is_verified));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.is_admin, is_admin) || other.is_admin == is_admin)&&(identical(other.is_verified, is_verified) || other.is_verified == is_verified));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,email,is_admin,recent_emotion_level,is_verified);
+int get hashCode => Object.hash(runtimeType,id,username,email,is_admin,is_verified);
 
 @override
 String toString() {
-  return 'UserInfo(id: $id, username: $username, email: $email, is_admin: $is_admin, recent_emotion_level: $recent_emotion_level, is_verified: $is_verified)';
+  return 'UserInfo(id: $id, username: $username, email: $email, is_admin: $is_admin, is_verified: $is_verified)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $UserInfoCopyWith<$Res>  {
   factory $UserInfoCopyWith(UserInfo value, $Res Function(UserInfo) _then) = _$UserInfoCopyWithImpl;
 @useResult
 $Res call({
- int id, String username, String email, bool is_admin, int recent_emotion_level, bool is_verified
+ int id, String username, String email, bool is_admin, bool is_verified
 });
 
 
@@ -66,14 +66,13 @@ class _$UserInfoCopyWithImpl<$Res>
 
 /// Create a copy of UserInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? email = null,Object? is_admin = null,Object? recent_emotion_level = null,Object? is_verified = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? email = null,Object? is_admin = null,Object? is_verified = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,is_admin: null == is_admin ? _self.is_admin : is_admin // ignore: cast_nullable_to_non_nullable
-as bool,recent_emotion_level: null == recent_emotion_level ? _self.recent_emotion_level : recent_emotion_level // ignore: cast_nullable_to_non_nullable
-as int,is_verified: null == is_verified ? _self.is_verified : is_verified // ignore: cast_nullable_to_non_nullable
+as bool,is_verified: null == is_verified ? _self.is_verified : is_verified // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -85,14 +84,13 @@ as bool,
 @JsonSerializable()
 
 class _UserInfo implements UserInfo {
-  const _UserInfo({required this.id, required this.username, required this.email, required this.is_admin, required this.recent_emotion_level, required this.is_verified});
+  const _UserInfo({required this.id, required this.username, required this.email, required this.is_admin, required this.is_verified});
   factory _UserInfo.fromJson(Map<String, dynamic> json) => _$UserInfoFromJson(json);
 
 @override final  int id;
 @override final  String username;
 @override final  String email;
 @override final  bool is_admin;
-@override final  int recent_emotion_level;
 @override final  bool is_verified;
 
 /// Create a copy of UserInfo
@@ -108,16 +106,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.is_admin, is_admin) || other.is_admin == is_admin)&&(identical(other.recent_emotion_level, recent_emotion_level) || other.recent_emotion_level == recent_emotion_level)&&(identical(other.is_verified, is_verified) || other.is_verified == is_verified));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserInfo&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.is_admin, is_admin) || other.is_admin == is_admin)&&(identical(other.is_verified, is_verified) || other.is_verified == is_verified));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,email,is_admin,recent_emotion_level,is_verified);
+int get hashCode => Object.hash(runtimeType,id,username,email,is_admin,is_verified);
 
 @override
 String toString() {
-  return 'UserInfo(id: $id, username: $username, email: $email, is_admin: $is_admin, recent_emotion_level: $recent_emotion_level, is_verified: $is_verified)';
+  return 'UserInfo(id: $id, username: $username, email: $email, is_admin: $is_admin, is_verified: $is_verified)';
 }
 
 
@@ -128,7 +126,7 @@ abstract mixin class _$UserInfoCopyWith<$Res> implements $UserInfoCopyWith<$Res>
   factory _$UserInfoCopyWith(_UserInfo value, $Res Function(_UserInfo) _then) = __$UserInfoCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String username, String email, bool is_admin, int recent_emotion_level, bool is_verified
+ int id, String username, String email, bool is_admin, bool is_verified
 });
 
 
@@ -145,14 +143,13 @@ class __$UserInfoCopyWithImpl<$Res>
 
 /// Create a copy of UserInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? email = null,Object? is_admin = null,Object? recent_emotion_level = null,Object? is_verified = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? email = null,Object? is_admin = null,Object? is_verified = null,}) {
   return _then(_UserInfo(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,is_admin: null == is_admin ? _self.is_admin : is_admin // ignore: cast_nullable_to_non_nullable
-as bool,recent_emotion_level: null == recent_emotion_level ? _self.recent_emotion_level : recent_emotion_level // ignore: cast_nullable_to_non_nullable
-as int,is_verified: null == is_verified ? _self.is_verified : is_verified // ignore: cast_nullable_to_non_nullable
+as bool,is_verified: null == is_verified ? _self.is_verified : is_verified // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
