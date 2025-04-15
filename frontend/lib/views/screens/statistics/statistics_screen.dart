@@ -74,21 +74,21 @@ class _WeatherScreenState extends State<WeatherScreen>
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
-                          vertical: 10,
+                          vertical: 8,
                         ),
                         child: _buildAIChatCard(primaryColor),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
-                          vertical: 10,
+                          vertical: 8,
                         ),
                         child: _buildDailySentenceCard(primaryColor),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
-                          vertical: 10,
+                          vertical: 8,
                         ),
                         child: _buildEmotionChartCard(primaryColor),
                       ),
@@ -148,7 +148,7 @@ class _WeatherScreenState extends State<WeatherScreen>
 
   Widget _buildEmotionChartCard(Color primaryColor) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12), // 卡片整体留白
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Material(
@@ -167,9 +167,7 @@ class _WeatherScreenState extends State<WeatherScreen>
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // 顶部安全留白
                     const SizedBox(height: 16),
-                    // 标题区域
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Row(
@@ -188,16 +186,27 @@ class _WeatherScreenState extends State<WeatherScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // 图表区域
+                    // MODIFIED START: 添加滚动条容器
                     Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16), // 底部留白
-                        child: _buildScrollableChart(
-                          snapshot.data!,
-                          primaryColor,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: primaryColor.withOpacity(0.2),
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: _buildScrollableChart(
+                            snapshot.data!,
+                            primaryColor,
+                          ),
                         ),
                       ),
                     ),
+                    // MODIFIED END
                   ],
                 );
               },
@@ -212,17 +221,27 @@ class _WeatherScreenState extends State<WeatherScreen>
     List<EmotionRecord> records,
     Color primaryColor,
   ) {
-    final chartWidth = records.length * 60;
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(), // 弹性滚动效果
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16), // 左右滚动留白
-        child: SizedBox(
-          width: chartWidth.toDouble(),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8), // 图表顶部留白
-            child: _buildEmotionChart(records, primaryColor),
+    final ScrollController _scrollController = ScrollController();
+    final chartWidth = records.isEmpty ? 0 : records.length * 60;
+
+    return Scrollbar(
+      controller: _scrollController,
+      thumbVisibility: true, // 替代 isAlwaysShown（适用于新版本）
+      thickness: 8,
+      radius: const Radius.circular(4),
+      // thumbColor: primaryColor.withOpacity(0.5), // 常态颜色
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SizedBox(
+            width: chartWidth.toDouble(),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: _buildEmotionChart(records, primaryColor),
+            ),
           ),
         ),
       ),
