@@ -63,10 +63,10 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Future<void> _createUserDialog() async {
-    final _usernameController = TextEditingController();
-    final _emailController = TextEditingController();
-    final _passwordController = TextEditingController();
-    bool _isAdmin = false;
+    final usernameController = TextEditingController();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    bool isAdmin = false;
 
     final result = await showDialog<bool>(
       context: context,
@@ -77,15 +77,15 @@ class _AdminPageState extends State<AdminPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: _usernameController,
+                controller: usernameController,
                 decoration: const InputDecoration(labelText: "用户名"),
               ),
               TextField(
-                controller: _emailController,
+                controller: emailController,
                 decoration: const InputDecoration(labelText: "邮箱"),
               ),
               TextField(
-                controller: _passwordController,
+                controller: passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(labelText: "密码"),
               ),
@@ -94,10 +94,10 @@ class _AdminPageState extends State<AdminPage> {
                   const Text("管理员权限"),
                   const Spacer(),
                   Switch(
-                    value: _isAdmin,
+                    value: isAdmin,
                     onChanged: (val) {
                       setState(() {
-                        _isAdmin = val;
+                        isAdmin = val;
                       });
                     },
                   ),
@@ -122,9 +122,9 @@ class _AdminPageState extends State<AdminPage> {
     if (result == true) {
       final newUser = UserInfo(
         id: 0,
-        username: _usernameController.text,
-        email: _emailController.text,
-        is_admin: _isAdmin,
+        username: usernameController.text,
+        email: emailController.text,
+        is_admin: isAdmin,
         is_verified: true,
       );
 
