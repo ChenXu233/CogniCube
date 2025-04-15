@@ -1,11 +1,11 @@
+import 'package:flutter/foundation.dart'; // 用于 kIsWeb 判断
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// 添加以下导入
-import 'dart:io';
 import 'package:window_size/window_size.dart';
+import 'platform.dart'; // 👈 平台判断封装，兼容 Web
 
 // View Models
 import 'view_models/auth_view_model.dart';
@@ -19,7 +19,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 设置窗口大小（仅限桌面平台）
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+  if (!kIsWeb && PlatformInfo.isDesktop) {
     setWindowTitle('CogniCube');
     setWindowFrame(const Rect.fromLTWH(100, 100, 1280, 720)); // 默认窗口大小和位置
   }
@@ -72,7 +72,6 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         return MediaQuery(
-          // 保持一致的媒体查询
           data: MediaQuery.of(context),
           child: Scaffold(
             resizeToAvoidBottomInset: true,
