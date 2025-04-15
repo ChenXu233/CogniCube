@@ -49,6 +49,11 @@ class _AdminPageState extends State<AdminPage> {
                       controller: _emailController,
                       decoration: const InputDecoration(labelText: "邮箱"),
                     ),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: const InputDecoration(labelText: "密码"),
+                    ),
                     Row(
                       children: [
                         const Text("管理员权限"),
