@@ -19,8 +19,7 @@ import '../views/screens/setting/setting_screen.dart';
 import '../views/screens/CBT/countdown_screen.dart';
 import '../views/screens/setting/editprofile_screen.dart';
 import '../views/screens/setting/helpfeedback_screen.dart';
-
-import '../services/admin.dart';
+import '../views/screens/admin/admin_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -46,6 +45,11 @@ final goRouter = GoRouter(
         from != null &&
         from.isNotEmpty) {
       return from;
+    }
+
+    // 如果用户未认证或不是管理员，重定向到首页
+    if (currentPath.startsWith('/admin') && !auth.isAdmin) {
+      return '/'; // 重定向到首页
     }
 
     return null;
@@ -127,11 +131,17 @@ final goRouter = GoRouter(
         ),
       ],
     ),
-
-    // 🌟 Admin 路由加在这里
+    // Admin Route, without error screen
     GoRoute(
       path: '/admin',
-      pageBuilder: (context, state) => const MaterialPage(child: AdminPage()),
+      pageBuilder: (context, state) {
+        final auth = Provider.of<AuthViewModel>(context);
+        // 如果没有管理员权限，直接跳转到首页
+        if (!auth.isAuthenticated || !auth.isAdmin) {
+          return const MaterialPage(child: HomeScreen()); // 重定向到首页
+        }
+        return const MaterialPage(child: AdminPage());
+      },
     ),
   ],
 );

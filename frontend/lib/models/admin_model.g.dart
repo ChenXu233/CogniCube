@@ -22,6 +22,21 @@ Map<String, dynamic> _$UserInfoToJson(_UserInfo instance) => <String, dynamic>{
   'is_verified': instance.is_verified,
 };
 
+_UserCreate _$UserCreateFromJson(Map<String, dynamic> json) => _UserCreate(
+  username: json['username'] as String,
+  email: json['email'] as String,
+  password: json['password'] as String,
+  is_admin: json['is_admin'] as bool,
+);
+
+Map<String, dynamic> _$UserCreateToJson(_UserCreate instance) =>
+    <String, dynamic>{
+      'username': instance.username,
+      'email': instance.email,
+      'password': instance.password,
+      'is_admin': instance.is_admin,
+    };
+
 _PaginatedUsers _$PaginatedUsersFromJson(Map<String, dynamic> json) =>
     _PaginatedUsers(
       total: (json['total'] as num).toInt(),

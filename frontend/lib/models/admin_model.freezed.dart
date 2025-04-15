@@ -159,6 +159,148 @@ as bool,
 
 
 /// @nodoc
+mixin _$UserCreate {
+
+ String get username; String get email; String get password; bool get is_admin;
+/// Create a copy of UserCreate
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UserCreateCopyWith<UserCreate> get copyWith => _$UserCreateCopyWithImpl<UserCreate>(this as UserCreate, _$identity);
+
+  /// Serializes this UserCreate to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserCreate&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.is_admin, is_admin) || other.is_admin == is_admin));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,username,email,password,is_admin);
+
+@override
+String toString() {
+  return 'UserCreate(username: $username, email: $email, password: $password, is_admin: $is_admin)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $UserCreateCopyWith<$Res>  {
+  factory $UserCreateCopyWith(UserCreate value, $Res Function(UserCreate) _then) = _$UserCreateCopyWithImpl;
+@useResult
+$Res call({
+ String username, String email, String password, bool is_admin
+});
+
+
+
+
+}
+/// @nodoc
+class _$UserCreateCopyWithImpl<$Res>
+    implements $UserCreateCopyWith<$Res> {
+  _$UserCreateCopyWithImpl(this._self, this._then);
+
+  final UserCreate _self;
+  final $Res Function(UserCreate) _then;
+
+/// Create a copy of UserCreate
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? username = null,Object? email = null,Object? password = null,Object? is_admin = null,}) {
+  return _then(_self.copyWith(
+username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
+as String,is_admin: null == is_admin ? _self.is_admin : is_admin // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+}
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _UserCreate implements UserCreate {
+  const _UserCreate({required this.username, required this.email, required this.password, required this.is_admin});
+  factory _UserCreate.fromJson(Map<String, dynamic> json) => _$UserCreateFromJson(json);
+
+@override final  String username;
+@override final  String email;
+@override final  String password;
+@override final  bool is_admin;
+
+/// Create a copy of UserCreate
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UserCreateCopyWith<_UserCreate> get copyWith => __$UserCreateCopyWithImpl<_UserCreate>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$UserCreateToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserCreate&&(identical(other.username, username) || other.username == username)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.is_admin, is_admin) || other.is_admin == is_admin));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,username,email,password,is_admin);
+
+@override
+String toString() {
+  return 'UserCreate(username: $username, email: $email, password: $password, is_admin: $is_admin)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UserCreateCopyWith<$Res> implements $UserCreateCopyWith<$Res> {
+  factory _$UserCreateCopyWith(_UserCreate value, $Res Function(_UserCreate) _then) = __$UserCreateCopyWithImpl;
+@override @useResult
+$Res call({
+ String username, String email, String password, bool is_admin
+});
+
+
+
+
+}
+/// @nodoc
+class __$UserCreateCopyWithImpl<$Res>
+    implements _$UserCreateCopyWith<$Res> {
+  __$UserCreateCopyWithImpl(this._self, this._then);
+
+  final _UserCreate _self;
+  final $Res Function(_UserCreate) _then;
+
+/// Create a copy of UserCreate
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? username = null,Object? email = null,Object? password = null,Object? is_admin = null,}) {
+  return _then(_UserCreate(
+username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
+as String,is_admin: null == is_admin ? _self.is_admin : is_admin // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$PaginatedUsers {
 
  int get total; int get page; int get per_page; List<UserInfo> get items;
