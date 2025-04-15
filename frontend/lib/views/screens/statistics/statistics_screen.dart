@@ -23,12 +23,6 @@ class _WeatherScreenState extends State<WeatherScreen>
   int _currentWeatherIndex = 1; //根据天气数据的索引来显示不同的天气
   late AnimationController _gradientController;
   final List<String> _weatherData = ['晴天', '多云', '雨天'];
-  // final List<String> _weatherImages = [
-  //   // 'https://example.com/sunny.jpg',
-  //   // 'https://example.com/cloudy.jpg',
-  //   // 'https://example.com/rainy.jpg',
-  // ];
-  // 天气图标数据
   final List<IconData> _weatherIcons = [
     Icons.wb_sunny,
     Icons.cloud,
@@ -152,25 +146,83 @@ class _WeatherScreenState extends State<WeatherScreen>
     );
   }
 
-  // 新增的卡片构建方法
   Widget _buildEmotionChartCard(Color primaryColor) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: Material(
-        color: Colors.white.withOpacity(0.35),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 220, maxHeight: 260),
-          padding: const EdgeInsets.all(24),
-          child: FutureBuilder<List<EmotionRecord>>(
-            future: EmotionApiService.getEmotionHistory(), // 假设已创建API服务
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return _buildChartLoading(primaryColor);
-              } else if (snapshot.hasError) {
-                return _buildChartError(primaryColor);
-              }
-              return _buildEmotionChart(snapshot.data!, primaryColor);
-            },
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12), // 卡片整体留白
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Material(
+          color: Colors.white.withOpacity(0.35),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 360, maxHeight: 400),
+            child: FutureBuilder<List<EmotionRecord>>(
+              future: EmotionApiService.getEmotionHistory(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return _buildChartLoading(primaryColor);
+                } else if (snapshot.hasError) {
+                  print(snapshot.error);
+                  return _buildChartError(primaryColor);
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // 顶部安全留白
+                    const SizedBox(height: 16),
+                    // 标题区域
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Row(
+                        children: [
+                          Icon(Icons.insights, color: primaryColor),
+                          const SizedBox(width: 8),
+                          Text(
+                            '情绪趋势分析',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // 图表区域
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 16), // 底部留白
+                        child: _buildScrollableChart(
+                          snapshot.data!,
+                          primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScrollableChart(
+    List<EmotionRecord> records,
+    Color primaryColor,
+  ) {
+    final chartWidth = records.length * 60;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(), // 弹性滚动效果
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16), // 左右滚动留白
+        child: SizedBox(
+          width: chartWidth.toDouble(),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8), // 图表顶部留白
+            child: _buildEmotionChart(records, primaryColor),
           ),
         ),
       ),
@@ -203,35 +255,50 @@ class _WeatherScreenState extends State<WeatherScreen>
 
   // 构建图表组件
   Widget _buildEmotionChart(List<EmotionRecord> records, Color primaryColor) {
-    final lineBars = _createChartLines(records, primaryColor);
-
     return LineChart(
       LineChartData(
-        lineBarsData: lineBars,
+        lineBarsData: _createChartLines(records, primaryColor),
         gridData: FlGridData(show: false),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
+              interval: 0.2, // 修改5：Y轴间隔调整为0.2
               getTitlesWidget:
-                  (value, meta) => Text(
-                    value.toInt().toString(),
-                    style: TextStyle(color: primaryColor, fontSize: 12),
+                  (value, meta) => Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: Text(
+                      value.toStringAsFixed(3), // 修改6：显示三位小数
+                      style: TextStyle(color: primaryColor, fontSize: 10),
+                    ),
                   ),
+              reservedSize: 40,
             ),
           ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: _calculateInterval(records),
+              interval: _calculateLabelInterval(
+                records.length,
+              ), // 修改7：使用新的间隔计算方法
               getTitlesWidget: (value, meta) {
-                final date = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                return Text(
-                  '${date.month}/${date.day}',
-                  style: TextStyle(color: primaryColor, fontSize: 12),
-                );
+                final index = value.toInt();
+                if (index >= 0 && index < records.length) {
+                  final date = DateTime.fromMillisecondsSinceEpoch(
+                    records[index].timestamp,
+                  );
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}', // 修改8：优化日期格式
+                      style: TextStyle(color: primaryColor, fontSize: 10),
+                    ),
+                  );
+                }
+                return const Text('');
               },
+              reservedSize: 28,
             ),
           ),
           rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -243,87 +310,123 @@ class _WeatherScreenState extends State<WeatherScreen>
                 (items) =>
                     items.map((item) {
                       return LineTooltipItem(
-                        '${item.barIndex == 0
-                            ? 'Valence'
-                            : item.barIndex == 1
-                            ? 'Arousal'
-                            : 'Intensity'}: ${item.y}',
-                        TextStyle(color: Colors.white),
+                        '${_getMetricName(item.barIndex)}: ${item.y.toStringAsFixed(3)}', // 修改9：工具提示显示三位小数
+                        TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       );
                     }).toList(),
+            fitInsideHorizontally: true,
+            fitInsideVertically: true,
           ),
+          touchSpotThreshold: 20, // 修改10：增大触摸区域
         ),
-        minX: records.first.time.millisecondsSinceEpoch.toDouble(),
-        maxX: records.last.time.millisecondsSinceEpoch.toDouble(),
+        minX: 0,
+        maxX: (records.length - 1).toDouble(),
+        minY: -1.0,
+        maxY: 1.0, // 修改11：设置最大Y值为1.0
       ),
-      // Removed duplicate lineTouchData parameter
     );
   }
 
+  // 辅助方法：获取指标名称
+  String _getMetricName(int index) {
+    switch (index) {
+      case 0:
+        return '愉悦度';
+      case 1:
+        return '激活度';
+      case 2:
+        return '强度';
+      default:
+        return '';
+    }
+  }
+
+  double _calculateLabelInterval(int dataCount) {
+    if (dataCount <= 10) return 1;
+    if (dataCount <= 20) return 2;
+    return dataCount / 10;
+  }
+
+  // 修改图表数据映射部分
   List<LineChartBarData> _createChartLines(
     List<EmotionRecord> records,
     Color primaryColor,
   ) {
-    final sortedRecords = records.sortedBy((r) => r.time);
+    final sortedRecords = records.sortedBy((r) => r.timestamp);
 
     return [
-      // Valence 线
       LineChartBarData(
         spots:
             sortedRecords
+                .asMap()
+                .entries
                 .map(
-                  (r) => FlSpot(
-                    r.time.millisecondsSinceEpoch.toDouble(),
-                    r.valence,
+                  (entry) => FlSpot(
+                    entry.key.toDouble(), // 修改14：使用索引作为X坐标
+                    entry.value.valence_score,
                   ),
                 )
                 .toList(),
         color: primaryColor,
-        barWidth: 2.5,
+        barWidth: 4, // 修改15：加粗线条宽度
         isCurved: true,
         dotData: FlDotData(show: false),
-        shadow: Shadow(color: primaryColor.withOpacity(0.3), blurRadius: 8),
+        shadow: Shadow(
+          color: primaryColor.withOpacity(0.3),
+          blurRadius: 12, // 修改16：增强阴影效果
+          offset: const Offset(4, 4),
+        ),
       ),
-      // Arousal 线
       LineChartBarData(
         spots:
             sortedRecords
+                .asMap()
+                .entries
                 .map(
-                  (r) => FlSpot(
-                    r.time.millisecondsSinceEpoch.toDouble(),
-                    r.arousal,
-                  ),
+                  (entry) =>
+                      FlSpot(entry.key.toDouble(), entry.value.dominance_score),
                 )
                 .toList(),
         color: primaryColor.withOpacity(0.7),
-        barWidth: 2,
+        barWidth: 3,
         isCurved: true,
         dotData: FlDotData(show: false),
       ),
-      // Intensity 线
       LineChartBarData(
         spots:
             sortedRecords
+                .asMap()
+                .entries
                 .map(
-                  (r) => FlSpot(
-                    r.time.millisecondsSinceEpoch.toDouble(),
-                    r.intensity_score,
-                  ),
+                  (entry) =>
+                      FlSpot(entry.key.toDouble(), entry.value.intensity_score),
                 )
                 .toList(),
         color: primaryColor.withOpacity(0.4),
-        barWidth: 1.5,
+        barWidth: 2,
         isCurved: true,
         dotData: FlDotData(show: false),
       ),
     ];
   }
+  // double _calculateInterval(List<EmotionRecord> records) {
+  //   if (records.isEmpty) return 1;
 
-  double _calculateInterval(List<EmotionRecord> records) {
-    if (records.isEmpty) return 1;
-    final duration = records.last.time.difference(records.first.time);
-    return duration.inDays > 7 ? 86400000 * 3 : 86400000; // 3天或1天间隔
-  }
+  //   // 将时间戳转换为DateTime对象
+  //   final firstDate = DateTime.fromMillisecondsSinceEpoch(
+  //     records.first.timestamp,
+  //   );
+  //   final lastDate = DateTime.fromMillisecondsSinceEpoch(
+  //     records.last.timestamp,
+  //   );
+
+  //   final duration = lastDate.difference(firstDate);
+  //   return duration.inDays > 7 ? 86400000 * 3 : 86400000;
+  // }
 
   Widget _buildAIChatCard(Color primaryColor) {
     return ClipRRect(
