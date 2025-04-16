@@ -19,32 +19,13 @@ class WeatherScreen extends StatefulWidget {
 
 class _WeatherScreenState extends State<WeatherScreen>
     with TickerProviderStateMixin {
-  late PageController _pageController;
   int _currentWeatherIndex = 1; //根据天气数据的索引来显示不同的天气
-  late AnimationController _gradientController;
   final List<String> _weatherData = ['晴天', '多云', '雨天'];
   final List<IconData> _weatherIcons = [
     Icons.wb_sunny,
     Icons.cloud,
     Icons.beach_access,
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: 1);
-    _gradientController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 15),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    _gradientController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,10 +94,10 @@ class _WeatherScreenState extends State<WeatherScreen>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withAlpha((0.3 * 255).toInt()),
               shape: BoxShape.circle,
               border: Border.all(
-                color: primaryColor.withOpacity(0.2),
+                color: primaryColor.withAlpha((0.2 * 255).toInt()),
                 width: 2,
               ),
             ),
@@ -135,7 +116,7 @@ class _WeatherScreenState extends State<WeatherScreen>
               color: primaryColor,
               shadows: [
                 Shadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withAlpha((0.15 * 255).toInt()),
                   blurRadius: 8,
                   offset: const Offset(2, 2),
                 ),
@@ -153,7 +134,7 @@ class _WeatherScreenState extends State<WeatherScreen>
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Material(
-          color: Colors.white.withOpacity(0.35),
+          color: Colors.white.withAlpha((0.15 * 255).toInt()),
           child: Container(
             constraints: const BoxConstraints(minHeight: 360, maxHeight: 400),
             child: FutureBuilder<List<EmotionRecord>>(
@@ -193,7 +174,9 @@ class _WeatherScreenState extends State<WeatherScreen>
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
-                              color: primaryColor.withOpacity(0.2),
+                              color: primaryColor.withAlpha(
+                                (0.2 * 255).toInt(),
+                              ),
                               width: 1.5,
                             ),
                           ),
@@ -222,17 +205,17 @@ class _WeatherScreenState extends State<WeatherScreen>
     List<EmotionRecord> records,
     Color primaryColor,
   ) {
-    final ScrollController _scrollController = ScrollController();
+    final ScrollController scrollController = ScrollController();
     final chartWidth = records.isEmpty ? 0 : records.length * 60;
 
     return Scrollbar(
-      controller: _scrollController,
+      controller: scrollController,
       thumbVisibility: true, // 替代 isAlwaysShown（适用于新版本）
       thickness: 8,
       radius: const Radius.circular(4),
       // thumbColor: primaryColor.withOpacity(0.5), // 常态颜色
       child: SingleChildScrollView(
-        controller: _scrollController,
+        controller: scrollController,
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         child: Padding(

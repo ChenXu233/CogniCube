@@ -6,6 +6,7 @@ void main() => runApp(MaterialApp(home: Scaffold(body: AnimationTest())));
 
 class AnimationTest extends StatefulWidget {
   @override
+  // ignore: library_private_types_in_public_api
   _AnimationTestState createState() => _AnimationTestState();
 }
 
