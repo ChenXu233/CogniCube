@@ -27,6 +27,16 @@ final Map<String, Color> _emotionColors = {
   '中性': Colors.grey,
 };
 
+final Map<String, String> _emotionEmojis = {
+  '快乐': '😄', // 笑脸
+  '悲伤': '😢', // 哭脸
+  '愤怒': '😠', // 生气
+  '恐惧': '😨', // 惊恐
+  '惊讶': '😲', // 惊讶
+  '厌恶': '🤢', // 恶心
+  '中性': '😐', // 无表情
+};
+
 class _WeatherScreenState extends State<WeatherScreen>
     with TickerProviderStateMixin {
   late PageController _pageController;
@@ -207,12 +217,9 @@ class _WeatherScreenState extends State<WeatherScreen>
                             ),
                           ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: _buildScrollableChart(
-                            snapshot.data!,
-                            primaryColor,
-                          ),
+                        child: _buildScrollableChart(
+                          snapshot.data!,
+                          primaryColor,
                         ),
                       ),
                     ),
@@ -240,8 +247,8 @@ class _WeatherScreenState extends State<WeatherScreen>
           Row(
             children: [
               Container(
-                width: 40,
-                padding: const EdgeInsets.only(bottom: 28),
+                width: 70,
+                padding: const EdgeInsets.only(bottom: 10),
                 child: _buildCustomYAxis(primaryColor),
               ),
               Expanded(
@@ -391,7 +398,7 @@ class _WeatherScreenState extends State<WeatherScreen>
                 final index = value.toInt();
                 if (index >= 0 && index < records.length) {
                   final date = DateTime.fromMillisecondsSinceEpoch(
-                    records[index].timestamp,
+                    records[index].timestamp * 1000,
                   );
                   return Transform.translate(
                     offset: const Offset(0, 6),
@@ -415,8 +422,32 @@ class _WeatherScreenState extends State<WeatherScreen>
           rightTitles: const AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
-          topTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: _calculateLabelInterval(records.length),
+              getTitlesWidget: (value, meta) {
+                final index = value.toInt();
+                if (index >= 0 && index < records.length) {
+                  return Transform.translate(
+                    offset: const Offset(0, -6),
+                    child: Row(
+                      children: [
+                        Text(_emotionEmojis[records[index].emotion_type] ?? ''),
+                        Text(
+                          records[index].emotion_type,
+                          style: TextStyle(
+                            color: primaryColor.withOpacity(0.8),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return const Text('');
+              },
+            ),
           ),
         ),
         lineBarsData: _createChartLines(records, primaryColor),
@@ -528,20 +559,6 @@ class _WeatherScreenState extends State<WeatherScreen>
       ),
     ];
   }
-  // double _calculateInterval(List<EmotionRecord> records) {
-  //   if (records.isEmpty) return 1;
-
-  //   // 将时间戳转换为DateTime对象
-  //   final firstDate = DateTime.fromMillisecondsSinceEpoch(
-  //     records.first.timestamp,
-  //   );
-  //   final lastDate = DateTime.fromMillisecondsSinceEpoch(
-  //     records.last.timestamp,
-  //   );
-
-  //   final duration = lastDate.difference(firstDate);
-  //   return duration.inDays > 7 ? 86400000 * 3 : 86400000;
-  //}
 
   Widget _buildAIChatCard(Color primaryColor) {
     return ClipRRect(
