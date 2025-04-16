@@ -22,29 +22,27 @@ class _BallAnimationWidgetState extends State<BallAnimationWidget>
       vsync: this,
       duration: const Duration(seconds: 15),
     )..repeat();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
 
     // 初始化多个随机小球
-    final screenSize = MediaQuery.of(context).size;
-    _balls = List.generate(
-      20,
-      (index) => Ball(
-        position: Offset(
-          Random().nextDouble() * screenSize.width,
-          Random().nextDouble() * screenSize.height,
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final screenSize = MediaQuery.of(context).size;
+      _balls = List.generate(
+        20,
+        (index) => Ball(
+          position: Offset(
+            Random().nextDouble() * screenSize.width,
+            Random().nextDouble() * screenSize.height,
+          ),
+          velocity: Offset(
+            (Random().nextDouble() * 1 - 0.25), // 降低速度范围
+            (Random().nextDouble() * 1 - 0.25),
+          ),
+          radius: Random().nextDouble() * 200 + 240,
+          color: _generateSoftColor(),
         ),
-        velocity: Offset(
-          (Random().nextDouble() * 1 - 0.25), // 降低速度范围
-          (Random().nextDouble() * 1 - 0.25),
-        ),
-        radius: Random().nextDouble() * 200 + 200,
-        color: _generateSoftColor(),
-      ),
-    );
+      );
+      setState(() {}); // 确保小球初始化后重新渲染
+    });
   }
 
   @override
@@ -122,12 +120,12 @@ class Ball {
     position += velocity;
 
     // 碰撞检测并反弹（屏幕边界）
-    if (position.dx - radius < -200 ||
-        position.dx + radius > screenSize.width + 200) {
+    if (position.dx - radius < -500 ||
+        position.dx + radius > screenSize.width + 500) {
       velocity = Offset(-velocity.dx, velocity.dy);
     }
-    if (position.dy - radius < -200 ||
-        position.dy + radius > screenSize.height + 200) {
+    if (position.dy - radius < -500 ||
+        position.dy + radius > screenSize.height + 500) {
       velocity = Offset(velocity.dx, -velocity.dy);
     }
 
