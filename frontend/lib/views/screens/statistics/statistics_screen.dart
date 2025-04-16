@@ -235,40 +235,42 @@ class _WeatherScreenState extends State<WeatherScreen>
 
     return Scrollbar(
       controller: scrollController,
-      child: Row(
+      child: Stack(
         children: [
-          // 左侧固定Y轴
-          Container(
-            width: 40,
-            padding: const EdgeInsets.only(bottom: 28),
-            child: _buildCustomYAxis(primaryColor),
-          ),
-          // 中间可滚动图表
-          Expanded(
-            child: SingleChildScrollView(
-              controller: scrollController,
-              scrollDirection: Axis.horizontal,
-              child: Container(
-                width: chartWidth.toDouble(),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: primaryColor.withOpacity(0.2),
-                      width: 1.5,
+          Row(
+            children: [
+              Container(
+                width: 40,
+                padding: const EdgeInsets.only(bottom: 28),
+                child: _buildCustomYAxis(primaryColor),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  scrollDirection: Axis.horizontal,
+                  child: Container(
+                    width: chartWidth.toDouble(),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: primaryColor.withOpacity(0.2),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: _buildEmotionChart(records, primaryColor),
                     ),
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: _buildEmotionChart(records, primaryColor),
-                ),
               ),
-            ),
+            ],
           ),
-          // 右侧固定图例
-          Container(
-            width: 80, // 图例固定宽度
-            padding: const EdgeInsets.only(bottom: 28),
+          // 保留的悬浮图例
+          Positioned(
+            right: 12,
+            top: 12,
             child: _buildChartLegend(primaryColor),
           ),
         ],
@@ -277,8 +279,8 @@ class _WeatherScreenState extends State<WeatherScreen>
   }
 
   Widget _buildCustomYAxis(Color primaryColor) {
-    const minY = -1.0;
-    const maxY = 1.0;
+    const minY = -1.2;
+    const maxY = 1.2;
     const interval = 0.2;
     final numberOfLabels = ((maxY - minY) / interval).round() + 1;
 
@@ -296,15 +298,20 @@ class _WeatherScreenState extends State<WeatherScreen>
 
   Widget _buildChartLegend(Color primaryColor) {
     return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: primaryColor.withOpacity(0.2), width: 0.5),
+      ),
       padding: const EdgeInsets.all(8),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildLegendItem('愉悦度', primaryColor),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           _buildLegendItem('激活度', primaryColor.withOpacity(0.7)),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           _buildLegendItem('强度', primaryColor.withOpacity(0.4)),
         ],
       ),
@@ -352,7 +359,6 @@ class _WeatherScreenState extends State<WeatherScreen>
   Widget _buildEmotionChart(List<EmotionRecord> records, Color primaryColor) {
     return LineChart(
       LineChartData(
-        // 修改1: 完整高度的背景框
         rangeAnnotations: RangeAnnotations(
           verticalRangeAnnotations:
               records.asMap().entries.map((entry) {
@@ -365,8 +371,16 @@ class _WeatherScreenState extends State<WeatherScreen>
                 );
               }).toList(),
         ),
-
-        gridData: FlGridData(show: false),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          getDrawingHorizontalLine:
+              (value) => FlLine(
+                color: primaryColor.withOpacity(0.1),
+                strokeWidth: 0.8,
+                dashArray: [4],
+              ),
+        ),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(
@@ -379,11 +393,14 @@ class _WeatherScreenState extends State<WeatherScreen>
                   final date = DateTime.fromMillisecondsSinceEpoch(
                     records[index].timestamp,
                   );
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 6),
+                  return Transform.translate(
+                    offset: const Offset(0, 6),
                     child: Text(
                       '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}',
-                      style: TextStyle(color: primaryColor, fontSize: 10),
+                      style: TextStyle(
+                        color: primaryColor.withOpacity(0.8),
+                        fontSize: 10,
+                      ),
                     ),
                   );
                 }
@@ -409,11 +426,11 @@ class _WeatherScreenState extends State<WeatherScreen>
                 (items) =>
                     items.map((item) {
                       return LineTooltipItem(
-                        '${_getMetricName(item.barIndex)}: ${item.y.toStringAsFixed(3)}',
+                        '${_getMetricName(item.barIndex)}: ${item.y.toStringAsFixed(3)}\n${records[item.x.toInt()].emotion_type}',
                         const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                          height: 1.4,
                         ),
                       );
                     }).toList(),
@@ -421,11 +438,12 @@ class _WeatherScreenState extends State<WeatherScreen>
             fitInsideVertically: true,
           ),
           touchSpotThreshold: 20,
+          handleBuiltInTouches: true,
         ),
         minX: 0,
         maxX: (records.length - 1).toDouble(),
-        minY: -1.0,
-        maxY: 1.0,
+        minY: -1.2,
+        maxY: 1.2,
       ),
     );
   }
