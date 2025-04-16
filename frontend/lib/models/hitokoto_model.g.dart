@@ -7,18 +7,16 @@ part of 'hitokoto_model.dart';
 // **************************************************************************
 
 _OneSentence _$OneSentenceFromJson(Map<String, dynamic> json) => _OneSentence(
-  id: (json['id'] as num).toInt(),
-  tag: json['tag'] as String,
-  name: json['name'] as String,
+  category: json['category'] as String,
+  author: json['author'] as String,
   origin: json['origin'] as String,
   content: json['content'] as String,
 );
 
 Map<String, dynamic> _$OneSentenceToJson(_OneSentence instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'tag': instance.tag,
-      'name': instance.name,
+      'category': instance.category,
+      'author': instance.author,
       'origin': instance.origin,
       'content': instance.content,
     };
