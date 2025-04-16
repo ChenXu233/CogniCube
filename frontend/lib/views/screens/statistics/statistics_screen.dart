@@ -70,6 +70,7 @@ class _WeatherScreenState extends State<WeatherScreen>
                     children: [
                       // 调整后的天气区域
                       _buildWeatherHeader(primaryColor),
+                      SizedBox(height: 100),
                       // 卡片区域
                       Padding(
                         padding: const EdgeInsets.symmetric(

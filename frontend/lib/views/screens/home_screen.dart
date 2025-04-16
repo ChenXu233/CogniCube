@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../components/navigation_bar.dart';
-import '../../utils/gradient_helper.dart';
 import '../../view_models/home_view_model.dart';
 import '../../views/screens/CBT/CBT_screen.dart';
 import './statistics/statistics_screen.dart';
 import '../../views/screens/user/profile_screen.dart';
+import '../components/ball_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:ui' as ui;
@@ -19,64 +19,32 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late PageController _pageController;
   int _currentIndex = 1;
-  late AnimationController _gradientController;
   late final HomeViewModel vm;
 
   // 初始按钮位置（右下角）
-  double _buttonX = 300;
-  double _buttonY = 600;
+  double _buttonX = 20;
+  double _buttonY = 20;
 
   @override
   void initState() {
     super.initState();
 
     _pageController = PageController(initialPage: _currentIndex);
-    _gradientController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 15),
-    )..repeat(reverse: true);
-
     vm = context.read<HomeViewModel>();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final extra =
-          GoRouter.of(context).routerDelegate.currentConfiguration.extra;
-      if (extra != null &&
-          extra is Map &&
-          extra.containsKey('pageIndex') &&
-          extra['pageIndex'] != null &&
-          extra['pageIndex'] is int) {
-        final index = extra['pageIndex'] as int;
-        setState(() {
-          _currentIndex = index;
-          _pageController.jumpToPage(index);
-        });
-      }
-    });
   }
 
   @override
   void dispose() {
     _pageController.dispose();
-    _gradientController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       body: Stack(
         children: [
-          AnimatedBuilder(
-            animation: _gradientController,
-            builder: (context, _) {
-              return Container(
-                decoration: BoxDecoration(gradient: createPrimaryGradient()),
-              );
-            },
-          ),
+          const BallAnimationWidget(), // 使用抽象的小球组件
           Positioned.fill(
             child: BackdropFilter(
               filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -110,14 +78,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: GestureDetector(
                 onPanUpdate: (details) {
                   setState(() {
+                    // 确保按钮不会超出屏幕边界
                     _buttonX = (_buttonX + details.delta.dx).clamp(
-                      0,
-                      screenSize.width - 110,
-                    ); // 限制按钮宽度
+                      0.0,
+                      MediaQuery.of(context).size.width - 110, // 按钮宽度限制
+                    );
                     _buttonY = (_buttonY + details.delta.dy).clamp(
-                      0,
-                      screenSize.height - 100,
-                    ); // 限制按钮高度
+                      0.0,
+                      MediaQuery.of(context).size.height - 100, // 按钮高度限制
+                    );
+                  });
+                },
+                onPanEnd: (_) {
+                  setState(() {
+                    // 确保按钮在拖动结束后仍在屏幕内
+                    _buttonX = _buttonX.clamp(
+                      0.0,
+                      MediaQuery.of(context).size.width - 110,
+                    );
+                    _buttonY = _buttonY.clamp(
+                      0.0,
+                      MediaQuery.of(context).size.height - 100,
+                    );
                   });
                 },
                 child: ElevatedButton.icon(

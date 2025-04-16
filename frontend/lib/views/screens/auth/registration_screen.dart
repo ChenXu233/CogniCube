@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_view_model.dart';
-import '../../../utils/gradient_helper.dart';
+import '../../components/ball_animation_widget.dart';
 import 'dart:ui' as ui;
 
 class RegistrationScreen extends StatefulWidget {
@@ -12,7 +12,8 @@ class RegistrationScreen extends StatefulWidget {
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
-class _RegistrationScreenState extends State<RegistrationScreen> with TickerProviderStateMixin {
+class _RegistrationScreenState extends State<RegistrationScreen>
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -48,16 +49,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> with TickerProv
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          AnimatedBuilder(
-            animation: _gradientController,
-            builder: (context, _) {
-              return Container(
-                decoration: BoxDecoration(
-                  gradient: createPrimaryGradient(),
-                ),
-              );
-            },
-          ),
+          const BallAnimationWidget(),
           Positioned.fill(
             child: BackdropFilter(
               filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -68,17 +60,32 @@ class _RegistrationScreenState extends State<RegistrationScreen> with TickerProv
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.only(top: 100, left: 20, right: 20, bottom: 40),
+                  padding: const EdgeInsets.only(
+                    top: 100,
+                    left: 20,
+                    right: 20,
+                    bottom: 40,
+                  ),
                   child: Form(
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text('创建账号',
-                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                color: const Color.fromARGB(255, 255, 140, 140),
-                                fontWeight: FontWeight.w800,
-                                shadows: [Shadow(color: Colors.black.withOpacity(0.2), blurRadius: 6)])),
+                        Text(
+                          '创建账号',
+                          style: Theme.of(
+                            context,
+                          ).textTheme.headlineMedium?.copyWith(
+                            color: const Color.fromARGB(255, 255, 140, 140),
+                            fontWeight: FontWeight.w800,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                        ),
                         const SizedBox(height: 50),
                         _buildUsernameField(),
                         const SizedBox(height: 20),
@@ -106,18 +113,31 @@ class _RegistrationScreenState extends State<RegistrationScreen> with TickerProv
   Widget _buildUsernameField() {
     return TextFormField(
       controller: _usernameController,
-      style: const TextStyle(color: Color.fromARGB(255, 21, 21, 21), fontSize: 16),
+      style: const TextStyle(
+        color: Color.fromARGB(255, 21, 21, 21),
+        fontSize: 16,
+      ),
       decoration: InputDecoration(
         labelText: '用户名',
-        labelStyle: const TextStyle(color: Color.fromARGB(179, 43, 43, 43), fontSize: 15),
-        prefixIcon: const Icon(Icons.person_outline, color: Color.fromARGB(179, 43, 43, 43), size: 22),
+        labelStyle: const TextStyle(
+          color: Color.fromARGB(179, 43, 43, 43),
+          fontSize: 15,
+        ),
+        prefixIcon: const Icon(
+          Icons.person_outline,
+          color: Color.fromARGB(179, 43, 43, 43),
+          size: 22,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide.none,
         ),
         filled: true,
         fillColor: Colors.white.withOpacity(0.35),
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 22,
+        ),
       ),
       textInputAction: TextInputAction.next,
       validator: (value) {
@@ -131,18 +151,31 @@ class _RegistrationScreenState extends State<RegistrationScreen> with TickerProv
   Widget _buildEmailField() {
     return TextFormField(
       controller: _emailController,
-      style: const TextStyle(color: Color.fromARGB(255, 21, 21, 21), fontSize: 16),
+      style: const TextStyle(
+        color: Color.fromARGB(255, 21, 21, 21),
+        fontSize: 16,
+      ),
       decoration: InputDecoration(
         labelText: '邮箱',
-        labelStyle: const TextStyle(color: Color.fromARGB(179, 43, 43, 43), fontSize: 15),
-        prefixIcon: const Icon(Icons.email_outlined, color: Color.fromARGB(179, 43, 43, 43), size: 22),
+        labelStyle: const TextStyle(
+          color: Color.fromARGB(179, 43, 43, 43),
+          fontSize: 15,
+        ),
+        prefixIcon: const Icon(
+          Icons.email_outlined,
+          color: Color.fromARGB(179, 43, 43, 43),
+          size: 22,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide.none,
         ),
         filled: true,
         fillColor: Colors.white.withOpacity(0.35),
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 22,
+        ),
       ),
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
@@ -159,12 +192,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> with TickerProv
   Widget _buildPasswordField() {
     return TextFormField(
       controller: _passwordController,
-      style: const TextStyle(color: Color.fromARGB(255, 21, 21, 21), fontSize: 16),
+      style: const TextStyle(
+        color: Color.fromARGB(255, 21, 21, 21),
+        fontSize: 16,
+      ),
       obscureText: _obscurePassword,
       decoration: InputDecoration(
         labelText: '密码',
-        labelStyle: const TextStyle(color: Color.fromARGB(179, 43, 43, 43), fontSize: 15),
-        prefixIcon: const Icon(Icons.lock_outlined, color: Color.fromARGB(179, 43, 43, 43), size: 22),
+        labelStyle: const TextStyle(
+          color: Color.fromARGB(179, 43, 43, 43),
+          fontSize: 15,
+        ),
+        prefixIcon: const Icon(
+          Icons.lock_outlined,
+          color: Color.fromARGB(179, 43, 43, 43),
+          size: 22,
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -179,7 +222,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> with TickerProv
         ),
         filled: true,
         fillColor: Colors.white.withOpacity(0.35),
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 22,
+        ),
       ),
       textInputAction: TextInputAction.next,
       validator: (value) {
@@ -196,19 +242,32 @@ class _RegistrationScreenState extends State<RegistrationScreen> with TickerProv
   Widget _buildConfirmPasswordField(BuildContext context) {
     return TextFormField(
       controller: _confirmPasswordController,
-      style: const TextStyle(color: Color.fromARGB(255, 21, 21, 21), fontSize: 16),
+      style: const TextStyle(
+        color: Color.fromARGB(255, 21, 21, 21),
+        fontSize: 16,
+      ),
       obscureText: _obscureConfirmPassword,
       decoration: InputDecoration(
         labelText: '确认密码',
-        labelStyle: const TextStyle(color: Color.fromARGB(179, 43, 43, 43), fontSize: 15),
-        prefixIcon: const Icon(Icons.lock_reset, color: Color.fromARGB(179, 43, 43, 43), size: 22),
+        labelStyle: const TextStyle(
+          color: Color.fromARGB(179, 43, 43, 43),
+          fontSize: 15,
+        ),
+        prefixIcon: const Icon(
+          Icons.lock_reset,
+          color: Color.fromARGB(179, 43, 43, 43),
+          size: 22,
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
             color: const Color.fromARGB(179, 94, 47, 47),
             size: 22,
           ),
-          onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+          onPressed:
+              () => setState(
+                () => _obscureConfirmPassword = !_obscureConfirmPassword,
+              ),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
@@ -216,7 +275,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> with TickerProv
         ),
         filled: true,
         fillColor: Colors.white.withOpacity(0.35),
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 22),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 22,
+        ),
       ),
       textInputAction: TextInputAction.done,
       onFieldSubmitted: (_) => _submitForm(context),
@@ -236,26 +298,34 @@ class _RegistrationScreenState extends State<RegistrationScreen> with TickerProv
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
-            backgroundColor: const Color.fromARGB(255, 153, 186, 186).withOpacity(0.3),
+            backgroundColor: const Color.fromARGB(
+              255,
+              255,
+              102,
+              102,
+            ).withOpacity(0.8),
             elevation: 4,
             shadowColor: Colors.black.withOpacity(0.3),
           ),
           onPressed: authVM.isLoading ? null : () => _submitForm(context),
-          child: authVM.isLoading
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    color: Color.fromARGB(255, 153, 186, 186),
+          child:
+              authVM.isLoading
+                  ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      color: Color.fromARGB(255, 186, 155, 153),
+                    ),
+                  )
+                  : const Text(
+                    '注册账号',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 53, 53, 53),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                )
-              : const Text('注册账号',
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 53, 53, 53),
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600
-                  )),
         );
       },
     );

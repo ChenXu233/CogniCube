@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.cognicube"
+    namespace = "com.cognicube.cognicube"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -41,7 +41,6 @@ android {
     productFlavors {
         create("with_impeller") {
             dimension = "impeller_mode"
-            // 注入 Manifest 占位符变量
             manifestPlaceholders["enableImpeller"] = "true"
         }
         create("without_impeller") {
@@ -51,7 +50,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.cognicube"
+        applicationId = "com.cognicube.cognicube"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

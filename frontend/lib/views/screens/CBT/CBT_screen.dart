@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/cbt_view_model.dart';
-import '../../../utils/gradient_helper.dart';
+import '../../components/ball_animation_widget.dart';
 import 'dart:ui' as ui;
 
 class CBTScreen extends StatelessWidget {
@@ -24,10 +24,7 @@ class _CBTScaffold extends StatelessWidget {
 
     return Stack(
       children: [
-        // 💜 底层渐变背景
-        Container(decoration: BoxDecoration(gradient: createPrimaryGradient())),
-
-        // 💜 模糊 + 半透明白滤镜（加了柔化背景效果）
+        const BallAnimationWidget(),
         Positioned.fill(
           child: BackdropFilter(
             filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),

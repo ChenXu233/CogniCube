@@ -1,4 +1,4 @@
-package com.example.cognicube
+package com.cognicube.cognicube
 
 import io.flutter.embedding.android.FlutterActivity
 
