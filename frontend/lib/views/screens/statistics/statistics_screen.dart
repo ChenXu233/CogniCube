@@ -10,6 +10,13 @@ import 'package:collection/collection.dart';
 import '../../../models/emotion_record_model.dart';
 import '../../../services/emotion.dart';
 
+class WeatherScreen extends StatefulWidget {
+  const WeatherScreen({super.key});
+
+  @override
+  State<WeatherScreen> createState() => _WeatherScreenState();
+}
+
 final Map<String, Color> _emotionColors = {
   '快乐': Colors.green,
   '悲伤': Colors.blue,
@@ -19,13 +26,6 @@ final Map<String, Color> _emotionColors = {
   '厌恶': Colors.brown,
   '中性': Colors.grey,
 };
-
-class WeatherScreen extends StatefulWidget {
-  const WeatherScreen({super.key});
-
-  @override
-  State<WeatherScreen> createState() => _WeatherScreenState();
-}
 
 class _WeatherScreenState extends State<WeatherScreen>
     with TickerProviderStateMixin {
@@ -235,22 +235,19 @@ class _WeatherScreenState extends State<WeatherScreen>
 
     return Scrollbar(
       controller: scrollController,
-      thumbVisibility: true,
-      thickness: 8,
-      radius: const Radius.circular(4),
       child: Row(
         children: [
-          // 自定义固定Y轴
+          // 左侧固定Y轴
           Container(
             width: 40,
             padding: const EdgeInsets.only(bottom: 28),
             child: _buildCustomYAxis(primaryColor),
           ),
+          // 中间可滚动图表
           Expanded(
             child: SingleChildScrollView(
               controller: scrollController,
               scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
               child: Container(
                 width: chartWidth.toDouble(),
                 decoration: BoxDecoration(
@@ -263,19 +260,16 @@ class _WeatherScreenState extends State<WeatherScreen>
                 ),
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: Stack(
-                    children: [
-                      _buildEmotionChart(records, primaryColor),
-                      Positioned(
-                        right: 16,
-                        top: 8,
-                        child: _buildChartLegend(primaryColor),
-                      ),
-                    ],
-                  ),
+                  child: _buildEmotionChart(records, primaryColor),
                 ),
               ),
             ),
+          ),
+          // 右侧固定图例
+          Container(
+            width: 80, // 图例固定宽度
+            padding: const EdgeInsets.only(bottom: 28),
+            child: _buildChartLegend(primaryColor),
           ),
         ],
       ),
@@ -303,15 +297,14 @@ class _WeatherScreenState extends State<WeatherScreen>
   Widget _buildChartLegend(Color primaryColor) {
     return Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(8),
-      ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildLegendItem('愉悦度', primaryColor),
+          const SizedBox(height: 12),
           _buildLegendItem('激活度', primaryColor.withOpacity(0.7)),
+          const SizedBox(height: 12),
           _buildLegendItem('强度', primaryColor.withOpacity(0.4)),
         ],
       ),
@@ -356,21 +349,26 @@ class _WeatherScreenState extends State<WeatherScreen>
     );
   }
 
-  // 构建图表组件
   Widget _buildEmotionChart(List<EmotionRecord> records, Color primaryColor) {
     return LineChart(
       LineChartData(
-        // 修改4: 添加背景框范围注释
+        // 修改1: 完整高度的背景框
         rangeAnnotations: RangeAnnotations(
-          verticalRangeAnnotations: _createBackgroundBoxes(records),
+          verticalRangeAnnotations:
+              records.asMap().entries.map((entry) {
+                final index = entry.key;
+                final emotionType = entry.value.emotion_type;
+                return VerticalRangeAnnotation(
+                  x1: index - 0.5,
+                  x2: index + 0.5,
+                  color: _emotionColors[emotionType]!.withOpacity(0.15),
+                );
+              }).toList(),
         ),
-        lineBarsData: _createChartLines(records, primaryColor),
+
         gridData: FlGridData(show: false),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
-          leftTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
@@ -394,6 +392,9 @@ class _WeatherScreenState extends State<WeatherScreen>
               reservedSize: 28,
             ),
           ),
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           rightTitles: const AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
@@ -401,6 +402,7 @@ class _WeatherScreenState extends State<WeatherScreen>
             sideTitles: SideTitles(showTitles: false),
           ),
         ),
+        lineBarsData: _createChartLines(records, primaryColor),
         lineTouchData: LineTouchData(
           touchTooltipData: LineTouchTooltipData(
             getTooltipItems:
@@ -446,20 +448,6 @@ class _WeatherScreenState extends State<WeatherScreen>
     if (dataCount <= 10) return 1;
     if (dataCount <= 20) return 2;
     return dataCount / 10;
-  }
-
-  List<VerticalRangeAnnotation> _createBackgroundBoxes(
-    List<EmotionRecord> records,
-  ) {
-    return records.asMap().entries.map((entry) {
-      final index = entry.key;
-      final emotionType = entry.value.emotion_type;
-      return VerticalRangeAnnotation(
-        x1: index - 0.5,
-        x2: index + 0.5,
-        color: _emotionColors[emotionType]!.withOpacity(0.15),
-      );
-    }).toList();
   }
 
   // 修改图表数据映射部分
@@ -535,7 +523,7 @@ class _WeatherScreenState extends State<WeatherScreen>
 
   //   final duration = lastDate.difference(firstDate);
   //   return duration.inDays > 7 ? 86400000 * 3 : 86400000;
-  // }
+  //}
 
   Widget _buildAIChatCard(Color primaryColor) {
     return ClipRRect(
