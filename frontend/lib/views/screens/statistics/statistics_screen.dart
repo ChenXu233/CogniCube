@@ -10,6 +10,16 @@ import 'package:collection/collection.dart';
 import '../../../models/emotion_record_model.dart';
 import '../../../services/emotion.dart';
 
+final Map<String, Color> _emotionColors = {
+  '快乐': Colors.green,
+  '悲伤': Colors.blue,
+  '愤怒': Colors.red,
+  '恐惧': Colors.purple,
+  '惊讶': Colors.orange,
+  '厌恶': Colors.brown,
+  '中性': Colors.grey,
+};
+
 class WeatherScreen extends StatefulWidget {
   const WeatherScreen({super.key});
 
@@ -19,13 +29,32 @@ class WeatherScreen extends StatefulWidget {
 
 class _WeatherScreenState extends State<WeatherScreen>
     with TickerProviderStateMixin {
+  late PageController _pageController;
   int _currentWeatherIndex = 1; //根据天气数据的索引来显示不同的天气
+  late AnimationController _gradientController;
   final List<String> _weatherData = ['晴天', '多云', '雨天'];
   final List<IconData> _weatherIcons = [
     Icons.wb_sunny,
     Icons.cloud,
     Icons.beach_access,
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 1);
+    _gradientController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 15),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _gradientController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,10 +123,10 @@ class _WeatherScreenState extends State<WeatherScreen>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withAlpha((0.3 * 255).toInt()),
+              color: Colors.white.withOpacity(0.3),
               shape: BoxShape.circle,
               border: Border.all(
-                color: primaryColor.withAlpha((0.2 * 255).toInt()),
+                color: primaryColor.withOpacity(0.2),
                 width: 2,
               ),
             ),
@@ -116,7 +145,7 @@ class _WeatherScreenState extends State<WeatherScreen>
               color: primaryColor,
               shadows: [
                 Shadow(
-                  color: Colors.black.withAlpha((0.15 * 255).toInt()),
+                  color: Colors.black.withOpacity(0.15),
                   blurRadius: 8,
                   offset: const Offset(2, 2),
                 ),
@@ -134,7 +163,7 @@ class _WeatherScreenState extends State<WeatherScreen>
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Material(
-          color: Colors.white.withAlpha((0.15 * 255).toInt()),
+          color: Colors.white.withOpacity(0.35),
           child: Container(
             constraints: const BoxConstraints(minHeight: 360, maxHeight: 400),
             child: FutureBuilder<List<EmotionRecord>>(
@@ -173,9 +202,7 @@ class _WeatherScreenState extends State<WeatherScreen>
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
-                              color: primaryColor.withAlpha(
-                                (0.2 * 255).toInt(),
-                              ),
+                              color: primaryColor.withOpacity(0.2),
                               width: 1.5,
                             ),
                           ),
@@ -333,6 +360,10 @@ class _WeatherScreenState extends State<WeatherScreen>
   Widget _buildEmotionChart(List<EmotionRecord> records, Color primaryColor) {
     return LineChart(
       LineChartData(
+        // 修改4: 添加背景框范围注释
+        rangeAnnotations: RangeAnnotations(
+          verticalRangeAnnotations: _createBackgroundBoxes(records),
+        ),
         lineBarsData: _createChartLines(records, primaryColor),
         gridData: FlGridData(show: false),
         borderData: FlBorderData(show: false),
@@ -377,7 +408,7 @@ class _WeatherScreenState extends State<WeatherScreen>
                     items.map((item) {
                       return LineTooltipItem(
                         '${_getMetricName(item.barIndex)}: ${item.y.toStringAsFixed(3)}',
-                        TextStyle(
+                        const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -417,6 +448,20 @@ class _WeatherScreenState extends State<WeatherScreen>
     return dataCount / 10;
   }
 
+  List<VerticalRangeAnnotation> _createBackgroundBoxes(
+    List<EmotionRecord> records,
+  ) {
+    return records.asMap().entries.map((entry) {
+      final index = entry.key;
+      final emotionType = entry.value.emotion_type;
+      return VerticalRangeAnnotation(
+        x1: index - 0.5,
+        x2: index + 0.5,
+        color: _emotionColors[emotionType]!.withOpacity(0.15),
+      );
+    }).toList();
+  }
+
   // 修改图表数据映射部分
   List<LineChartBarData> _createChartLines(
     List<EmotionRecord> records,
@@ -431,19 +476,17 @@ class _WeatherScreenState extends State<WeatherScreen>
                 .asMap()
                 .entries
                 .map(
-                  (entry) => FlSpot(
-                    entry.key.toDouble(), // 修改14：使用索引作为X坐标
-                    entry.value.valence_score,
-                  ),
+                  (entry) =>
+                      FlSpot(entry.key.toDouble(), entry.value.valence_score),
                 )
                 .toList(),
         color: primaryColor,
-        barWidth: 4, // 修改15：加粗线条宽度
+        barWidth: 4,
         isCurved: true,
         dotData: FlDotData(show: false),
         shadow: Shadow(
           color: primaryColor.withOpacity(0.3),
-          blurRadius: 12, // 修改16：增强阴影效果
+          blurRadius: 12,
           offset: const Offset(4, 4),
         ),
       ),
