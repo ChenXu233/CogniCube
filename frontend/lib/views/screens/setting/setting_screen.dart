@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
-import '../../../utils/gradient_helper.dart';
+import '../../../views/components/ball_animation_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -75,14 +75,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     return Scaffold(
       body: Stack(
         children: [
-          AnimatedBuilder(
-            animation: _gradientController,
-            builder: (context, _) {
-              return Container(
-                decoration: BoxDecoration(gradient: createPrimaryGradient()),
-              );
-            },
-          ),
+          const BallAnimationWidget(),
           Positioned.fill(
             child: BackdropFilter(
               filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),

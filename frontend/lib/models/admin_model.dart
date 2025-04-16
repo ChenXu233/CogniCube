@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'admin_model.freezed.dart';
 part 'admin_model.g.dart';
 
+/// 用户信息
 @freezed
 abstract class UserInfo with _$UserInfo {
   const factory UserInfo({
@@ -10,7 +11,6 @@ abstract class UserInfo with _$UserInfo {
     required String username,
     required String email,
     required bool is_admin,
-    required int recent_emotion_level,
     required bool is_verified,
   }) = _UserInfo;
 
@@ -18,6 +18,21 @@ abstract class UserInfo with _$UserInfo {
       _$UserInfoFromJson(json);
 }
 
+/// 创建用户时使用的模型（包含 password）
+@freezed
+abstract class UserCreate with _$UserCreate {
+  const factory UserCreate({
+    required String username,
+    required String email,
+    required String password,
+    required bool is_admin,
+  }) = _UserCreate;
+
+  factory UserCreate.fromJson(Map<String, dynamic> json) =>
+      _$UserCreateFromJson(json);
+}
+
+/// 分页用户数据
 @freezed
 abstract class PaginatedUsers with _$PaginatedUsers {
   const factory PaginatedUsers({
@@ -29,17 +44,4 @@ abstract class PaginatedUsers with _$PaginatedUsers {
 
   factory PaginatedUsers.fromJson(Map<String, dynamic> json) =>
       _$PaginatedUsersFromJson(json);
-}
-
-extension UserInfoToJson on UserInfo {
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "username": username,
-      "email": email,
-      "is_admin": is_admin,
-      "recent_emotion_level": recent_emotion_level,
-      "is_verified": is_verified,
-    };
-  }
 }

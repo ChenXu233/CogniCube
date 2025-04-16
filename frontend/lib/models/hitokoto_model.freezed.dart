@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$OneSentence {
 
- int get id; String get tag; String get name; String get origin; String get content;
+ String get category; String get author; String get origin; String get content;
 /// Create a copy of OneSentence
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $OneSentenceCopyWith<OneSentence> get copyWith => _$OneSentenceCopyWithImpl<OneS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OneSentence&&(identical(other.id, id) || other.id == id)&&(identical(other.tag, tag) || other.tag == tag)&&(identical(other.name, name) || other.name == name)&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.content, content) || other.content == content));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OneSentence&&(identical(other.category, category) || other.category == category)&&(identical(other.author, author) || other.author == author)&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.content, content) || other.content == content));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,tag,name,origin,content);
+int get hashCode => Object.hash(runtimeType,category,author,origin,content);
 
 @override
 String toString() {
-  return 'OneSentence(id: $id, tag: $tag, name: $name, origin: $origin, content: $content)';
+  return 'OneSentence(category: $category, author: $author, origin: $origin, content: $content)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $OneSentenceCopyWith<$Res>  {
   factory $OneSentenceCopyWith(OneSentence value, $Res Function(OneSentence) _then) = _$OneSentenceCopyWithImpl;
 @useResult
 $Res call({
- int id, String tag, String name, String origin, String content
+ String category, String author, String origin, String content
 });
 
 
@@ -66,11 +66,10 @@ class _$OneSentenceCopyWithImpl<$Res>
 
 /// Create a copy of OneSentence
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? tag = null,Object? name = null,Object? origin = null,Object? content = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? category = null,Object? author = null,Object? origin = null,Object? content = null,}) {
   return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,tag: null == tag ? _self.tag : tag // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
+as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as String,origin: null == origin ? _self.origin : origin // ignore: cast_nullable_to_non_nullable
 as String,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as String,
@@ -84,12 +83,11 @@ as String,
 @JsonSerializable()
 
 class _OneSentence implements OneSentence {
-  const _OneSentence({required this.id, required this.tag, required this.name, required this.origin, required this.content});
+  const _OneSentence({required this.category, required this.author, required this.origin, required this.content});
   factory _OneSentence.fromJson(Map<String, dynamic> json) => _$OneSentenceFromJson(json);
 
-@override final  int id;
-@override final  String tag;
-@override final  String name;
+@override final  String category;
+@override final  String author;
 @override final  String origin;
 @override final  String content;
 
@@ -106,16 +104,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OneSentence&&(identical(other.id, id) || other.id == id)&&(identical(other.tag, tag) || other.tag == tag)&&(identical(other.name, name) || other.name == name)&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.content, content) || other.content == content));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OneSentence&&(identical(other.category, category) || other.category == category)&&(identical(other.author, author) || other.author == author)&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.content, content) || other.content == content));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,tag,name,origin,content);
+int get hashCode => Object.hash(runtimeType,category,author,origin,content);
 
 @override
 String toString() {
-  return 'OneSentence(id: $id, tag: $tag, name: $name, origin: $origin, content: $content)';
+  return 'OneSentence(category: $category, author: $author, origin: $origin, content: $content)';
 }
 
 
@@ -126,7 +124,7 @@ abstract mixin class _$OneSentenceCopyWith<$Res> implements $OneSentenceCopyWith
   factory _$OneSentenceCopyWith(_OneSentence value, $Res Function(_OneSentence) _then) = __$OneSentenceCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String tag, String name, String origin, String content
+ String category, String author, String origin, String content
 });
 
 
@@ -143,11 +141,10 @@ class __$OneSentenceCopyWithImpl<$Res>
 
 /// Create a copy of OneSentence
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? tag = null,Object? name = null,Object? origin = null,Object? content = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? category = null,Object? author = null,Object? origin = null,Object? content = null,}) {
   return _then(_OneSentence(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,tag: null == tag ? _self.tag : tag // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
+as String,author: null == author ? _self.author : author // ignore: cast_nullable_to_non_nullable
 as String,origin: null == origin ? _self.origin : origin // ignore: cast_nullable_to_non_nullable
 as String,content: null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
 as String,

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../utils/dio_util.dart';
 import '../models/admin_model.dart';
@@ -6,6 +5,7 @@ import '../models/admin_model.dart';
 class AdminService {
   static final Dio _dio = DioUtil().dio;
 
+  /// 获取用户分页列表
   static Future<PaginatedUsers> getUsers(int page, int size) async {
     try {
       Response response = await _dio.get(
@@ -22,9 +22,10 @@ class AdminService {
     }
   }
 
-  static Future<String> creatUser(UserInfo user) async {
+  /// 创建新用户
+  static Future<String> createUser(UserCreate user) async {
     try {
-      Response response = await _dio.post('/admin/users', data: user.toJson());
+      final response = await _dio.post('/admin/users', data: user.toJson());
       return "创建成功";
     } catch (e) {
       if (e is DioException) {
@@ -35,99 +36,35 @@ class AdminService {
     }
   }
 
-  static Exception _handleDioError(DioException e) {
-    return Exception('网络请求失败: ${e.response?.statusCode}');
-  }
-}
-
-class AdminPage extends StatefulWidget {
-  const AdminPage({super.key});
-
-  @override
-  State<AdminPage> createState() => _AdminPageState();
-}
-
-class _AdminPageState extends State<AdminPage> {
-  late Future<PaginatedUsers> _userFuture;
-  final int _page = 1;
-  final int _perPage = 10;
-
-  @override
-  void initState() {
-    super.initState();
-    _userFuture = AdminService.getUsers(_page, _perPage);
-  }
-
-  void _createUser() async {
-    // 示例用户数据，可改成弹窗表单
-    final newUser = UserInfo(
-      id: 0,
-      username: '新用户',
-      email: 'newuser@example.com',
-      is_admin: true,
-      recent_emotion_level: 0,
-      is_verified: true,
-    );
-
+  /// 删除指定用户
+  static Future<void> deleteUser(int userId) async {
     try {
-      final msg = await AdminService.creatUser(newUser);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-
-      // 刷新列表
-      setState(() {
-        _userFuture = AdminService.getUsers(_page, _perPage);
-      });
+      await _dio.delete('/admin/users/$userId');
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (e is DioException) {
+        throw _handleDioError(e);
+      } else {
+        rethrow;
+      }
     }
   }
 
-  Widget _buildUserList(List<UserInfo> users) {
-    return ListView.builder(
-      itemCount: users.length,
-      itemBuilder: (context, index) {
-        final user = users[index];
-        return ListTile(
-          title: Text(user.username),
-          subtitle: Text('${user.email} • ${user.is_admin}'),
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('用户管理'),
-        actions: [
-          IconButton(icon: const Icon(Icons.add), onPressed: _createUser),
-        ],
-      ),
-      body: FutureBuilder<PaginatedUsers>(
-        future: _userFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('出错了：${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            final users = snapshot.data!.items;
-            return _buildUserList(users);
-          } else {
-            return const Center(child: Text('没有用户数据'));
-          }
-        },
-      ),
-    );
+  /// 统一处理 Dio 错误
+  static Exception _handleDioError(DioException e) {
+    final statusCode = e.response?.statusCode ?? '未知错误';
+    final message = e.response?.data['detail'] ?? '请求失败';
+    return Exception('网络请求失败 [$statusCode]: $message');
   }
 }
 
-// 扩展函数：UserInfo.toJson()
+// 🔁 用户信息转 JSON，字段与后端保持一致
 extension UserInfoToJson on UserInfo {
   Map<String, dynamic> toJson() {
-    return {"name": username, "email": email, "is_admin": is_admin};
+    return {
+      "username": username,
+      "email": email,
+      "password": "123456", // 示例密码，后续可以改为输入字段
+      "is_admin": is_admin,
+    };
   }
 }

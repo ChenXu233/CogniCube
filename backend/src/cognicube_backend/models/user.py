@@ -25,6 +25,7 @@ class User(Base):
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
 
+
     @property
     def password(self):
         """密码属性不可读"""

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_view_model.dart';
-import '../../../utils/gradient_helper.dart';
-import 'dart:ui' as ui;
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -57,31 +55,9 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     return Scaffold(
       extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          //an
-          AnimatedBuilder(
-            animation: _gradientController,
-            builder: (context, _) {
-              return Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: createPrimaryGradient(),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
-            ),
-          ),
-
           // 内容层
           Positioned(
             top: 100,
@@ -94,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white.withOpacity(0.4),
+                        color: Colors.white.withAlpha((0.4 * 255).toInt()),
                         spreadRadius: 8,
                         blurRadius: 15,
                       ),
@@ -123,14 +99,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      // ✅ 修改后的按钮点击逻辑
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(
                           255,
                           236,
                           171,
                           171,
-                        ).withOpacity(0.8),
+                        ).withAlpha((0.8 * 255).toInt()),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -141,6 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           final confirm = await _showLogoutConfirmationDialog();
                           if (confirm == true) {
                             authViewModel.logout();
+                            // ignore: use_build_context_synchronously
                             context.go('/login');
                           }
                         } else {
@@ -170,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           236,
                           171,
                           171,
-                        ).withOpacity(0.8),
+                        ).withAlpha((0.8 * 255).toInt()),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

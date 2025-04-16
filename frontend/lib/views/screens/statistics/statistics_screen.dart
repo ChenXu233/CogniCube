@@ -17,38 +17,39 @@ class WeatherScreen extends StatefulWidget {
   State<WeatherScreen> createState() => _WeatherScreenState();
 }
 
+final Map<String, Color> _emotionColors = {
+  '快乐': Colors.green,
+  '悲伤': Colors.blue,
+  '愤怒': Colors.red,
+  '恐惧': Colors.purple,
+  '惊讶': Colors.orange,
+  '厌恶': Colors.brown,
+  '中性': Colors.grey,
+};
+
+final Map<String, String> _emotionEmojis = {
+  '快乐': '😄', // 笑脸
+  '悲伤': '😢', // 哭脸
+  '愤怒': '😠', // 生气
+  '恐惧': '😨', // 惊恐
+  '惊讶': '😲', // 惊讶
+  '厌恶': '🤢', // 恶心
+  '中性': '😐', // 无表情
+};
+
 class _WeatherScreenState extends State<WeatherScreen>
     with TickerProviderStateMixin {
   late PageController _pageController;
-  int _currentWeatherIndex = 1; //根据天气数据的索引来显示不同的天气
-  late AnimationController _gradientController;
-  final List<String> _weatherData = ['晴天', '多云', '雨天'];
-  // final List<String> _weatherImages = [
-  //   // 'https://example.com/sunny.jpg',
-  //   // 'https://example.com/cloudy.jpg',
-  //   // 'https://example.com/rainy.jpg',
-  // ];
-  // 天气图标数据
-  final List<IconData> _weatherIcons = [
-    Icons.wb_sunny,
-    Icons.cloud,
-    Icons.beach_access,
-  ];
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 1);
-    _gradientController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 15),
-    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _pageController.dispose();
-    _gradientController.dispose();
     super.dispose();
   }
 
@@ -76,25 +77,26 @@ class _WeatherScreenState extends State<WeatherScreen>
                     children: [
                       // 调整后的天气区域
                       _buildWeatherHeader(primaryColor),
+                      SizedBox(height: 100),
                       // 卡片区域
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
-                          vertical: 10,
+                          vertical: 8,
                         ),
                         child: _buildAIChatCard(primaryColor),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
-                          vertical: 10,
+                          vertical: 8,
                         ),
                         child: _buildDailySentenceCard(primaryColor),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
-                          vertical: 10,
+                          vertical: 8,
                         ),
                         child: _buildEmotionChartCard(primaryColor),
                       ),
@@ -110,69 +112,277 @@ class _WeatherScreenState extends State<WeatherScreen>
   }
 
   Widget _buildWeatherHeader(Color primaryColor) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 40, bottom: 30),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: primaryColor.withOpacity(0.2),
-                width: 2,
+    // 定义情绪类型与天气的映射关系
+    const weatherMap = {
+      "高兴": {"icon": Icons.wb_sunny, "label": "晴朗:高兴"},
+      "平静": {"icon": Icons.cloud, "label": "多云:平静"},
+      "中性": {"icon": Icons.filter_drama, "label": "阴天:中性"},
+      "悲伤": {"icon": Icons.beach_access, "label": "小雨:悲伤"},
+      "抑郁": {"icon": Icons.flash_on, "label": "雷暴:抑郁"},
+    };
+
+    return FutureBuilder<EmotionWeather>(
+      future: EmotionApiService.getEmotionWeather(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator(color: primaryColor));
+        } else if (snapshot.hasError || !snapshot.hasData) {
+          return Center(
+            child: Text('加载失败', style: TextStyle(color: primaryColor)),
+          );
+        }
+
+        final emotionWeather = snapshot.data!;
+        final weatherInfo = weatherMap[emotionWeather.emotion_type]!;
+
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // 响应式布局关键点：
+            final isLargeScreen = constraints.maxWidth > 600; // 判断大屏幕阈值
+            final iconSize = isLargeScreen ? 200.0 : 200.0; // 动态图标尺寸
+            final titleFontSize = isLargeScreen ? 52.0 : 52.0; // 动态标题字号
+            final tempFontSize = isLargeScreen ? 80.0 : 60.0; // 动态温度字号
+            final isCenter =
+                isLargeScreen
+                    ? MainAxisAlignment
+                        .start // 是否靠左
+                    : MainAxisAlignment.center; // 是否居中
+
+            return Padding(
+              padding: const EdgeInsets.only(top: 40, bottom: 30),
+              child: Flex(
+                direction:
+                    isLargeScreen ? Axis.horizontal : Axis.vertical, // 自动切换排列方向
+                mainAxisAlignment: isCenter,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Icon(
+                      weatherInfo["icon"] as IconData,
+                      color: primaryColor,
+                      size: iconSize,
+                    ),
+                  ),
+                  SizedBox(
+                    width: isLargeScreen ? 40 : 0,
+                    height: isLargeScreen ? 0 : 20,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(right: isLargeScreen ? 25 : 0),
+                        child: Text(
+                          weatherInfo["label"] as String,
+                          style: TextStyle(
+                            fontSize: titleFontSize,
+                            fontWeight: FontWeight.w700,
+                            color: primaryColor,
+                            shadows: [/* 阴影保持 */],
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${emotionWeather.emotion_level}°C',
+                        style: TextStyle(
+                          fontSize: tempFontSize,
+                          color: primaryColor,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ),
-            child: Icon(
-              _weatherIcons[_currentWeatherIndex],
-              color: primaryColor,
-              size: 48, // 增大图标尺寸
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildEmotionChartCard(Color primaryColor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Material(
+          color: Colors.white.withOpacity(0.35),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 360, maxHeight: 400),
+            child: FutureBuilder<List<EmotionRecord>>(
+              future: EmotionApiService.getEmotionHistory(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return _buildChartLoading(primaryColor);
+                } else if (snapshot.hasError) {
+                  print(snapshot.error);
+                  return _buildChartError(primaryColor);
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Row(
+                        children: [
+                          Icon(Icons.insights, color: primaryColor),
+                          const SizedBox(width: 8),
+                          Text(
+                            '情绪趋势分析',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: primaryColor.withOpacity(0.2),
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                        child: _buildScrollableChart(
+                          snapshot.data!,
+                          primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
-          const SizedBox(width: 20),
-          Text(
-            _weatherData[_currentWeatherIndex],
-            style: TextStyle(
-              fontSize: 32, // 增大字体尺寸
-              fontWeight: FontWeight.w600,
-              color: primaryColor,
-              shadows: [
-                Shadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 8,
-                  offset: const Offset(2, 2),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScrollableChart(
+    List<EmotionRecord> records,
+    Color primaryColor,
+  ) {
+    final ScrollController scrollController = ScrollController();
+    final chartWidth =
+        records.isEmpty ? 0 : (records.length * 80).clamp(400, double.infinity);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.hasClients && records.isNotEmpty) {
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      }
+    });
+
+    return Scrollbar(
+      controller: scrollController,
+      thumbVisibility: true,
+      notificationPredicate: (notification) => notification.depth == 0,
+      child: Stack(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 可滚动内容区域
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: Container(
+                    width: chartWidth.toDouble(),
+                    padding: const EdgeInsets.only(
+                      right: 40, // 为图例预留空间
+                      left: 40,
+                      top: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: primaryColor.withOpacity(0.2),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                    child: _buildEmotionChart(records, primaryColor),
+                  ),
                 ),
-              ],
-            ),
+              ),
+              Container(
+                width: 70,
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _buildCustomYAxis(primaryColor),
+              ),
+            ],
+          ),
+          Positioned(
+            left: 24,
+            top: 100,
+            child: IgnorePointer(child: _buildChartLegend(primaryColor)),
           ),
         ],
       ),
     );
   }
 
-  // 新增的卡片构建方法
-  Widget _buildEmotionChartCard(Color primaryColor) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: Material(
-        color: Colors.white.withOpacity(0.35),
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 220, maxHeight: 260),
-          padding: const EdgeInsets.all(24),
-          child: FutureBuilder<List<EmotionRecord>>(
-            future: EmotionApiService.getEmotionHistory(), // 假设已创建API服务
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return _buildChartLoading(primaryColor);
-              } else if (snapshot.hasError) {
-                return _buildChartError(primaryColor);
-              }
-              return _buildEmotionChart(snapshot.data!, primaryColor);
-            },
-          ),
-        ),
+  Widget _buildCustomYAxis(Color primaryColor) {
+    const minY = -1.2;
+    const maxY = 1.2;
+    const interval = 0.2;
+    final numberOfLabels = ((maxY - minY) / interval).round() + 1;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(numberOfLabels, (index) {
+        final yValue = (maxY - index * interval).toStringAsFixed(3);
+        return Text(
+          yValue,
+          style: TextStyle(color: primaryColor.withOpacity(0.8), fontSize: 10),
+        );
+      }),
+    );
+  }
+
+  Widget _buildChartLegend(Color primaryColor) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: primaryColor.withOpacity(0.8), width: 0.5),
+      ),
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildLegendItem('愉悦度', primaryColor),
+          const SizedBox(height: 6),
+          _buildLegendItem('激活度', primaryColor.withOpacity(0.7)),
+          const SizedBox(height: 6),
+          _buildLegendItem('强度', primaryColor.withOpacity(0.4)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendItem(String label, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(width: 12, height: 2, color: color),
+          const SizedBox(width: 8),
+          Text(label, style: TextStyle(color: color, fontSize: 10)),
+        ],
       ),
     );
   }
@@ -201,128 +411,201 @@ class _WeatherScreenState extends State<WeatherScreen>
     );
   }
 
-  // 构建图表组件
   Widget _buildEmotionChart(List<EmotionRecord> records, Color primaryColor) {
-    final lineBars = _createChartLines(records, primaryColor);
-
     return LineChart(
       LineChartData(
-        lineBarsData: lineBars,
-        gridData: FlGridData(show: false),
+        rangeAnnotations: RangeAnnotations(
+          verticalRangeAnnotations:
+              records.asMap().entries.map((entry) {
+                final index = entry.key;
+                final emotionType = entry.value.emotion_type;
+                return VerticalRangeAnnotation(
+                  x1: index - 0.5,
+                  x2: index + 0.5,
+                  color: _emotionColors[emotionType]!.withOpacity(0.15),
+                );
+              }).toList(),
+        ),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          getDrawingHorizontalLine:
+              (value) => FlLine(
+                color: primaryColor.withOpacity(0.1),
+                strokeWidth: 0.8,
+                dashArray: [4],
+              ),
+        ),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              getTitlesWidget:
-                  (value, meta) => Text(
-                    value.toInt().toString(),
-                    style: TextStyle(color: primaryColor, fontSize: 12),
-                  ),
-            ),
-          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: _calculateInterval(records),
+              interval: _calculateLabelInterval(records.length),
               getTitlesWidget: (value, meta) {
-                final date = DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                return Text(
-                  '${date.month}/${date.day}',
-                  style: TextStyle(color: primaryColor, fontSize: 12),
-                );
+                final index = value.toInt();
+                if (index >= 0 && index < records.length) {
+                  final date = DateTime.fromMillisecondsSinceEpoch(
+                    records[index].timestamp * 1000,
+                  );
+                  return Transform.translate(
+                    offset: const Offset(0, 6),
+                    child: Text(
+                      '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}',
+                      style: TextStyle(
+                        color: primaryColor.withOpacity(0.8),
+                        fontSize: 10,
+                      ),
+                    ),
+                  );
+                }
+                return const Text('');
+              },
+              reservedSize: 28,
+            ),
+          ),
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: _calculateLabelInterval(records.length),
+              getTitlesWidget: (value, meta) {
+                final index = value.toInt();
+                if (index >= 0 && index < records.length) {
+                  return Transform.translate(
+                    offset: const Offset(0, -6),
+                    child: Row(
+                      children: [
+                        Text(_emotionEmojis[records[index].emotion_type] ?? ''),
+                        Text(
+                          records[index].emotion_type,
+                          style: TextStyle(
+                            color: primaryColor.withOpacity(0.8),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return const Text('');
               },
             ),
           ),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
+        lineBarsData: _createChartLines(records, primaryColor),
         lineTouchData: LineTouchData(
           touchTooltipData: LineTouchTooltipData(
             getTooltipItems:
                 (items) =>
                     items.map((item) {
                       return LineTooltipItem(
-                        '${item.barIndex == 0
-                            ? 'Valence'
-                            : item.barIndex == 1
-                            ? 'Arousal'
-                            : 'Intensity'}: ${item.y}',
-                        TextStyle(color: Colors.white),
+                        '${_getMetricName(item.barIndex)}: ${item.y.toStringAsFixed(3)}\n${records[item.x.toInt()].emotion_type}',
+                        const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
                       );
                     }).toList(),
+            fitInsideHorizontally: true,
+            fitInsideVertically: true,
           ),
+          touchSpotThreshold: 20,
+          handleBuiltInTouches: true,
         ),
-        minX: records.first.time.millisecondsSinceEpoch.toDouble(),
-        maxX: records.last.time.millisecondsSinceEpoch.toDouble(),
+        minX: 0,
+        maxX: (records.length - 1).toDouble(),
+        minY: -1.2,
+        maxY: 1.2,
       ),
-      // Removed duplicate lineTouchData parameter
     );
   }
 
+  // 辅助方法：获取指标名称
+  String _getMetricName(int index) {
+    switch (index) {
+      case 0:
+        return '愉悦度';
+      case 1:
+        return '激活度';
+      case 2:
+        return '强度';
+      default:
+        return '';
+    }
+  }
+
+  double _calculateLabelInterval(int dataCount) {
+    if (dataCount <= 10) return 1;
+    if (dataCount <= 20) return 2;
+    return dataCount / 10;
+  }
+
+  // 修改图表数据映射部分
   List<LineChartBarData> _createChartLines(
     List<EmotionRecord> records,
     Color primaryColor,
   ) {
-    final sortedRecords = records.sortedBy((r) => r.time);
+    final sortedRecords = records.sortedBy((r) => r.timestamp);
 
     return [
-      // Valence 线
       LineChartBarData(
         spots:
             sortedRecords
+                .asMap()
+                .entries
                 .map(
-                  (r) => FlSpot(
-                    r.time.millisecondsSinceEpoch.toDouble(),
-                    r.valence,
-                  ),
+                  (entry) =>
+                      FlSpot(entry.key.toDouble(), entry.value.valence_score),
                 )
                 .toList(),
         color: primaryColor,
-        barWidth: 2.5,
+        barWidth: 4,
         isCurved: true,
         dotData: FlDotData(show: false),
-        shadow: Shadow(color: primaryColor.withOpacity(0.3), blurRadius: 8),
+        shadow: Shadow(
+          color: primaryColor.withOpacity(0.3),
+          blurRadius: 12,
+          offset: const Offset(4, 4),
+        ),
       ),
-      // Arousal 线
       LineChartBarData(
         spots:
             sortedRecords
+                .asMap()
+                .entries
                 .map(
-                  (r) => FlSpot(
-                    r.time.millisecondsSinceEpoch.toDouble(),
-                    r.arousal,
-                  ),
+                  (entry) =>
+                      FlSpot(entry.key.toDouble(), entry.value.dominance_score),
                 )
                 .toList(),
         color: primaryColor.withOpacity(0.7),
+        barWidth: 3,
+        isCurved: true,
+        dotData: FlDotData(show: false),
+      ),
+      LineChartBarData(
+        spots:
+            sortedRecords
+                .asMap()
+                .entries
+                .map(
+                  (entry) =>
+                      FlSpot(entry.key.toDouble(), entry.value.intensity_score),
+                )
+                .toList(),
+        color: primaryColor.withOpacity(0.4),
         barWidth: 2,
         isCurved: true,
         dotData: FlDotData(show: false),
       ),
-      // Intensity 线
-      LineChartBarData(
-        spots:
-            sortedRecords
-                .map(
-                  (r) => FlSpot(
-                    r.time.millisecondsSinceEpoch.toDouble(),
-                    r.intensity_score,
-                  ),
-                )
-                .toList(),
-        color: primaryColor.withOpacity(0.4),
-        barWidth: 1.5,
-        isCurved: true,
-        dotData: FlDotData(show: false),
-      ),
     ];
-  }
-
-  double _calculateInterval(List<EmotionRecord> records) {
-    if (records.isEmpty) return 1;
-    final duration = records.last.time.difference(records.first.time);
-    return duration.inDays > 7 ? 86400000 * 3 : 86400000; // 3天或1天间隔
   }
 
   Widget _buildAIChatCard(Color primaryColor) {

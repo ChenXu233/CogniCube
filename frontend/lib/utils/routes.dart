@@ -19,8 +19,7 @@ import '../views/screens/setting/setting_screen.dart';
 import '../views/screens/CBT/countdown_screen.dart';
 import '../views/screens/setting/editprofile_screen.dart';
 import '../views/screens/setting/helpfeedback_screen.dart';
-
-import '../services/admin.dart';
+import '../views/screens/admin/admin_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -48,6 +47,11 @@ final goRouter = GoRouter(
       return from;
     }
 
+    // 如果用户未认证或不是管理员，重定向到首页
+    if (currentPath.startsWith('/admin') && !auth.isAdmin) {
+      return '/'; // 重定向到首页
+    }
+
     return null;
   },
 
@@ -65,6 +69,11 @@ final goRouter = GoRouter(
           path: 'setting',
           pageBuilder:
               (context, state) => const MaterialPage(child: SettingsScreen()),
+        ),
+        GoRoute(
+          path: 'admin',
+          pageBuilder:
+              (context, state) => const MaterialPage(child: AdminScreen()),
         ),
       ],
     ),
@@ -126,12 +135,6 @@ final goRouter = GoRouter(
               (context, state) => const MaterialPage(child: CountdownScreen()),
         ),
       ],
-    ),
-
-    // 🌟 Admin 路由加在这里
-    GoRoute(
-      path: '/admin',
-      pageBuilder: (context, state) => const MaterialPage(child: AdminPage()),
     ),
   ],
 );

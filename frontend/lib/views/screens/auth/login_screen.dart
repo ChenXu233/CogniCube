@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_view_model.dart';
-import '../../../utils/gradient_helper.dart';
+import '../../../views/components/ball_animation_widget.dart';
 import 'package:dio/dio.dart';
 import 'dart:ui' as ui;
 
 class LoginScreen extends StatefulWidget {
-  final String? redirectMessage; // 新增重定向消息参数
-  final String? fromLocation; // 新增来源路径参数
+  final String? redirectMessage;
+  final String? fromLocation;
 
   const LoginScreen({super.key, this.redirectMessage, this.fromLocation});
 
@@ -16,23 +16,16 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with TickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  late AnimationController _gradientController;
 
   @override
   void initState() {
     super.initState();
-    _gradientController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 15),
-    )..repeat(reverse: true);
 
-    // 显示重定向提示消息
     if (widget.redirectMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -47,7 +40,8 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   void dispose() {
-    _gradientController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -62,14 +56,7 @@ class _LoginScreenState extends State<LoginScreen>
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          AnimatedBuilder(
-            animation: _gradientController,
-            builder: (context, _) {
-              return Container(
-                decoration: BoxDecoration(gradient: createPrimaryGradient()),
-              );
-            },
-          ),
+          const BallAnimationWidget(),
           Positioned.fill(
             child: BackdropFilter(
               filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -143,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen>
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.35), // 透明度调整为35%
+        fillColor: Colors.white.withOpacity(0.35),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 18,
           horizontal: 22,
@@ -189,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen>
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.35), // 透明度调整为35%
+        fillColor: Colors.white.withOpacity(0.35),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 18,
           horizontal: 22,
@@ -287,9 +274,8 @@ class _LoginScreenState extends State<LoginScreen>
 
       if (authVM.isAuthenticated && mounted) {
         final targetLocation = widget.fromLocation ?? '/';
-        if (mounted) context.go(targetLocation);
+        context.go(targetLocation);
       } else if (mounted) {
-        // 显示未知错误
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('登录失败，请稍后重试'),
@@ -322,7 +308,6 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  // 新增 Dio 错误解析方法
   String _parseDioError(DioException e) {
     if (e.type == DioExceptionType.connectionTimeout) {
       return '连接超时，请检查网络';
