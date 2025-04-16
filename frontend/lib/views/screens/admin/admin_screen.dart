@@ -102,164 +102,168 @@ class _AdminScreenState extends State<AdminScreen> {
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: Stack(
               children: [
-                const Text(
-                  "💼 用户管理",
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.deepPurple,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF6EEFF),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.deepPurple.shade100),
-                  ),
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      ListView.builder(
-                        itemCount: users.length,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          final user = users[index];
-                          return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.purple.shade50,
-                                  blurRadius: 4,
-                                  offset: const Offset(1, 2),
-                                ),
-                              ],
-                            ),
-                            child: ListTile(
-                              title: Text(user.username),
-                              subtitle: Text(user.email),
-                              trailing: IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () => _deleteUser(user.id),
-                              ),
-                            ),
-                          );
-                        },
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      "💼 用户管理",
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.deepPurple,
                       ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF6EEFF),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.deepPurple.shade100),
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
                         children: [
-                          ElevatedButton(
-                            onPressed:
-                                _currentPage > 1
-                                    ? () {
-                                      setState(() {
-                                        _currentPage--;
-                                        _loadUsers();
-                                      });
-                                    }
-                                    : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurple.shade200,
-                            ),
-                            child: const Text("上一页"),
+                          ListView.builder(
+                            itemCount: users.length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              final user = users[index];
+                              return Container(
+                                margin: const EdgeInsets.symmetric(vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.purple.shade50,
+                                      blurRadius: 4,
+                                      offset: const Offset(1, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: ListTile(
+                                  title: Text(user.username),
+                                  subtitle: Text(user.email),
+                                  trailing: IconButton(
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () => _deleteUser(user.id),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                          Text("第 $_currentPage 页，共 $pageCount 页"),
-                          ElevatedButton(
-                            onPressed:
-                                _currentPage < pageCount
-                                    ? () {
-                                      setState(() {
-                                        _currentPage++;
-                                        _loadUsers();
-                                      });
-                                    }
-                                    : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurple.shade200,
-                            ),
-                            child: const Text("下一页"),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ElevatedButton(
+                                onPressed:
+                                    _currentPage > 1
+                                        ? () {
+                                          setState(() {
+                                            _currentPage--;
+                                            _loadUsers();
+                                          });
+                                        }
+                                        : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.deepPurple.shade200,
+                                ),
+                                child: const Text("上一页"),
+                              ),
+                              Text("第 $_currentPage 页，共 $pageCount 页"),
+                              ElevatedButton(
+                                onPressed:
+                                    _currentPage < pageCount
+                                        ? () {
+                                          setState(() {
+                                            _currentPage++;
+                                            _loadUsers();
+                                          });
+                                        }
+                                        : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.deepPurple.shade200,
+                                ),
+                                child: const Text("下一页"),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-                const Text(
-                  "📝 添加新用户",
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.deepPurple,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.95),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: Colors.deepPurple.shade100),
-                  ),
-                  padding: const EdgeInsets.all(20),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        _buildTextField(_usernameController, "用户名"),
-                        const SizedBox(height: 16),
-                        _buildTextField(_emailController, "邮箱"),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          _passwordController,
-                          "密码",
-                          isPassword: true,
-                        ),
-                        const SizedBox(height: 16),
-                        SwitchListTile(
-                          title: const Text("是否为管理员"),
-                          value: _isAdmin,
-                          activeColor: Colors.deepPurple,
-                          onChanged:
-                              (value) => setState(() => _isAdmin = value),
-                        ),
-                        const SizedBox(height: 20),
-                        ElevatedButton.icon(
-                          onPressed: _createUser,
-                          icon: const Icon(Icons.add_circle_outline),
-                          label: const Text("创建用户"),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurple,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 36,
-                              vertical: 14,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            textStyle: const TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
+
+                    const SizedBox(height: 30),
+                    const Text(
+                      "📝 添加新用户",
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.deepPurple,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: Colors.deepPurple.shade100),
+                      ),
+                      padding: const EdgeInsets.all(20),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            _buildTextField(_usernameController, "用户名"),
+                            const SizedBox(height: 16),
+                            _buildTextField(_emailController, "邮箱"),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              _passwordController,
+                              "密码",
+                              isPassword: true,
+                            ),
+                            const SizedBox(height: 16),
+                            SwitchListTile(
+                              title: const Text("是否为管理员"),
+                              value: _isAdmin,
+                              activeColor: Colors.deepPurple,
+                              onChanged:
+                                  (value) => setState(() => _isAdmin = value),
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton.icon(
+                              onPressed: _createUser,
+                              icon: const Icon(Icons.add_circle_outline),
+                              label: const Text("创建用户"),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepPurple,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 36,
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                textStyle: const TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
