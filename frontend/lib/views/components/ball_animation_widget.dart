@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../../utils/gradient_helper.dart';
 
 class BallAnimationWidget extends StatefulWidget {
   const BallAnimationWidget({super.key});
@@ -136,10 +135,6 @@ class Ball {
   }
 }
 
-extension on Offset {
-  double dot(Offset other) => dx * other.dx + dy * other.dy;
-}
-
 // 自定义画布绘制小球
 class BallPainter extends CustomPainter {
   final List<Ball> balls;
@@ -160,8 +155,8 @@ class BallPainter extends CustomPainter {
         center: const Alignment(0, 0),
         radius: 0.8,
         colors: [
-          ball.color.withOpacity(0.8), // 中心颜色，带透明度
-          ball.color.withOpacity(0.0), // 边缘颜色，完全透明
+          ball.color.withAlpha((0.8 * 255).toInt()), // 中心颜色，带透明度
+          ball.color.withAlpha(0), // 边缘颜色，完全透明
         ],
       ).createShader(
         Rect.fromCircle(center: ball.position, radius: ball.radius),

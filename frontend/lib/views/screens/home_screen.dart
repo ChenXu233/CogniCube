@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../components/navigation_bar.dart';
-import '../../utils/gradient_helper.dart';
 import '../../view_models/home_view_model.dart';
 import '../../views/screens/CBT/CBT_screen.dart';
 import './statistics/statistics_screen.dart';
@@ -9,7 +8,6 @@ import '../components/ball_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:ui' as ui;
-import 'dart:math';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,9 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late PageController _pageController;
   int _currentIndex = 1;
-  late AnimationController _gradientController;
   late final HomeViewModel vm;
-  late List<Ball> _balls;
 
   // 初始按钮位置（右下角）
   double _buttonX = 20;
@@ -34,53 +30,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.initState();
 
     _pageController = PageController(initialPage: _currentIndex);
-    _gradientController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 15),
-    )..repeat();
-
     vm = context.read<HomeViewModel>();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    // 初始化多个随机小球
-    final screenSize = MediaQuery.of(context).size;
-    _balls = List.generate(
-      10,
-      (index) => Ball(
-        position: Offset(
-          Random().nextDouble() * screenSize.width,
-          Random().nextDouble() * screenSize.height,
-        ),
-        velocity: Offset(
-          Random().nextDouble() * 2 - 1,
-          Random().nextDouble() * 2 - 1,
-        ),
-        radius: Random().nextDouble() * 30 + 20,
-        color: Color.fromARGB(
-          255,
-          Random().nextInt(256),
-          Random().nextInt(256),
-          Random().nextInt(256),
-        ),
-      ),
-    );
   }
 
   @override
   void dispose() {
     _pageController.dispose();
-    _gradientController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       body: Stack(
         children: [
