@@ -23,6 +23,8 @@ async def login(user: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     if not user_db.verify_password(user.password):
         raise HTTPException(status_code=401, detail="Email or password incorrect")
+    if not user_db.is_verified:
+        raise HTTPException(status_code=401, detail="User not verified")
 
     # 生成访问令牌
     access_token = create_jwt_token(
