@@ -168,7 +168,6 @@ class _WeatherScreenState extends State<WeatherScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // MODIFIED START: 添加滚动条容器
                     Expanded(
                       child: Container(
                         decoration: BoxDecoration(
@@ -190,7 +189,6 @@ class _WeatherScreenState extends State<WeatherScreen>
                         ),
                       ),
                     ),
-                    // MODIFIED END
                   ],
                 );
               },
@@ -210,24 +208,99 @@ class _WeatherScreenState extends State<WeatherScreen>
 
     return Scrollbar(
       controller: scrollController,
-      thumbVisibility: true, // 替代 isAlwaysShown（适用于新版本）
+      thumbVisibility: true,
       thickness: 8,
       radius: const Radius.circular(4),
-      // thumbColor: primaryColor.withOpacity(0.5), // 常态颜色
-      child: SingleChildScrollView(
-        controller: scrollController,
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: SizedBox(
-            width: chartWidth.toDouble(),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: _buildEmotionChart(records, primaryColor),
+      child: Row(
+        children: [
+          // 自定义固定Y轴
+          Container(
+            width: 40,
+            padding: const EdgeInsets.only(bottom: 28),
+            child: _buildCustomYAxis(primaryColor),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              controller: scrollController,
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Container(
+                width: chartWidth.toDouble(),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: primaryColor.withOpacity(0.2),
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Stack(
+                    children: [
+                      _buildEmotionChart(records, primaryColor),
+                      Positioned(
+                        right: 16,
+                        top: 8,
+                        child: _buildChartLegend(primaryColor),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCustomYAxis(Color primaryColor) {
+    const minY = -1.0;
+    const maxY = 1.0;
+    const interval = 0.2;
+    final numberOfLabels = ((maxY - minY) / interval).round() + 1;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(numberOfLabels, (index) {
+        final yValue = (maxY - index * interval).toStringAsFixed(3);
+        return Text(
+          yValue,
+          style: TextStyle(color: primaryColor.withOpacity(0.8), fontSize: 10),
+        );
+      }),
+    );
+  }
+
+  Widget _buildChartLegend(Color primaryColor) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildLegendItem('愉悦度', primaryColor),
+          _buildLegendItem('激活度', primaryColor.withOpacity(0.7)),
+          _buildLegendItem('强度', primaryColor.withOpacity(0.4)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendItem(String label, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(width: 12, height: 2, color: color),
+          const SizedBox(width: 8),
+          Text(label, style: TextStyle(color: color, fontSize: 10)),
+        ],
       ),
     );
   }
@@ -264,27 +337,13 @@ class _WeatherScreenState extends State<WeatherScreen>
         gridData: FlGridData(show: false),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              interval: 0.2, // 修改5：Y轴间隔调整为0.2
-              getTitlesWidget:
-                  (value, meta) => Padding(
-                    padding: const EdgeInsets.only(right: 6),
-                    child: Text(
-                      value.toStringAsFixed(3), // 修改6：显示三位小数
-                      style: TextStyle(color: primaryColor, fontSize: 10),
-                    ),
-                  ),
-              reservedSize: 40,
-            ),
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
           ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: _calculateLabelInterval(
-                records.length,
-              ), // 修改7：使用新的间隔计算方法
+              interval: _calculateLabelInterval(records.length),
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
                 if (index >= 0 && index < records.length) {
@@ -294,7 +353,7 @@ class _WeatherScreenState extends State<WeatherScreen>
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
-                      '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}', // 修改8：优化日期格式
+                      '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}',
                       style: TextStyle(color: primaryColor, fontSize: 10),
                     ),
                   );
@@ -304,8 +363,12 @@ class _WeatherScreenState extends State<WeatherScreen>
               reservedSize: 28,
             ),
           ),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
         ),
         lineTouchData: LineTouchData(
           touchTooltipData: LineTouchTooltipData(
@@ -313,7 +376,7 @@ class _WeatherScreenState extends State<WeatherScreen>
                 (items) =>
                     items.map((item) {
                       return LineTooltipItem(
-                        '${_getMetricName(item.barIndex)}: ${item.y.toStringAsFixed(3)}', // 修改9：工具提示显示三位小数
+                        '${_getMetricName(item.barIndex)}: ${item.y.toStringAsFixed(3)}',
                         TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -324,12 +387,12 @@ class _WeatherScreenState extends State<WeatherScreen>
             fitInsideHorizontally: true,
             fitInsideVertically: true,
           ),
-          touchSpotThreshold: 20, // 修改10：增大触摸区域
+          touchSpotThreshold: 20,
         ),
         minX: 0,
         maxX: (records.length - 1).toDouble(),
         minY: -1.0,
-        maxY: 1.0, // 修改11：设置最大Y值为1.0
+        maxY: 1.0,
       ),
     );
   }
