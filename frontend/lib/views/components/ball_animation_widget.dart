@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 class BallAnimationWidget extends StatefulWidget {
@@ -30,17 +31,17 @@ class _BallAnimationWidgetState extends State<BallAnimationWidget>
     // 初始化多个随机小球
     final screenSize = MediaQuery.of(context).size;
     _balls = List.generate(
-      10,
+      20,
       (index) => Ball(
         position: Offset(
           Random().nextDouble() * screenSize.width,
           Random().nextDouble() * screenSize.height,
         ),
         velocity: Offset(
-          (Random().nextDouble() * 0.5 - 0.25), // 降低速度范围
-          (Random().nextDouble() * 0.5 - 0.25),
+          (Random().nextDouble() * 1 - 0.25), // 降低速度范围
+          (Random().nextDouble() * 1 - 0.25),
         ),
-        radius: Random().nextDouble() * 30 + 80,
+        radius: Random().nextDouble() * 200 + 200,
         color: _generateSoftColor(),
       ),
     );
@@ -73,6 +74,10 @@ class _BallAnimationWidgetState extends State<BallAnimationWidget>
             );
           },
         ),
+        ImageFiltered(
+          imageFilter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(color: const ui.Color.fromARGB(20, 255, 183, 249)),
+        ),
       ],
     );
   }
@@ -85,6 +90,15 @@ class _BallAnimationWidgetState extends State<BallAnimationWidget>
       const Color.fromARGB(255, 225, 236, 125),
       Colors.orange,
       Colors.purple,
+      Colors.blue,
+      Colors.teal,
+      Colors.lime,
+      const Color.fromARGB(255, 255, 183, 3),
+      const Color.fromARGB(255, 3, 169, 244),
+      const Color.fromARGB(255, 156, 39, 176),
+      const Color.fromARGB(255, 76, 175, 80),
+      const Color.fromARGB(255, 244, 67, 54),
+      const Color.fromARGB(255, 33, 150, 243),
     ];
     return baseColors[Random().nextInt(baseColors.length)];
   }
@@ -108,10 +122,12 @@ class Ball {
     position += velocity;
 
     // 碰撞检测并反弹（屏幕边界）
-    if (position.dx - radius < 0 || position.dx + radius > screenSize.width) {
+    if (position.dx - radius < -200 ||
+        position.dx + radius > screenSize.width + 200) {
       velocity = Offset(-velocity.dx, velocity.dy);
     }
-    if (position.dy - radius < 0 || position.dy + radius > screenSize.height) {
+    if (position.dy - radius < -200 ||
+        position.dy + radius > screenSize.height + 200) {
       velocity = Offset(velocity.dx, -velocity.dy);
     }
 
