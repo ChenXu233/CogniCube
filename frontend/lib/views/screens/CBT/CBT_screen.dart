@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/cbt_view_model.dart';
-import '../../components/ball_animation_widget.dart';
 import 'dart:ui' as ui;
 
 class CBTScreen extends StatelessWidget {
@@ -24,21 +23,13 @@ class _CBTScaffold extends StatelessWidget {
 
     return Stack(
       children: [
-        const BallAnimationWidget(),
-        Positioned.fill(
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
-          ),
-        ),
-
         // 主体内容
         SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(
               left: 16,
               right: 16,
-              top: 32,
+              top: 100,
               bottom: 16,
             ),
             child: ListView.separated(

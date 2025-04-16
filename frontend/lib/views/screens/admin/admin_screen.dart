@@ -3,14 +3,14 @@ import '/services/admin.dart';
 import '/models/admin_model.dart';
 import 'package:go_router/go_router.dart';
 
-class AdminPage extends StatefulWidget {
-  const AdminPage({super.key});
+class AdminScreen extends StatefulWidget {
+  const AdminScreen({super.key});
 
   @override
-  State<AdminPage> createState() => _AdminPageState();
+  State<AdminScreen> createState() => _AdminScreenState();
 }
 
-class _AdminPageState extends State<AdminPage> {
+class _AdminScreenState extends State<AdminScreen> {
   int _currentPage = 1;
   final int _pageSize = 10;
   late Future<PaginatedUsers> _userFuture;

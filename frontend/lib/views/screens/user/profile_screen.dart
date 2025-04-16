@@ -55,6 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     return Scaffold(
       extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           // 内容层
