@@ -21,7 +21,7 @@ void main() async {
   // 设置窗口大小（仅限桌面平台）
   if (!kIsWeb && PlatformInfo.isDesktop) {
     setWindowTitle('CogniCube');
-    setWindowFrame(const Rect.fromLTWH(100, 100, 1280, 720)); // 默认窗口大小和位置
+    setWindowFrame(const Rect.fromLTWH(100, 100, 640, 1000)); // 默认窗口大小和位置
   }
 
   // 初始化 SharedPreferences

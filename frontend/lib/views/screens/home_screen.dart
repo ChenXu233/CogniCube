@@ -5,9 +5,11 @@ import '../../view_models/home_view_model.dart';
 import '../../views/screens/CBT/CBT_screen.dart';
 import './statistics/statistics_screen.dart';
 import '../../views/screens/user/profile_screen.dart';
+import '../components/ball_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:ui' as ui;
+import 'dart:math';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _currentIndex = 1;
   late AnimationController _gradientController;
   late final HomeViewModel vm;
+  late List<Ball> _balls;
 
   // 初始按钮位置（右下角）
   double _buttonX = 20;
@@ -34,25 +37,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _gradientController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 15),
-    )..repeat(reverse: true);
+    )..repeat();
 
     vm = context.read<HomeViewModel>();
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final extra =
-          GoRouter.of(context).routerDelegate.currentConfiguration.extra;
-      if (extra != null &&
-          extra is Map &&
-          extra.containsKey('pageIndex') &&
-          extra['pageIndex'] != null &&
-          extra['pageIndex'] is int) {
-        final index = extra['pageIndex'] as int;
-        setState(() {
-          _currentIndex = index;
-          _pageController.jumpToPage(index);
-        });
-      }
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // 初始化多个随机小球
+    final screenSize = MediaQuery.of(context).size;
+    _balls = List.generate(
+      10,
+      (index) => Ball(
+        position: Offset(
+          Random().nextDouble() * screenSize.width,
+          Random().nextDouble() * screenSize.height,
+        ),
+        velocity: Offset(
+          Random().nextDouble() * 2 - 1,
+          Random().nextDouble() * 2 - 1,
+        ),
+        radius: Random().nextDouble() * 30 + 20,
+        color: Color.fromARGB(
+          255,
+          Random().nextInt(256),
+          Random().nextInt(256),
+          Random().nextInt(256),
+        ),
+      ),
+    );
   }
 
   @override
@@ -69,14 +84,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Scaffold(
       body: Stack(
         children: [
-          AnimatedBuilder(
-            animation: _gradientController,
-            builder: (context, _) {
-              return Container(
-                decoration: BoxDecoration(gradient: createPrimaryGradient()),
-              );
-            },
-          ),
+          const BallAnimationWidget(), // 使用抽象的小球组件
           Positioned.fill(
             child: BackdropFilter(
               filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),

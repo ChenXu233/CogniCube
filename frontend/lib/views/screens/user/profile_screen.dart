@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/auth_view_model.dart';
-import '../../../utils/gradient_helper.dart';
+import '../../components/ball_animation_widget.dart';
 import 'dart:ui' as ui;
 
 class ProfileScreen extends StatefulWidget {
@@ -59,21 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          //an
-          AnimatedBuilder(
-            animation: _gradientController,
-            builder: (context, _) {
-              return Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: createPrimaryGradient(),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+          const BallAnimationWidget(),
 
           Positioned.fill(
             child: BackdropFilter(
