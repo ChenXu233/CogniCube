@@ -4,7 +4,7 @@ import '/models/admin_model.dart';
 import 'package:go_router/go_router.dart';
 
 class AdminPage extends StatefulWidget {
-  const AdminPage({Key? key}) : super(key: key);
+  const AdminPage({super.key});
 
   @override
   State<AdminPage> createState() => _AdminPageState();

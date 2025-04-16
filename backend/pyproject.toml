@@ -1,6 +1,6 @@
 [project]
 name = "CogniCube_backend"
-version = "0.1.0"
+version = "0.1.1"
 description = "Default template for PDM package"
 authors = [
     { name = "XuChenXu", email = "91937041+ChenXu233@users.noreply.github.com" },

@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late final HomeViewModel vm;
 
   // 初始按钮位置（右下角）
-  double _buttonX = 300;
+  double _buttonX = 600;
   double _buttonY = 600;
 
   @override
