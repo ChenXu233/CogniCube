@@ -20,4 +20,17 @@ class EmotionApiService {
       throw Exception('请求失败: $e');
     }
   }
+
+  static Future<EmotionWeather> getEmotionWeather() async {
+    try {
+      final response = await _dio.get('/statistics/emotion_weather');
+      if (response.statusCode == 200) {
+        return EmotionWeather.fromJson(response.data);
+      } else {
+        throw Exception('请求失败: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('请求失败: $e');
+    }
+  }
 }

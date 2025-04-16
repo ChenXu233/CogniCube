@@ -25,3 +25,15 @@ Map<String, dynamic> _$EmotionRecordToJson(_EmotionRecord instance) =>
       'valence_score': instance.valence_score,
       'dominance_score': instance.dominance_score,
     };
+
+_EmotionWeather _$EmotionWeatherFromJson(Map<String, dynamic> json) =>
+    _EmotionWeather(
+      emotion_level: (json['emotion_level'] as num).toInt(),
+      emotion_type: json['emotion_type'] as String,
+    );
+
+Map<String, dynamic> _$EmotionWeatherToJson(_EmotionWeather instance) =>
+    <String, dynamic>{
+      'emotion_level': instance.emotion_level,
+      'emotion_type': instance.emotion_type,
+    };

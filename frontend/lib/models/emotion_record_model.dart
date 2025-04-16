@@ -17,3 +17,14 @@ abstract class EmotionRecord with _$EmotionRecord {
   factory EmotionRecord.fromJson(Map<String, dynamic> json) =>
       _$EmotionRecordFromJson(json);
 }
+
+@freezed
+abstract class EmotionWeather with _$EmotionWeather {
+  const factory EmotionWeather({
+    required int emotion_level,
+    required String emotion_type,
+  }) = _EmotionWeather;
+
+  factory EmotionWeather.fromJson(Map<String, dynamic> json) =>
+      _$EmotionWeatherFromJson(json);
+}

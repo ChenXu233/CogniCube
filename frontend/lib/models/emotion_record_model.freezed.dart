@@ -160,4 +160,140 @@ as double,
 
 }
 
+
+/// @nodoc
+mixin _$EmotionWeather {
+
+ int get emotion_level; String get emotion_type;
+/// Create a copy of EmotionWeather
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$EmotionWeatherCopyWith<EmotionWeather> get copyWith => _$EmotionWeatherCopyWithImpl<EmotionWeather>(this as EmotionWeather, _$identity);
+
+  /// Serializes this EmotionWeather to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EmotionWeather&&(identical(other.emotion_level, emotion_level) || other.emotion_level == emotion_level)&&(identical(other.emotion_type, emotion_type) || other.emotion_type == emotion_type));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,emotion_level,emotion_type);
+
+@override
+String toString() {
+  return 'EmotionWeather(emotion_level: $emotion_level, emotion_type: $emotion_type)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $EmotionWeatherCopyWith<$Res>  {
+  factory $EmotionWeatherCopyWith(EmotionWeather value, $Res Function(EmotionWeather) _then) = _$EmotionWeatherCopyWithImpl;
+@useResult
+$Res call({
+ int emotion_level, String emotion_type
+});
+
+
+
+
+}
+/// @nodoc
+class _$EmotionWeatherCopyWithImpl<$Res>
+    implements $EmotionWeatherCopyWith<$Res> {
+  _$EmotionWeatherCopyWithImpl(this._self, this._then);
+
+  final EmotionWeather _self;
+  final $Res Function(EmotionWeather) _then;
+
+/// Create a copy of EmotionWeather
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? emotion_level = null,Object? emotion_type = null,}) {
+  return _then(_self.copyWith(
+emotion_level: null == emotion_level ? _self.emotion_level : emotion_level // ignore: cast_nullable_to_non_nullable
+as int,emotion_type: null == emotion_type ? _self.emotion_type : emotion_type // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// @nodoc
+@JsonSerializable()
+
+class _EmotionWeather implements EmotionWeather {
+  const _EmotionWeather({required this.emotion_level, required this.emotion_type});
+  factory _EmotionWeather.fromJson(Map<String, dynamic> json) => _$EmotionWeatherFromJson(json);
+
+@override final  int emotion_level;
+@override final  String emotion_type;
+
+/// Create a copy of EmotionWeather
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$EmotionWeatherCopyWith<_EmotionWeather> get copyWith => __$EmotionWeatherCopyWithImpl<_EmotionWeather>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$EmotionWeatherToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EmotionWeather&&(identical(other.emotion_level, emotion_level) || other.emotion_level == emotion_level)&&(identical(other.emotion_type, emotion_type) || other.emotion_type == emotion_type));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,emotion_level,emotion_type);
+
+@override
+String toString() {
+  return 'EmotionWeather(emotion_level: $emotion_level, emotion_type: $emotion_type)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$EmotionWeatherCopyWith<$Res> implements $EmotionWeatherCopyWith<$Res> {
+  factory _$EmotionWeatherCopyWith(_EmotionWeather value, $Res Function(_EmotionWeather) _then) = __$EmotionWeatherCopyWithImpl;
+@override @useResult
+$Res call({
+ int emotion_level, String emotion_type
+});
+
+
+
+
+}
+/// @nodoc
+class __$EmotionWeatherCopyWithImpl<$Res>
+    implements _$EmotionWeatherCopyWith<$Res> {
+  __$EmotionWeatherCopyWithImpl(this._self, this._then);
+
+  final _EmotionWeather _self;
+  final $Res Function(_EmotionWeather) _then;
+
+/// Create a copy of EmotionWeather
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? emotion_level = null,Object? emotion_type = null,}) {
+  return _then(_EmotionWeather(
+emotion_level: null == emotion_level ? _self.emotion_level : emotion_level // ignore: cast_nullable_to_non_nullable
+as int,emotion_type: null == emotion_type ? _self.emotion_type : emotion_type // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
 // dart format on
