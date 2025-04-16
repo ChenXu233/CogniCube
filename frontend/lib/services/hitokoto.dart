@@ -7,10 +7,10 @@ class OneSentenceApiService {
   // 获取每日一言
   static Future<OneSentence> getDailySentence() async {
     try {
-      final response = await _dio.get('https://api.xygeng.cn/openapi/one');
+      final response = await _dio.get('https://v1.jinrishici.com/all.json');
       if (response.statusCode == 200) {
-        print(response.data['data']);
-        final data = response.data['data'];
+        print(response.data);
+        final data = response.data;
         return OneSentence.fromJson(data);
       } else {
         throw Exception('请求失败: ${response.statusCode}');

@@ -6,9 +6,8 @@ part 'hitokoto_model.g.dart';
 @freezed
 abstract class OneSentence with _$OneSentence {
   const factory OneSentence({
-    required int id,
-    required String tag,
-    required String name,
+    required String category,
+    required String author,
     required String origin,
     required String content,
   }) = _OneSentence;
