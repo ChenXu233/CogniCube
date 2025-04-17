@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/chat_view_model.dart';
 import '../../../views/components/message_bubble.dart';
+import '../../components/ball_animation_widget.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:ui'; // 导入ImageFilter
+import 'dart:ui' as ui; // 导入ImageFilter并设置别名
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -30,7 +31,13 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // 主内容区域（消息列表 + 输入框）
+          const BallAnimationWidget(),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(color: const Color.fromARGB(150, 255, 255, 255)),
+            ),
+          ),
           Positioned.fill(
             child: Column(
               children: [
@@ -56,7 +63,7 @@ class _ChatScreenState extends State<ChatScreen> {
       right: 0,
       child: ClipRect(
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // 模糊参数
+          filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10), // 模糊参数
           child: Container(
             padding: EdgeInsets.only(top: statusBarHeight),
             decoration: BoxDecoration(

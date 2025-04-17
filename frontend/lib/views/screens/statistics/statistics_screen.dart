@@ -27,32 +27,29 @@ final Map<String, Color> _emotionColors = {
   '中性': Colors.grey,
 };
 
+final Map<String, String> _emotionEmojis = {
+  '快乐': '😄', // 笑脸
+  '悲伤': '😢', // 哭脸
+  '愤怒': '😠', // 生气
+  '恐惧': '😨', // 惊恐
+  '惊讶': '😲', // 惊讶
+  '厌恶': '🤢', // 恶心
+  '中性': '😐', // 无表情
+};
+
 class _WeatherScreenState extends State<WeatherScreen>
     with TickerProviderStateMixin {
   late PageController _pageController;
-  int _currentWeatherIndex = 1; //根据天气数据的索引来显示不同的天气
-  late AnimationController _gradientController;
-  final List<String> _weatherData = ['晴天', '多云', '雨天'];
-  final List<IconData> _weatherIcons = [
-    Icons.wb_sunny,
-    Icons.cloud,
-    Icons.beach_access,
-  ];
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 1);
-    _gradientController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 15),
-    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _pageController.dispose();
-    _gradientController.dispose();
     super.dispose();
   }
 
@@ -115,45 +112,92 @@ class _WeatherScreenState extends State<WeatherScreen>
   }
 
   Widget _buildWeatherHeader(Color primaryColor) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 40, bottom: 30),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: primaryColor.withOpacity(0.2),
-                width: 2,
+    // 定义情绪类型与天气的映射关系
+    const weatherMap = {
+      "高兴": {"icon": Icons.wb_sunny, "label": "晴朗:高兴"},
+      "平静": {"icon": Icons.cloud, "label": "多云:平静"},
+      "中性": {"icon": Icons.filter_drama, "label": "阴天:中性"},
+      "悲伤": {"icon": Icons.beach_access, "label": "小雨:悲伤"},
+      "抑郁": {"icon": Icons.flash_on, "label": "雷暴:抑郁"},
+    };
+
+    return FutureBuilder<EmotionWeather>(
+      future: EmotionApiService.getEmotionWeather(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator(color: primaryColor));
+        } else if (snapshot.hasError || !snapshot.hasData) {
+          return Center(
+            child: Text('加载失败', style: TextStyle(color: primaryColor)),
+          );
+        }
+
+        final emotionWeather = snapshot.data!;
+        final weatherInfo = weatherMap[emotionWeather.emotion_type]!;
+
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // 响应式布局关键点：
+            final isLargeScreen = constraints.maxWidth > 600; // 判断大屏幕阈值
+            final iconSize = isLargeScreen ? 200.0 : 200.0; // 动态图标尺寸
+            final titleFontSize = isLargeScreen ? 52.0 : 52.0; // 动态标题字号
+            final tempFontSize = isLargeScreen ? 80.0 : 60.0; // 动态温度字号
+            final isCenter =
+                isLargeScreen
+                    ? MainAxisAlignment
+                        .start // 是否靠左
+                    : MainAxisAlignment.center; // 是否居中
+
+            return Padding(
+              padding: const EdgeInsets.only(top: 40, bottom: 30),
+              child: Flex(
+                direction:
+                    isLargeScreen ? Axis.horizontal : Axis.vertical, // 自动切换排列方向
+                mainAxisAlignment: isCenter,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Icon(
+                      weatherInfo["icon"] as IconData,
+                      color: primaryColor,
+                      size: iconSize,
+                    ),
+                  ),
+                  SizedBox(
+                    width: isLargeScreen ? 40 : 0,
+                    height: isLargeScreen ? 0 : 20,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(right: isLargeScreen ? 25 : 0),
+                        child: Text(
+                          weatherInfo["label"] as String,
+                          style: TextStyle(
+                            fontSize: titleFontSize,
+                            fontWeight: FontWeight.w700,
+                            color: primaryColor,
+                            shadows: [/* 阴影保持 */],
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${emotionWeather.emotion_level}°C',
+                        style: TextStyle(
+                          fontSize: tempFontSize,
+                          color: primaryColor,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ),
-            child: Icon(
-              _weatherIcons[_currentWeatherIndex],
-              color: primaryColor,
-              size: 48, // 增大图标尺寸
-            ),
-          ),
-          const SizedBox(width: 20),
-          Text(
-            _weatherData[_currentWeatherIndex],
-            style: TextStyle(
-              fontSize: 32, // 增大字体尺寸
-              fontWeight: FontWeight.w600,
-              color: primaryColor,
-              shadows: [
-                Shadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 8,
-                  offset: const Offset(2, 2),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -207,12 +251,9 @@ class _WeatherScreenState extends State<WeatherScreen>
                             ),
                           ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: _buildScrollableChart(
-                            snapshot.data!,
-                            primaryColor,
-                          ),
+                        child: _buildScrollableChart(
+                          snapshot.data!,
+                          primaryColor,
                         ),
                       ),
                     ),
@@ -231,45 +272,61 @@ class _WeatherScreenState extends State<WeatherScreen>
     Color primaryColor,
   ) {
     final ScrollController scrollController = ScrollController();
-    final chartWidth = records.isEmpty ? 0 : records.length * 60;
+    final chartWidth =
+        records.isEmpty ? 0 : (records.length * 80).clamp(400, double.infinity);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.hasClients && records.isNotEmpty) {
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      }
+    });
 
     return Scrollbar(
       controller: scrollController,
-      child: Row(
+      thumbVisibility: true,
+      notificationPredicate: (notification) => notification.depth == 0,
+      child: Stack(
         children: [
-          // 左侧固定Y轴
-          Container(
-            width: 40,
-            padding: const EdgeInsets.only(bottom: 28),
-            child: _buildCustomYAxis(primaryColor),
-          ),
-          // 中间可滚动图表
-          Expanded(
-            child: SingleChildScrollView(
-              controller: scrollController,
-              scrollDirection: Axis.horizontal,
-              child: Container(
-                width: chartWidth.toDouble(),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: primaryColor.withOpacity(0.2),
-                      width: 1.5,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 可滚动内容区域
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: Container(
+                    width: chartWidth.toDouble(),
+                    padding: const EdgeInsets.only(
+                      right: 40, // 为图例预留空间
+                      left: 40,
+                      top: 8,
                     ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: primaryColor.withOpacity(0.2),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                    child: _buildEmotionChart(records, primaryColor),
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: _buildEmotionChart(records, primaryColor),
-                ),
               ),
-            ),
+              Container(
+                width: 70,
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _buildCustomYAxis(primaryColor),
+              ),
+            ],
           ),
-          // 右侧固定图例
-          Container(
-            width: 80, // 图例固定宽度
-            padding: const EdgeInsets.only(bottom: 28),
-            child: _buildChartLegend(primaryColor),
+          Positioned(
+            left: 24,
+            top: 100,
+            child: IgnorePointer(child: _buildChartLegend(primaryColor)),
           ),
         ],
       ),
@@ -277,8 +334,8 @@ class _WeatherScreenState extends State<WeatherScreen>
   }
 
   Widget _buildCustomYAxis(Color primaryColor) {
-    const minY = -1.0;
-    const maxY = 1.0;
+    const minY = -1.2;
+    const maxY = 1.2;
     const interval = 0.2;
     final numberOfLabels = ((maxY - minY) / interval).round() + 1;
 
@@ -296,15 +353,20 @@ class _WeatherScreenState extends State<WeatherScreen>
 
   Widget _buildChartLegend(Color primaryColor) {
     return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: primaryColor.withOpacity(0.8), width: 0.5),
+      ),
       padding: const EdgeInsets.all(8),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildLegendItem('愉悦度', primaryColor),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           _buildLegendItem('激活度', primaryColor.withOpacity(0.7)),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           _buildLegendItem('强度', primaryColor.withOpacity(0.4)),
         ],
       ),
@@ -352,7 +414,6 @@ class _WeatherScreenState extends State<WeatherScreen>
   Widget _buildEmotionChart(List<EmotionRecord> records, Color primaryColor) {
     return LineChart(
       LineChartData(
-        // 修改1: 完整高度的背景框
         rangeAnnotations: RangeAnnotations(
           verticalRangeAnnotations:
               records.asMap().entries.map((entry) {
@@ -365,8 +426,16 @@ class _WeatherScreenState extends State<WeatherScreen>
                 );
               }).toList(),
         ),
-
-        gridData: FlGridData(show: false),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          getDrawingHorizontalLine:
+              (value) => FlLine(
+                color: primaryColor.withOpacity(0.1),
+                strokeWidth: 0.8,
+                dashArray: [4],
+              ),
+        ),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(
@@ -377,13 +446,16 @@ class _WeatherScreenState extends State<WeatherScreen>
                 final index = value.toInt();
                 if (index >= 0 && index < records.length) {
                   final date = DateTime.fromMillisecondsSinceEpoch(
-                    records[index].timestamp,
+                    records[index].timestamp * 1000,
                   );
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 6),
+                  return Transform.translate(
+                    offset: const Offset(0, 6),
                     child: Text(
                       '${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}',
-                      style: TextStyle(color: primaryColor, fontSize: 10),
+                      style: TextStyle(
+                        color: primaryColor.withOpacity(0.8),
+                        fontSize: 10,
+                      ),
                     ),
                   );
                 }
@@ -398,8 +470,32 @@ class _WeatherScreenState extends State<WeatherScreen>
           rightTitles: const AxisTitles(
             sideTitles: SideTitles(showTitles: false),
           ),
-          topTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: _calculateLabelInterval(records.length),
+              getTitlesWidget: (value, meta) {
+                final index = value.toInt();
+                if (index >= 0 && index < records.length) {
+                  return Transform.translate(
+                    offset: const Offset(0, -6),
+                    child: Row(
+                      children: [
+                        Text(_emotionEmojis[records[index].emotion_type] ?? ''),
+                        Text(
+                          records[index].emotion_type,
+                          style: TextStyle(
+                            color: primaryColor.withOpacity(0.8),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return const Text('');
+              },
+            ),
           ),
         ),
         lineBarsData: _createChartLines(records, primaryColor),
@@ -409,11 +505,11 @@ class _WeatherScreenState extends State<WeatherScreen>
                 (items) =>
                     items.map((item) {
                       return LineTooltipItem(
-                        '${_getMetricName(item.barIndex)}: ${item.y.toStringAsFixed(3)}',
+                        '${_getMetricName(item.barIndex)}: ${item.y.toStringAsFixed(3)}\n${records[item.x.toInt()].emotion_type}',
                         const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                          height: 1.4,
                         ),
                       );
                     }).toList(),
@@ -421,11 +517,12 @@ class _WeatherScreenState extends State<WeatherScreen>
             fitInsideVertically: true,
           ),
           touchSpotThreshold: 20,
+          handleBuiltInTouches: true,
         ),
         minX: 0,
         maxX: (records.length - 1).toDouble(),
-        minY: -1.0,
-        maxY: 1.0,
+        minY: -1.2,
+        maxY: 1.2,
       ),
     );
   }
@@ -510,20 +607,6 @@ class _WeatherScreenState extends State<WeatherScreen>
       ),
     ];
   }
-  // double _calculateInterval(List<EmotionRecord> records) {
-  //   if (records.isEmpty) return 1;
-
-  //   // 将时间戳转换为DateTime对象
-  //   final firstDate = DateTime.fromMillisecondsSinceEpoch(
-  //     records.first.timestamp,
-  //   );
-  //   final lastDate = DateTime.fromMillisecondsSinceEpoch(
-  //     records.last.timestamp,
-  //   );
-
-  //   final duration = lastDate.difference(firstDate);
-  //   return duration.inDays > 7 ? 86400000 * 3 : 86400000;
-  //}
 
   Widget _buildAIChatCard(Color primaryColor) {
     return ClipRRect(
