@@ -12,7 +12,7 @@ class BallAnimationWidget extends StatefulWidget {
 class _BallAnimationWidgetState extends State<BallAnimationWidget>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
-  late List<Ball> _balls;
+  late List<Ball> _balls = []; // 初始化为空列表
 
   @override
   void initState() {
